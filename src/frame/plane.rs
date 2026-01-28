@@ -22,22 +22,24 @@ pub trait AsRegion<T: Pixel> {
 impl<T: Pixel> AsRegion<T> for Plane<T> {
   #[inline(always)]
   fn region(&self, area: Area) -> PlaneRegion<'_, T> {
+    let geo = self.geometry();
     let rect = area.to_rect(
-      self.cfg.xdec,
-      self.cfg.ydec,
-      self.cfg.stride - self.cfg.xorigin,
-      self.cfg.alloc_height - self.cfg.yorigin,
+      geo.subsampling_x.get().trailing_zeros() as usize,
+      geo.subsampling_y.get().trailing_zeros() as usize,
+      geo.stride.get() - geo.pad_left,
+      geo.alloc_height().get() - geo.pad_top,
     );
     PlaneRegion::new(self, rect)
   }
 
   #[inline(always)]
   fn region_mut(&mut self, area: Area) -> PlaneRegionMut<'_, T> {
+    let geo = self.geometry();
     let rect = area.to_rect(
-      self.cfg.xdec,
-      self.cfg.ydec,
-      self.cfg.stride - self.cfg.xorigin,
-      self.cfg.alloc_height - self.cfg.yorigin,
+      geo.subsampling_x.get().trailing_zeros() as usize,
+      geo.subsampling_y.get().trailing_zeros() as usize,
+      geo.stride.get() - geo.pad_left,
+      geo.alloc_height().get() - geo.pad_top,
     );
     PlaneRegionMut::new(self, rect)
   }

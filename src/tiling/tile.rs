@@ -1,3 +1,5 @@
+// src/tiling/tile.rs
+
 // Copyright (c) 2019-2022, The rav1e contributors. All rights reserved
 //
 // This source code is subject to the terms of the BSD 2 Clause License and
@@ -6,6 +8,8 @@
 // obtain it at www.aomedia.org/license/software. If the Alliance for Open
 // Media Patent License 1.0 was not distributed with this source code in the
 // PATENTS file, you can obtain it at www.aomedia.org/license/patent.
+
+use std::num::NonZeroUsize;
 
 use super::*;
 
@@ -111,22 +115,34 @@ macro_rules! tile_common {
         frame: &'a $($opt_mut)? Frame<T>,
         luma_rect: TileRect,
       ) -> Self {
-        let mut planes_iter = frame.planes.$iter();
+        let (ydec, xdec) = if let Some((sx, sy)) = frame.subsampling.subsample_ratio() {
+             (sy.trailing_zeros() as usize, sx.trailing_zeros() as usize)
+        } else {
+             (0, 0)
+        };
+
+        // Access the planes explicitly
+        let Frame { y_plane, u_plane, v_plane, .. } = frame;
+
         Self {
           planes: [
-            {
-              let plane = planes_iter.next().unwrap();
-              $pr_type::new(plane, luma_rect.into())
+            $pr_type::new(y_plane, luma_rect.into()),
+            if let Some(plane) = u_plane {
+                let rect = luma_rect.decimated(xdec, ydec);
+                $pr_type::new(plane, rect.into())
+            } else {
+                // If the plane is missing (Monochrome), create an empty region.
+                // We use the y_plane config as a placeholder since it lives long enough.
+                // The region will be empty/null so the config values shouldn't be accessed logic-wise.
+                // Note: v_frame 0.5.0 requires padding_api or direct access for geometry,
+                // assuming PlaneRegion handles accessing cfg correctly now.
+                $pr_type::empty(&y_plane)
             },
-            {
-              let plane = planes_iter.next().unwrap();
-              let rect = luma_rect.decimated(plane.cfg.xdec, plane.cfg.ydec);
-              $pr_type::new(plane, rect.into())
-            },
-            {
-              let plane = planes_iter.next().unwrap();
-              let rect = luma_rect.decimated(plane.cfg.xdec, plane.cfg.ydec);
-              $pr_type::new(plane, rect.into())
+            if let Some(plane) = v_plane {
+                let rect = luma_rect.decimated(xdec, ydec);
+                $pr_type::new(plane, rect.into())
+            } else {
+                $pr_type::empty(&y_plane)
             },
           ],
         }
@@ -154,16 +170,22 @@ macro_rules! tile_common {
           planes: {
             let sub_plane = |pli: usize| {
               let plane = &self.planes[pli];
-              let &PlaneConfig { xdec, ydec, .. } = plane.plane_cfg;
-              let rect = tile_rect.decimated(xdec, ydec);
-              if !plane.is_null() {
-                assert!(rect.x >= 0 && rect.x as usize <= plane.rect().width);
-                assert!(rect.y >= 0 && rect.y as usize <= plane.rect().height);
-                assert!(rect.x as usize + rect.width <=
-                        plane.rect().x as usize + plane.rect().width);
-                assert!(rect.y as usize + rect.height <=
-                        plane.rect().y as usize + plane.rect().height);
+              if plane.is_null() {
+                  return plane.subregion(area); // Should return empty if already empty
               }
+              // v_frame 0.5.0 uses subsampling_x/y (NonZeroU8) instead of xdec/ydec
+              let xdec = plane.plane_cfg.subsampling_x.get().trailing_zeros() as usize;
+              let ydec = plane.plane_cfg.subsampling_y.get().trailing_zeros() as usize;
+
+              let rect = tile_rect.decimated(xdec, ydec);
+
+              assert!(rect.x >= 0 && rect.x as usize <= plane.rect().width);
+              assert!(rect.y >= 0 && rect.y as usize <= plane.rect().height);
+              assert!(rect.x as usize + rect.width <=
+                      plane.rect().x as usize + plane.rect().width);
+              assert!(rect.y as usize + rect.height <=
+                      plane.rect().y as usize + plane.rect().height);
+
               plane.subregion(rect.to_area())
             };
             [sub_plane(0), sub_plane(1), sub_plane(2)]
@@ -188,12 +210,50 @@ macro_rules! tile_common {
       // Return a copy of this tile's contents in a new backing frame.
       #[inline(always)]
       pub(crate) fn scratch_copy(&self) -> Frame<T> {
+        use v_frame::chroma::ChromaSubsampling;
+        use std::num::NonZeroU8;
+
+        let y_plane = self.planes[0].scratch_copy();
+
+        let u_plane = if !self.planes[1].is_null() {
+            Some(self.planes[1].scratch_copy())
+        } else {
+            None
+        };
+
+        let v_plane = if !self.planes[2].is_null() {
+             Some(self.planes[2].scratch_copy())
+        } else {
+             None
+        };
+
+        // Reconstruct subsampling info
+        let subsampling = if let Some(ref u) = u_plane {
+             // Heuristic: determine subsampling from relative size
+             let y_w = y_plane.width().get();
+             let u_w = u.width().get();
+             let y_h = y_plane.height().get();
+             let u_h = u.height().get();
+
+             if u_w == y_w && u_h == y_h {
+                 ChromaSubsampling::Yuv444
+             } else if u_w == (y_w + 1)/2 && u_h == y_h {
+                 ChromaSubsampling::Yuv422
+             } else {
+                 ChromaSubsampling::Yuv420
+             }
+        } else {
+             ChromaSubsampling::Monochrome
+        };
+
         Frame {
-          planes: [
-            self.planes[0].scratch_copy(),
-            self.planes[1].scratch_copy(),
-            self.planes[2].scratch_copy(),
-          ],
+          y_plane,
+          u_plane,
+          v_plane,
+          subsampling,
+          // Use a default bit_depth, this frame is likely for scratch usage.
+          // rav1e internal frames usually track this, but scratch_copy might be lossy on metadata.
+          bit_depth: NonZeroU8::new(8).unwrap(),
         }
       }
     }

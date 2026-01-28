@@ -8,7 +8,7 @@
 // PATENTS file, you can obtain it at www.aomedia.org/license/patent.
 
 use crate::cpu_features::CpuFeatureLevel;
-use crate::frame::*;
+use crate::frame::PlaneSlice;
 use crate::mc::FilterMode::*;
 use crate::mc::*;
 use crate::tiling::*;

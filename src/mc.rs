@@ -18,7 +18,7 @@ cfg_if::cfg_if! {
 }
 
 use crate::cpu_features::CpuFeatureLevel;
-use crate::frame::*;
+use crate::frame::PlaneSlice;
 use crate::tiling::*;
 use crate::util::*;
 

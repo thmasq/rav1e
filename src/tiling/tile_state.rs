@@ -21,7 +21,9 @@ use crate::predict::{InterCompoundBuffers, PredictionMode};
 use crate::quantize::*;
 use crate::rdo::*;
 use crate::stats::EncoderStats;
+use crate::util::math::Fixed;
 use crate::util::*;
+use std::fmt;
 use std::ops::{Index, IndexMut};
 use std::sync::Arc;
 
@@ -45,7 +47,6 @@ use std::sync::Arc;
 ///
 /// Some others (like `rec`) are written tile-wise, but must be accessible
 /// frame-wise once the tile views vanish (e.g. for deblocking).
-#[derive(Debug)]
 pub struct TileStateMut<'a, T: Pixel> {
   pub sbo: PlaneSuperBlockOffset,
   pub sb_size_log2: usize,
@@ -68,6 +69,25 @@ pub struct TileStateMut<'a, T: Pixel> {
   pub coded_block_info: MiTileState,
   pub integral_buffer: IntegralImageBuffer,
   pub inter_compound_buffers: InterCompoundBuffers,
+}
+
+impl<'a, T: Pixel> fmt::Debug for TileStateMut<'a, T> {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    f.debug_struct("TileStateMut")
+      .field("sbo", &self.sbo)
+      .field("sb_size_log2", &self.sb_size_log2)
+      .field("width", &self.width)
+      .field("height", &self.height)
+      .field("mi_width", &self.mi_width)
+      .field("mi_height", &self.mi_height)
+      .field("input", &"Frame<T>")
+      .field("input_tile", &"Tile<T>")
+      .field("input_hres", &"Plane<T>")
+      .field("input_qres", &"Plane<T>")
+      .field("rec", &"TileMut<T>")
+      .field("qc", &self.qc)
+      .finish()
+  }
 }
 
 /// Contains information for a coded block that is

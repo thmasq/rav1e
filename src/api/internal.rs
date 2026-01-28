@@ -16,6 +16,7 @@ use crate::api::{
 use crate::color::ChromaSampling::Cs400;
 use crate::dist::get_satd;
 use crate::encoder::*;
+use crate::frame::PlanePad;
 use crate::frame::*;
 use crate::partition::*;
 use crate::rate::{
@@ -295,7 +296,6 @@ impl<T: Pixel> ContextInner<T> {
       },
       enc.min_key_frame_interval as usize,
       enc.max_key_frame_interval as usize,
-      av_scenechange::CpuFeatureLevel::default(),
     );
     keyframe_detector.enable_cache();
 
@@ -340,18 +340,23 @@ impl<T: Pixel> ContextInner<T> {
     params: Option<FrameParameters>,
   ) -> Result<(), EncoderStatus> {
     if let Some(ref mut frame) = frame {
-      use crate::api::color::ChromaSampling;
-      let EncoderConfig { width, height, chroma_sampling, .. } = *self.config;
-      let planes =
-        if chroma_sampling == ChromaSampling::Cs400 { 1 } else { 3 };
-      // Try to add padding
+      let EncoderConfig { width, height, .. } = *self.config;
+
       if let Some(ref mut frame) = Arc::get_mut(frame) {
-        for plane in frame.planes[..planes].iter_mut() {
+        let planes_iter = std::iter::once(&mut frame.y_plane)
+          .chain(frame.u_plane.as_mut())
+          .chain(frame.v_plane.as_mut());
+
+        for plane in planes_iter {
           plane.pad(width, height);
         }
       }
-      // Enforce that padding is added
-      for (p, plane) in frame.planes[..planes].iter().enumerate() {
+
+      let planes_iter = std::iter::once(&frame.y_plane)
+        .chain(frame.u_plane.as_ref())
+        .chain(frame.v_plane.as_ref());
+
+      for (p, plane) in planes_iter.enumerate() {
         assert!(
           plane.probe_padding(width, height),
           "Plane {p} was not padded before passing Frame to send_frame()."
@@ -865,7 +870,7 @@ impl<T: Pixel> ContextInner<T> {
         // We use the cached values from scenechange above if available,
         // otherwise we need to calculate them here.
         let frame = self.frame_q[&fi.input_frameno].as_ref().unwrap();
-        let mut temp_plane = frame.planes[0].clone();
+        let mut temp_plane: Plane<T> = frame.y_plane.clone();
 
         estimate_intra_costs(
           &mut temp_plane,
@@ -882,13 +887,13 @@ impl<T: Pixel> ContextInner<T> {
     keyframe_detector: &mut SceneChangeDetector<T>,
     next_lookahead_frame: &mut u64, keyframes: &mut BTreeSet<u64>,
   ) {
-    if keyframes_forced.contains(next_lookahead_frame)
-      || keyframe_detector.analyze_next_frame(
-        lookahead_frames,
-        *next_lookahead_frame as usize,
-        *keyframes.iter().last().unwrap() as usize,
-      )
-    {
+    let (is_keyframe, _scenecut) = keyframe_detector.analyze_next_frame(
+      lookahead_frames,
+      *next_lookahead_frame as usize,
+      *keyframes.iter().last().unwrap() as usize,
+    );
+
+    if keyframes_forced.contains(next_lookahead_frame) || is_keyframe {
       keyframes.insert(*next_lookahead_frame);
     }
 
@@ -916,8 +921,8 @@ impl<T: Pixel> ContextInner<T> {
     reference_frame_block_importances: &mut [f32],
   ) {
     let coded_data = fi.coded_frame_data.as_ref().unwrap();
-    let plane_org = &frame.planes[0];
-    let plane_ref = &reference_frame.planes[0];
+    let plane_org = &frame.y_plane;
+    let plane_ref = &reference_frame.y_plane;
     let lookahead_intra_costs_lines =
       coded_data.lookahead_intra_costs.chunks_exact(coded_data.w_in_imp_b);
     let block_importances_lines =
@@ -1344,7 +1349,7 @@ impl<T: Pixel> ContextInner<T> {
       if self.config.tune == Tune::Psychovisual {
         let frame =
           self.frame_q[&frame_data.fi.input_frameno].as_ref().unwrap();
-        coded_data.activity_mask = ActivityMask::from_plane(&frame.planes[0]);
+        coded_data.activity_mask = ActivityMask::from_plane(&frame.y_plane);
         coded_data.activity_mask.fill_scales(
           frame_data.fi.sequence.bit_depth,
           &mut coded_data.activity_scales,

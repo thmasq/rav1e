@@ -12,6 +12,7 @@ use super::*;
 use crate::context::*;
 use crate::encoder::*;
 use crate::me::WriteGuardMEStats;
+use crate::util::math::Fixed;
 use crate::util::*;
 
 use std::iter::FusedIterator;

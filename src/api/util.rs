@@ -197,7 +197,7 @@ pub enum EncoderStatus {
 ///
 /// A packet contains one shown frame together with zero or more additional
 /// frames.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Serialize, Deserialize)]
 pub struct Packet<T: Pixel> {
   /// The packet data.
   pub data: Vec<u8>,

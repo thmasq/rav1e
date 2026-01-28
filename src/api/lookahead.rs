@@ -15,9 +15,10 @@ use crate::transform::TxSize;
 use crate::util::Aligned;
 use crate::Pixel;
 use rayon::iter::*;
+use std::num::{NonZeroU8, NonZeroUsize};
 use std::sync::Arc;
-use v_frame::frame::Frame;
-use v_frame::pixel::CastFromPrimitive;
+use v_frame::chroma::ChromaSubsampling;
+use v_frame::frame::{Frame, FrameBuilder};
 use v_frame::plane::Plane;
 
 pub(crate) const IMP_BLOCK_MV_UNITS_PER_PIXEL: i64 = 8;
@@ -31,7 +32,7 @@ pub(crate) fn estimate_intra_costs<T: Pixel>(
   temp_plane: &mut Plane<T>, frame: &Frame<T>, bit_depth: usize,
   cpu_feature_level: CpuFeatureLevel,
 ) -> Box<[u32]> {
-  let plane = &frame.planes[0];
+  let plane = &frame.y_plane;
   let plane_after_prediction = temp_plane;
 
   let bsize = BlockSize::from_width_and_height(
@@ -40,8 +41,8 @@ pub(crate) fn estimate_intra_costs<T: Pixel>(
   );
   let tx_size = bsize.tx_size();
 
-  let h_in_imp_b = plane.cfg.height / IMPORTANCE_BLOCK_SIZE;
-  let w_in_imp_b = plane.cfg.width / IMPORTANCE_BLOCK_SIZE;
+  let h_in_imp_b = plane.height().get() / IMPORTANCE_BLOCK_SIZE;
+  let w_in_imp_b = plane.width().get() / IMPORTANCE_BLOCK_SIZE;
   let mut intra_costs = Vec::with_capacity(h_in_imp_b * w_in_imp_b);
 
   for y in 0..h_in_imp_b {
@@ -126,10 +127,10 @@ pub(crate) fn estimate_intra_costs<T: Pixel>(
 pub(crate) fn estimate_importance_block_difference<T: Pixel>(
   frame: Arc<Frame<T>>, ref_frame: Arc<Frame<T>>,
 ) -> f64 {
-  let plane_org = &frame.planes[0];
-  let plane_ref = &ref_frame.planes[0];
-  let h_in_imp_b = plane_org.cfg.height / IMPORTANCE_BLOCK_SIZE;
-  let w_in_imp_b = plane_org.cfg.width / IMPORTANCE_BLOCK_SIZE;
+  let plane_org = &frame.y_plane;
+  let plane_ref = &ref_frame.y_plane;
+  let h_in_imp_b = plane_org.height().get() / IMPORTANCE_BLOCK_SIZE;
+  let w_in_imp_b = plane_org.width().get() / IMPORTANCE_BLOCK_SIZE;
 
   let mut imp_block_costs = 0;
 
@@ -157,7 +158,7 @@ pub(crate) fn estimate_importance_block_difference<T: Pixel>(
           .map(|row| {
             // 16-bit precision is sufficient for an 8px row, as IMPORTANCE_BLOCK_SIZE * (2^12 - 1) < 2^16 - 1,
             // so overflow is not possible
-            row.iter().map(|pixel| u16::cast_from(*pixel)).sum::<u16>() as i64
+            row.iter().map(|pixel| pixel.to_u16().unwrap()).sum::<u16>() as i64
           })
           .sum::<i64>()
       };
@@ -209,21 +210,24 @@ pub(crate) fn estimate_inter_costs<T: Pixel>(
     Arc::clone(&frame),
     buffer,
     // We do not use this field, so we can avoid the expensive allocation
-    Arc::new(Frame {
-      planes: [
-        Plane::new(0, 0, 0, 0, 0, 0),
-        Plane::new(0, 0, 0, 0, 0, 0),
-        Plane::new(0, 0, 0, 0, 0, 0),
-      ],
-    }),
+    Arc::new(
+      FrameBuilder::new(
+        NonZeroUsize::new(16).unwrap(),
+        NonZeroUsize::new(16).unwrap(),
+        ChromaSubsampling::Yuv420,
+        NonZeroU8::new(8).unwrap(),
+      )
+      .build::<T>()
+      .unwrap(),
+    ),
   );
   compute_motion_vectors(&mut fi, &mut fs, &inter_cfg);
 
   // Estimate inter costs
-  let plane_org = &frame.planes[0];
-  let plane_ref = &ref_frame.planes[0];
-  let h_in_imp_b = plane_org.cfg.height / IMPORTANCE_BLOCK_SIZE;
-  let w_in_imp_b = plane_org.cfg.width / IMPORTANCE_BLOCK_SIZE;
+  let plane_org = &frame.y_plane;
+  let plane_ref = &ref_frame.y_plane;
+  let h_in_imp_b = plane_org.height().get() / IMPORTANCE_BLOCK_SIZE;
+  let w_in_imp_b = plane_org.width().get() / IMPORTANCE_BLOCK_SIZE;
   let stats = &fs.frame_me_stats.read().expect("poisoned lock")[0];
   let bsize = BlockSize::from_width_and_height(
     IMPORTANCE_BLOCK_SIZE,

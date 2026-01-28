@@ -15,8 +15,8 @@ use crate::predict::{
 use crate::tiling::{PlaneRegion, PlaneRegionMut};
 use crate::transform::TxSize;
 use crate::Pixel;
+use crate::PixelType;
 use std::mem::MaybeUninit;
-use v_frame::pixel::PixelType;
 
 macro_rules! decl_angular_ipred_fn {
   ($($f:ident),+) => {

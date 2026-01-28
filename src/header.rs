@@ -13,7 +13,7 @@ use crate::ec::*;
 use crate::lrf::*;
 use crate::partition::*;
 use crate::tiling::MAX_TILE_WIDTH;
-use crate::util::Fixed;
+use crate::util::math::Fixed;
 use crate::util::Pixel;
 
 use crate::DeblockState;

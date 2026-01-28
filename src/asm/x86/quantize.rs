@@ -16,7 +16,9 @@ use crate::context::av1_get_coded_tx_size;
 use crate::cpu_features::CpuFeatureLevel;
 use crate::quantize::*;
 use crate::transform::TxSize;
-use crate::util::*;
+use crate::util::Coefficient;
+use crate::Pixel;
+use crate::PixelType;
 use std::mem::MaybeUninit;
 
 type DequantizeFn = unsafe fn(

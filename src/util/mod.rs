@@ -11,10 +11,15 @@ mod align;
 mod cdf;
 mod kmeans;
 mod logexp;
+mod pixel;
 mod uninit;
 
-pub use v_frame::math::*;
-pub use v_frame::pixel::*;
+pub mod math;
+
+pub use crate::util::math::{
+  clamp, msb, round_shift, CastFromPrimitive, ILog,
+};
+pub use crate::util::pixel::{Coefficient, Pixel, PixelType};
 
 pub use align::*;
 pub use cdf::*;

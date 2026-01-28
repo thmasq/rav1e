@@ -13,6 +13,7 @@ mod tables;
 
 cfg_if::cfg_if! {
   if #[cfg(nasm_x86_64)] {
+    use crate::util::Coefficient;
     pub use crate::asm::x86::quantize::*;
   } else {
     pub use self::rust::*;
@@ -23,7 +24,6 @@ pub use tables::*;
 
 use crate::scan_order::av1_scan_orders;
 use crate::transform::{TxSize, TxType};
-use crate::util::*;
 use std::mem;
 use std::num::{NonZeroU16, NonZeroU32, NonZeroU64};
 
