@@ -17,7 +17,9 @@ use std::{fmt, io, mem};
 use arg_enum_proc_macro::ArgEnum;
 use arrayvec::*;
 use bitstream_io::{BigEndian, BitWrite, BitWriter};
+use num_traits::Zero;
 use rayon::iter::*;
+use v_frame::chroma::ChromaSubsampling;
 
 use crate::activity::*;
 use crate::api::*;
@@ -73,7 +75,7 @@ const MAX_NUM_OPERATING_POINTS: usize =
 pub const IMPORTANCE_BLOCK_SIZE: usize =
   1 << (IMPORTANCE_BLOCK_TO_BLOCK_SHIFT + BLOCK_TO_PLANE_SHIFT);
 
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub struct ReferenceFrame<T: Pixel> {
   pub order_hint: u32,
   pub width: u32,
@@ -87,6 +89,25 @@ pub struct ReferenceFrame<T: Pixel> {
   pub frame_me_stats: RefMEStats,
   pub output_frameno: u64,
   pub segmentation: SegmentationState,
+}
+
+impl<T: Pixel> fmt::Debug for ReferenceFrame<T> {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    f.debug_struct("ReferenceFrame")
+      .field("order_hint", &self.order_hint)
+      .field("width", &self.width)
+      .field("height", &self.height)
+      .field("render_width", &self.render_width)
+      .field("render_height", &self.render_height)
+      .field("frame", &"Frame<T>")
+      .field("input_hres", &"Plane<T>")
+      .field("input_qres", &"Plane<T>")
+      .field("cdfs", &self.cdfs)
+      .field("frame_me_stats", &self.frame_me_stats)
+      .field("output_frameno", &self.output_frameno)
+      .field("segmentation", &self.segmentation)
+      .finish()
+  }
 }
 
 #[derive(Debug, Clone, Default)]
@@ -406,7 +427,65 @@ impl Sequence {
   }
 }
 
-#[derive(Debug, Clone)]
+trait PlaneDownsample<T: Pixel> {
+  fn downsampled(&self, width: usize, height: usize) -> Plane<T>;
+}
+
+impl<T: Pixel> PlaneDownsample<T> for Plane<T> {
+  fn downsampled(&self, _width: usize, _height: usize) -> Plane<T> {
+    let src = self;
+    let src_cfg = PlaneConfig::new(&src.geometry());
+
+    let new_width = (src_cfg.width + 1) / 2;
+    let new_height = (src_cfg.height + 1) / 2;
+
+    let new_frame =
+      Frame::new(new_width, new_height, ChromaSubsampling::Monochrome);
+    let mut new_plane = new_frame.planes().next().unwrap().clone();
+    let dst_cfg = PlaneConfig::new(&new_plane.geometry());
+
+    let src_stride = src_cfg.stride;
+    let src_xorigin = src_cfg.xorigin;
+    let src_yorigin = src_cfg.yorigin;
+    let src_data = src.data();
+
+    let dst_stride = dst_cfg.stride;
+    let dst_xorigin = dst_cfg.xorigin;
+    let dst_yorigin = dst_cfg.yorigin;
+    let dst_data = new_plane.data_mut();
+
+    let width = src_cfg.width;
+    let height = src_cfg.height;
+
+    for y in 0..new_height {
+      let src_y = y * 2;
+      let src_y_next = if src_y + 1 < height { src_y + 1 } else { src_y };
+
+      let dst_row_idx = (dst_yorigin + y) * dst_stride + dst_xorigin;
+      let src_row0_idx = (src_yorigin + src_y) * src_stride + src_xorigin;
+      let src_row1_idx = (src_yorigin + src_y_next) * src_stride + src_xorigin;
+
+      for x in 0..new_width {
+        let src_x = x * 2;
+        let src_x_next = if src_x + 1 < width { src_x + 1 } else { src_x };
+
+        let val0 = src_data[src_row0_idx + src_x];
+        let val1 = src_data[src_row0_idx + src_x_next];
+        let val2 = src_data[src_row1_idx + src_x];
+        let val3 = src_data[src_row1_idx + src_x_next];
+
+        let avg =
+          (val0.to_i32() + val1.to_i32() + val2.to_i32() + val3.to_i32() + 2)
+            >> 2;
+
+        dst_data[dst_row_idx + x] = T::cast_from(avg);
+      }
+    }
+    new_plane
+  }
+}
+
+#[derive(Clone)]
 pub struct FrameState<T: Pixel> {
   pub sb_size_log2: usize,
   pub input: Arc<Frame<T>>,
@@ -423,6 +502,26 @@ pub struct FrameState<T: Pixel> {
   // these are stored per-tile for easier access.
   pub frame_me_stats: RefMEStats,
   pub enc_stats: EncoderStats,
+}
+
+impl<T: Pixel> fmt::Debug for FrameState<T> {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    f.debug_struct("FrameState")
+      .field("sb_size_log2", &self.sb_size_log2)
+      .field("input", &"Frame<T>")
+      .field("input_hres", &"Plane<T>")
+      .field("input_qres", &"Plane<T>")
+      .field("rec", &"Frame<T>")
+      .field("cdfs", &self.cdfs)
+      .field("context_update_tile_id", &self.context_update_tile_id)
+      .field("max_tile_size_bytes", &self.max_tile_size_bytes)
+      .field("deblock", &self.deblock)
+      .field("segmentation", &self.segmentation)
+      .field("restoration", &self.restoration)
+      .field("frame_me_stats", &self.frame_me_stats)
+      .field("enc_stats", &self.enc_stats)
+      .finish()
+  }
 }
 
 impl<T: Pixel> FrameState<T> {
@@ -447,8 +546,9 @@ impl<T: Pixel> FrameState<T> {
   ) -> Self {
     let rs = RestorationState::new(fi, &frame);
 
-    let hres = Plane::new(0, 0, 0, 0, 0, 0);
-    let qres = Plane::new(0, 0, 0, 0, 0, 0);
+    let dummy_frame = Frame::new(1, 1, fi.sequence.chroma_sampling);
+    let hres = dummy_frame.y_plane.clone();
+    let qres = hres.clone();
 
     Self {
       sb_size_log2: fi.sb_size_log2(),
@@ -471,10 +571,10 @@ impl<T: Pixel> FrameState<T> {
     fi: &FrameInvariants<T>, frame: Arc<Frame<T>>,
   ) -> Self {
     let rs = RestorationState::new(fi, &frame);
-    let luma_width = frame.planes[0].cfg.width;
-    let luma_height = frame.planes[0].cfg.height;
+    let luma_width = frame.planes().next().unwrap().geometry().width.get();
+    let luma_height = frame.planes().next().unwrap().geometry().height.get();
 
-    let hres = frame.planes[0].downsampled(fi.width, fi.height);
+    let hres = frame.planes().next().unwrap().downsampled(fi.width, fi.height);
     let qres = hres.downsampled(fi.width, fi.height);
 
     Self {
@@ -502,7 +602,8 @@ impl<T: Pixel> FrameState<T> {
   where
     F: FnOnce(&mut TileStateMut<'_, T>) -> R,
   {
-    let PlaneConfig { width, height, .. } = self.rec.planes[0].cfg;
+    let PlaneConfig { width, height, .. } =
+      PlaneConfig::new(&self.rec.planes().next().unwrap().geometry());
     let sbo_0 = PlaneSuperBlockOffset(SuperBlockOffset { x: 0, y: 0 });
     let frame_me_stats = self.frame_me_stats.clone();
     let frame_me_stats = &mut *frame_me_stats.write().expect("poisoned lock");
@@ -1376,7 +1477,7 @@ fn diff<T: Pixel>(
     dst.chunks_exact_mut(width).zip(src1.rows_iter()).zip(src2.rows_iter())
   {
     for ((r, v1), v2) in l.iter_mut().zip(s1).zip(s2) {
-      r.write(i16::cast_from(*v1) - i16::cast_from(*v2));
+      r.write(v1.to_i16().unwrap() - v2.to_i16().unwrap());
     }
   }
 }
@@ -1431,7 +1532,8 @@ pub fn encode_tx_block<T: Pixel, W: Writer>(
   rdo_type: RDOType,
   need_recon_pixel: bool,
 ) -> (bool, ScaledDistortion) {
-  let PlaneConfig { xdec, ydec, .. } = ts.input.planes[p].cfg;
+  let PlaneConfig { xdec, ydec, .. } =
+    PlaneConfig::new(&ts.input.planes().nth(p).unwrap().geometry());
   let tile_rect = ts.tile_rect().decimated(xdec, ydec);
   let area = Area::BlockRect {
     bo: tx_bo.0,
@@ -1518,7 +1620,7 @@ pub fn encode_tx_block<T: Pixel, W: Writer>(
   let coeffs = &mut coeffs.data[..tx_size.area()];
   let qcoeffs = init_slice_repeat_mut(
     &mut qcoeffs.data[..coded_tx_area],
-    T::Coeff::cast_from(0),
+    T::Coeff::zero(),
   );
   let rcoeffs = &mut rcoeffs.data[..coded_tx_area];
 
@@ -1627,14 +1729,14 @@ pub fn encode_tx_block<T: Pixel, W: Writer>(
         .iter()
         .zip(rcoeffs.iter())
         .map(|(&a, &b)| {
-          let c = i32::cast_from(a) - i32::cast_from(b);
+          let c = Into::<i32>::into(a) - Into::<i32>::into(b);
           (c * c) as u64
         })
         .sum::<u64>()
         + coeffs[rcoeffs.len()..]
           .iter()
           .map(|&a| {
-            let c = i32::cast_from(a);
+            let c = Into::<i32>::into(a);
             (c * c) as u64
           })
           .sum::<u64>();
@@ -1673,7 +1775,8 @@ pub fn motion_compensate<T: Pixel>(
 ) {
   debug_assert!(!luma_mode.is_intra());
 
-  let PlaneConfig { xdec: u_xdec, ydec: u_ydec, .. } = ts.input.planes[1].cfg;
+  let PlaneConfig { xdec: u_xdec, ydec: u_ydec, .. } =
+    PlaneConfig::new(&ts.input.planes().nth(1).unwrap().geometry());
 
   // Inter mode prediction can take place once for a whole partition,
   // instead of each tx-block.
@@ -1702,7 +1805,7 @@ pub fn motion_compensate<T: Pixel>(
 
     let rec = &mut ts.rec.planes[p];
     let po = tile_bo.plane_offset(&rec.plane_cfg);
-    let &PlaneConfig { xdec, ydec, .. } = rec.plane_cfg;
+    let PlaneConfig { xdec, ydec, .. } = rec.plane_cfg;
     let tile_rect = luma_tile_rect.decimated(xdec, ydec);
 
     let area = Area::BlockStartingAt { bo: tile_bo.0 };
@@ -1956,7 +2059,8 @@ pub fn encode_block_post_cdef<T: Pixel, W: Writer>(
   } else {
     BlockSize::BLOCK_64X64
   };
-  let PlaneConfig { xdec, ydec, .. } = ts.input.planes[1].cfg;
+  let PlaneConfig { xdec, ydec, .. } =
+    PlaneConfig::new(&ts.input.planes().nth(1).unwrap().geometry());
   if skip {
     cw.bc.reset_skip_context(
       tile_bo,
@@ -2258,7 +2362,8 @@ pub fn write_tx_blocks<T: Pixel, W: Writer>(
     assert_ne!(qidx, 0);
   }
 
-  let PlaneConfig { xdec, ydec, .. } = ts.input.planes[1].cfg;
+  let PlaneConfig { xdec, ydec, .. } =
+    PlaneConfig::new(&ts.input.planes().nth(1).unwrap().geometry());
   let mut ac = Aligned::<[MaybeUninit<i16>; 32 * 32]>::uninit_array();
   let mut partition_has_coeff: bool = false;
   let mut tx_dist = ScaledDistortion::zero();
@@ -2283,7 +2388,9 @@ pub fn write_tx_blocks<T: Pixel, W: Writer>(
       if tx_bo.0.x >= ts.mi_width || tx_bo.0.y >= ts.mi_height {
         continue;
       }
-      let po = tx_bo.plane_offset(&ts.input.planes[0].cfg);
+      let cfg =
+        PlaneConfig::new(&ts.input.planes().next().unwrap().geometry());
+      let po = tx_bo.plane_offset(&cfg);
       let (has_coeff, dist) = encode_tx_block(
         fi,
         ts,
@@ -2369,7 +2476,9 @@ pub fn write_tx_blocks<T: Pixel, W: Writer>(
             - ((bh * tx_size.height_mi() == 1) as usize) * ydec,
         });
 
-        let mut po = tile_bo.plane_offset(&ts.input.planes[p].cfg);
+        let cfg =
+          PlaneConfig::new(&ts.input.planes().nth(p).unwrap().geometry());
+        let mut po = tile_bo.plane_offset(&cfg);
         po.x += (bx * uv_tx_size.width()) as isize;
         po.y += (by * uv_tx_size.height()) as isize;
         let (has_coeff, dist) = encode_tx_block(
@@ -2421,7 +2530,8 @@ pub fn write_tx_tree<T: Pixel, W: Writer>(
   let bh = bsize.height_mi() / tx_size.height_mi();
   let qidx = get_qidx(fi, ts, cw, tile_bo);
 
-  let PlaneConfig { xdec, ydec, .. } = ts.input.planes[1].cfg;
+  let PlaneConfig { xdec, ydec, .. } =
+    PlaneConfig::new(&ts.input.planes().nth(1).unwrap().geometry());
   let ac = &[0i16; 0];
   let mut partition_has_coeff: bool = false;
   let mut tx_dist = ScaledDistortion::zero();
@@ -2448,7 +2558,9 @@ pub fn write_tx_tree<T: Pixel, W: Writer>(
         continue;
       }
 
-      let po = tx_bo.plane_offset(&ts.input.planes[0].cfg);
+      let cfg =
+        PlaneConfig::new(&ts.input.planes().next().unwrap().geometry());
+      let po = tx_bo.plane_offset(&cfg);
       let (has_coeff, dist) = encode_tx_block(
         fi,
         ts,
@@ -2530,7 +2642,9 @@ pub fn write_tx_tree<T: Pixel, W: Writer>(
             - (max_tx_size.height_mi() == 1) as usize * ydec,
         });
 
-        let mut po = tile_bo.plane_offset(&ts.input.planes[p].cfg);
+        let cfg =
+          PlaneConfig::new(&ts.input.planes().nth(p).unwrap().geometry());
+        let mut po = tile_bo.plane_offset(&cfg);
         po.x += (bx * uv_tx_size.width()) as isize;
         po.y += (by * uv_tx_size.height()) as isize;
         let (has_coeff, dist) = encode_tx_block(
@@ -3640,7 +3754,9 @@ fn encode_tile<'a, T: Pixel>(
       for pli in 0..planes {
         let dst = &mut ts.rec.planes[pli];
         let src = &rec_copy[pli];
-        for (dst_row, src_row) in dst.rows_iter_mut().zip(src.rows_iter()) {
+        for (dst_row, src_row) in
+          dst.rows_iter_mut().zip(src.as_region().rows_iter())
+        {
           for (out, input) in dst_row.iter_mut().zip(src_row) {
             *out = *input;
           }
@@ -3741,7 +3857,12 @@ pub fn encode_show_existing_frame<T: Pixel>(
     let planes =
       if fi.sequence.chroma_sampling == ChromaSampling::Cs400 { 1 } else { 3 };
     for p in 0..planes {
-      fs_rec.planes[p].data.copy_from_slice(&rec.frame.planes[p].data);
+      fs_rec
+        .planes_mut()
+        .nth(p)
+        .unwrap()
+        .data()
+        .copy_from_slice(&rec.frame.planes().nth(p).unwrap().data());
     }
   }
   packet
