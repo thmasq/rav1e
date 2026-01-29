@@ -723,7 +723,11 @@ impl RCState {
   pub(crate) fn select_qi<T: Pixel>(
     &self, ctx: &ContextInner<T>, output_frameno: u64, fti: usize,
     maybe_prev_log_base_q: Option<i64>, log_isqrt_mean_scale: i64,
-  ) -> QuantizerParameters {
+  ) -> QuantizerParameters
+  where
+    u32: crate::util::math::CastFromPrimitive<T::Coeff>,
+    i32: crate::util::math::CastFromPrimitive<T::Coeff>,
+  {
     // Is rate control active?
     if self.target_bitrate <= 0 {
       // Rate control is not active.
@@ -1259,7 +1263,11 @@ impl RCState {
 
   pub(crate) fn select_pass1_log_base_q<T: Pixel>(
     &self, ctx: &ContextInner<T>, output_frameno: u64,
-  ) -> i64 {
+  ) -> i64
+  where
+    u32: crate::util::math::CastFromPrimitive<T::Coeff>,
+    i32: crate::util::math::CastFromPrimitive<T::Coeff>,
+  {
     assert_eq!(self.twopass_state, PASS_SINGLE);
     self.select_qi(ctx, output_frameno, FRAME_SUBTYPE_I, None, 0).log_base_q
   }

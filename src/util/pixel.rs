@@ -33,7 +33,14 @@ pub trait Pixel:
 
 /// Trait for transform coefficients (i16, i32)
 pub trait Coefficient:
-  RegisteredPrimitive + Into<i32> + AddAssign + Signed + Debug + 'static
+  RegisteredPrimitive
+  + Into<i32>
+  + AddAssign
+  + Signed
+  + Debug
+  + 'static
+  + CastFromPrimitive<i32>
+  + CastFromPrimitive<usize>
 {
   type Pixel: Pixel<Coeff = Self>;
 }

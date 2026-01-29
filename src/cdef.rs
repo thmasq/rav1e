@@ -44,7 +44,13 @@ pub struct CdefDirections {
 }
 
 pub(crate) mod rust {
-  use super::*;
+  use crate::util;
+
+  use super::{
+    clamp, cmp, msb, CastFromPrimitive, CpuFeatureLevel, Pixel,
+    PlaneRegionMut, PlaneSlice, CDEF_HAVE_ALL, CDEF_HAVE_BOTTOM,
+    CDEF_HAVE_LEFT, CDEF_HAVE_RIGHT, CDEF_HAVE_TOP, CDEF_VERY_LARGE,
+  };
 
   use simd_helpers::cold_for_target_arch;
 
@@ -200,7 +206,9 @@ pub(crate) mod rust {
     pri_strength: i32, sec_strength: i32, dir: usize, damping: i32,
     bit_depth: usize, xdec: usize, ydec: usize, edges: u8,
     _cpu: CpuFeatureLevel,
-  ) {
+  ) where
+    i32: util::math::CastFromPrimitive<U>,
+  {
     if edges != CDEF_HAVE_ALL {
       // slowpath for unpadded border[s]
       let tmpstride = 2 + (8 >> xdec) + 2;

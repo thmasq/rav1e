@@ -21,7 +21,6 @@ use num_traits::Zero;
 use rayon::iter::*;
 use v_frame::chroma::ChromaSubsampling;
 
-use crate::activity::*;
 use crate::api::*;
 use crate::cdef::*;
 use crate::context::*;
@@ -50,6 +49,7 @@ use crate::tiling::*;
 use crate::transform::*;
 use crate::util::*;
 use crate::wasm_bindgen::*;
+use crate::{activity::*, util};
 
 #[allow(dead_code)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -1531,7 +1531,12 @@ pub fn encode_tx_block<T: Pixel, W: Writer>(
   pred_intra_param: IntraParam,
   rdo_type: RDOType,
   need_recon_pixel: bool,
-) -> (bool, ScaledDistortion) {
+) -> (bool, ScaledDistortion)
+where
+  u32: util::math::CastFromPrimitive<<T as util::pixel::Pixel>::Coeff>,
+  i32: util::math::CastFromPrimitive<<T as util::pixel::Pixel>::Coeff>,
+  <T as util::pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>,
+{
   let PlaneConfig { xdec, ydec, .. } =
     PlaneConfig::new(&ts.input.planes().nth(p).unwrap().geometry());
   let tile_rect = ts.tile_rect().decimated(xdec, ydec);
@@ -2047,7 +2052,12 @@ pub fn encode_block_post_cdef<T: Pixel, W: Writer>(
   tx_type: TxType, mode_context: usize, mv_stack: &[CandidateMV],
   rdo_type: RDOType, need_recon_pixel: bool,
   enc_stats: Option<&mut EncoderStats>,
-) -> (bool, ScaledDistortion) {
+) -> (bool, ScaledDistortion)
+where
+  u32: util::math::CastFromPrimitive<<T as util::pixel::Pixel>::Coeff>,
+  i32: util::math::CastFromPrimitive<<T as util::pixel::Pixel>::Coeff>,
+  <T as util::pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>,
+{
   let planes =
     if fi.sequence.chroma_sampling == ChromaSampling::Cs400 { 1 } else { 3 };
   let is_inter = !luma_mode.is_intra();
@@ -2352,7 +2362,12 @@ pub fn write_tx_blocks<T: Pixel, W: Writer>(
   tile_bo: TileBlockOffset, bsize: BlockSize, tx_size: TxSize,
   tx_type: TxType, skip: bool, cfl: CFLParams, luma_only: bool,
   rdo_type: RDOType, need_recon_pixel: bool,
-) -> (bool, ScaledDistortion) {
+) -> (bool, ScaledDistortion)
+where
+  u32: util::math::CastFromPrimitive<<T as util::pixel::Pixel>::Coeff>,
+  i32: util::math::CastFromPrimitive<<T as util::pixel::Pixel>::Coeff>,
+  <T as util::pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>,
+{
   let bw = bsize.width_mi() / tx_size.width_mi();
   let bh = bsize.height_mi() / tx_size.height_mi();
   let qidx = get_qidx(fi, ts, cw, tile_bo);
@@ -2522,7 +2537,12 @@ pub fn write_tx_tree<T: Pixel, W: Writer>(
   angle_delta_y: i8, tile_bo: TileBlockOffset, bsize: BlockSize,
   tx_size: TxSize, tx_type: TxType, skip: bool, luma_only: bool,
   rdo_type: RDOType, need_recon_pixel: bool,
-) -> (bool, ScaledDistortion) {
+) -> (bool, ScaledDistortion)
+where
+  u32: util::math::CastFromPrimitive<<T as util::pixel::Pixel>::Coeff>,
+  i32: util::math::CastFromPrimitive<<T as util::pixel::Pixel>::Coeff>,
+  <T as util::pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>,
+{
   if skip {
     return (false, ScaledDistortion::zero());
   }
@@ -2685,7 +2705,11 @@ pub fn encode_block_with_modes<T: Pixel, W: Writer>(
   bsize: BlockSize, tile_bo: TileBlockOffset,
   mode_decision: &PartitionParameters, rdo_type: RDOType,
   enc_stats: Option<&mut EncoderStats>,
-) {
+) where
+  u32: util::math::CastFromPrimitive<<T as util::pixel::Pixel>::Coeff>,
+  i32: util::math::CastFromPrimitive<<T as util::pixel::Pixel>::Coeff>,
+  <T as util::pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>,
+{
   let (mode_luma, mode_chroma) =
     (mode_decision.pred_mode_luma, mode_decision.pred_mode_chroma);
   let cfl = mode_decision.pred_cfl_params;
@@ -2751,7 +2775,12 @@ fn encode_partition_bottomup<T: Pixel, W: Writer>(
   cw: &mut ContextWriter, w_pre_cdef: &mut W, w_post_cdef: &mut W,
   bsize: BlockSize, tile_bo: TileBlockOffset, ref_rd_cost: f64,
   inter_cfg: &InterConfig, enc_stats: &mut EncoderStats,
-) -> PartitionGroupParameters {
+) -> PartitionGroupParameters
+where
+  u32: util::math::CastFromPrimitive<<T as util::pixel::Pixel>::Coeff>,
+  i32: util::math::CastFromPrimitive<<T as util::pixel::Pixel>::Coeff>,
+  <T as util::pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>,
+{
   let rdo_type = RDOType::PixelDistRealRate;
   let mut rd_cost = f64::MAX;
   let mut best_rd = f64::MAX;
@@ -3035,7 +3064,11 @@ fn encode_partition_topdown<T: Pixel, W: Writer>(
   bsize: BlockSize, tile_bo: TileBlockOffset,
   block_output: &Option<PartitionGroupParameters>, inter_cfg: &InterConfig,
   enc_stats: &mut EncoderStats,
-) {
+) where
+  u32: util::math::CastFromPrimitive<<T as util::pixel::Pixel>::Coeff>,
+  i32: util::math::CastFromPrimitive<<T as util::pixel::Pixel>::Coeff>,
+  <T as util::pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>,
+{
   if tile_bo.0.x >= ts.mi_width || tile_bo.0.y >= ts.mi_height {
     return;
   }
@@ -3351,7 +3384,12 @@ fn get_initial_cdfcontext<T: Pixel>(fi: &FrameInvariants<T>) -> CDFContext {
 #[profiling::function]
 fn encode_tile_group<T: Pixel>(
   fi: &FrameInvariants<T>, fs: &mut FrameState<T>, inter_cfg: &InterConfig,
-) -> Vec<u8> {
+) -> Vec<u8>
+where
+  u32: util::math::CastFromPrimitive<<T as util::pixel::Pixel>::Coeff>,
+  i32: util::math::CastFromPrimitive<<T as util::pixel::Pixel>::Coeff>,
+  <T as util::pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>,
+{
   let planes =
     if fi.sequence.chroma_sampling == ChromaSampling::Cs400 { 1 } else { 3 };
   let mut blocks = FrameBlocks::new(fi.w_in_b, fi.h_in_b);
@@ -3584,7 +3622,12 @@ fn encode_tile<'a, T: Pixel>(
   fi: &FrameInvariants<T>, ts: &'a mut TileStateMut<'_, T>,
   fc: &'a mut CDFContext, blocks: &'a mut TileBlocksMut<'a>,
   inter_cfg: &InterConfig,
-) -> (Vec<u8>, EncoderStats) {
+) -> (Vec<u8>, EncoderStats)
+where
+  u32: util::math::CastFromPrimitive<<T as util::pixel::Pixel>::Coeff>,
+  i32: util::math::CastFromPrimitive<<T as util::pixel::Pixel>::Coeff>,
+  <T as util::pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>,
+{
   let mut enc_stats = EncoderStats::default();
   let mut w = WriterEncoder::new();
   let planes =
@@ -3889,7 +3932,12 @@ fn get_initial_segmentation<T: Pixel>(
 #[profiling::function]
 pub fn encode_frame<T: Pixel>(
   fi: &FrameInvariants<T>, fs: &mut FrameState<T>, inter_cfg: &InterConfig,
-) -> Vec<u8> {
+) -> Vec<u8>
+where
+  u32: util::math::CastFromPrimitive<<T as util::pixel::Pixel>::Coeff>,
+  i32: util::math::CastFromPrimitive<<T as util::pixel::Pixel>::Coeff>,
+  <T as util::pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>,
+{
   debug_assert!(!fi.is_show_existing_frame());
   let obu_extension = 0;
 

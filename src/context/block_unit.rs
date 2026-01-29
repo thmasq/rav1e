@@ -12,6 +12,7 @@ use std::mem::MaybeUninit;
 use super::*;
 
 use crate::predict::PredictionMode;
+use crate::util::{self, CastFromPrimitive};
 
 pub const MAX_PLANES: usize = 3;
 
@@ -1780,13 +1781,20 @@ impl ContextWriter<'_> {
     symbol_with_update!(self, w, is_inter as u32, cdf);
   }
 
-  pub fn write_coeffs_lv_map<T: Coefficient, W: Writer>(
+  pub fn write_coeffs_lv_map<
+    T: Coefficient + num_traits::AsPrimitive<u8>,
+    W: Writer,
+  >(
     &mut self, w: &mut W, plane: usize, bo: TileBlockOffset, coeffs_in: &[T],
     eob: u16, pred_mode: PredictionMode, tx_size: TxSize, tx_type: TxType,
     plane_bsize: BlockSize, xdec: usize, ydec: usize,
     use_reduced_tx_set: bool, frame_clipped_txw: usize,
     frame_clipped_txh: usize,
-  ) -> bool {
+  ) -> bool
+  where
+    u32: util::math::CastFromPrimitive<T>,
+    i32: util::math::CastFromPrimitive<T>,
+  {
     debug_assert!(frame_clipped_txw != 0);
     debug_assert!(frame_clipped_txh != 0);
 
@@ -1917,7 +1925,9 @@ impl ContextWriter<'_> {
     &mut self, coeffs: &[T], levels: &mut [u8], scan: &[u16], eob: u16,
     tx_size: TxSize, tx_class: TxClass, txs_ctx: usize, plane_type: usize,
     w: &mut W,
-  ) {
+  ) where
+    u32: util::math::CastFromPrimitive<T>,
+  {
     let mut coeff_contexts =
       Aligned::<[MaybeUninit<i8>; MAX_CODED_TX_SQUARE]>::uninit_array();
 
@@ -1983,7 +1993,11 @@ impl ContextWriter<'_> {
   fn encode_coeff_signs<T: Coefficient, W: Writer>(
     &mut self, coeffs: &[T], w: &mut W, plane_type: usize, txb_ctx: TXB_CTX,
     orig_cul_level: u32,
-  ) -> u32 {
+  ) -> u32
+  where
+    u32: util::math::CastFromPrimitive<T>,
+    i32: util::math::CastFromPrimitive<T>,
+  {
     // Loop to code all signs in the transform block,
     // starting with the sign of DC (if applicable)
     for (c, &v) in coeffs.iter().enumerate() {

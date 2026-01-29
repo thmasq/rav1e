@@ -20,6 +20,7 @@ use crate::api::internal::*;
 use crate::api::util::*;
 use crate::encoder::*;
 use crate::frame::*;
+use crate::util;
 use crate::util::Pixel;
 
 /// The encoder context.
@@ -32,7 +33,11 @@ pub struct Context<T: Pixel> {
   pub(crate) is_flushing: bool,
 }
 
-impl<T: Pixel> Context<T> {
+impl<T: Pixel> Context<T>
+where
+  u32: crate::util::math::CastFromPrimitive<T::Coeff>,
+  i32: crate::util::math::CastFromPrimitive<T::Coeff>,
+{
   /// Allocates and returns a new frame.
   ///
   /// # Examples
@@ -299,7 +304,10 @@ impl<T: Pixel> Context<T> {
   /// # }
   /// ```
   #[inline]
-  pub fn receive_packet(&mut self) -> Result<Packet<T>, EncoderStatus> {
+  pub fn receive_packet(&mut self) -> Result<Packet<T>, EncoderStatus>
+  where
+    <T as util::pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>,
+  {
     let inner = &mut self.inner;
     let mut run = move || inner.receive_packet();
 
@@ -388,7 +396,11 @@ pub enum RcData {
   Frame(Box<[u8]>),
 }
 
-impl<T: Pixel> Context<T> {
+impl<T: Pixel> Context<T>
+where
+  u32: crate::util::math::CastFromPrimitive<T::Coeff>,
+  i32: crate::util::math::CastFromPrimitive<T::Coeff>,
+{
   /// Return the Rate Control Summary Packet size
   ///
   /// It is useful mainly to preserve space when saving

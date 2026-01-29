@@ -11,10 +11,10 @@ mod align;
 mod cdf;
 mod kmeans;
 mod logexp;
-mod pixel;
 mod uninit;
 
 pub mod math;
+pub mod pixel;
 
 pub use crate::util::math::{
   clamp, msb, round_shift, CastFromPrimitive, ILog,

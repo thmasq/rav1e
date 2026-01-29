@@ -9,7 +9,10 @@
 #![deny(missing_docs)]
 
 use crate::activity::ActivityMask;
-use crate::api::lookahead::*;
+use crate::api::lookahead::{
+  compute_motion_vectors, estimate_intra_costs, IMP_BLOCK_AREA_IN_MV_UNITS,
+  IMP_BLOCK_MV_UNITS_PER_PIXEL, IMP_BLOCK_SIZE_IN_MV_UNITS,
+};
 use crate::api::{
   EncoderConfig, EncoderStatus, FrameType, Opaque, Packet, T35,
 };
@@ -25,6 +28,7 @@ use crate::rate::{
 };
 use crate::stats::EncoderStats;
 use crate::tiling::Area;
+use crate::util;
 use crate::util::Pixel;
 use arrayvec::ArrayVec;
 use av_scenechange::SceneChangeDetector;
@@ -261,7 +265,11 @@ pub(crate) struct ContextInner<T: Pixel> {
   t35_q: BTreeMap<u64, Box<[T35]>>,
 }
 
-impl<T: Pixel> ContextInner<T> {
+impl<T: Pixel> ContextInner<T>
+where
+  u32: util::math::CastFromPrimitive<<T as util::pixel::Pixel>::Coeff>,
+  i32: util::math::CastFromPrimitive<<T as util::pixel::Pixel>::Coeff>,
+{
   pub fn new(enc: &EncoderConfig) -> Self {
     // initialize with temporal delimiter
     let packet_data = TEMPORAL_DELIMITER.to_vec();
@@ -1265,7 +1273,10 @@ impl<T: Pixel> ContextInner<T> {
 
   pub(crate) fn encode_packet(
     &mut self, cur_output_frameno: u64,
-  ) -> Result<Packet<T>, EncoderStatus> {
+  ) -> Result<Packet<T>, EncoderStatus>
+  where
+    <T as util::pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>,
+  {
     if self
       .frame_data
       .get(&cur_output_frameno)
@@ -1339,7 +1350,10 @@ impl<T: Pixel> ContextInner<T> {
   #[profiling::function]
   pub fn encode_normal_packet(
     &mut self, cur_output_frameno: u64,
-  ) -> Result<Packet<T>, EncoderStatus> {
+  ) -> Result<Packet<T>, EncoderStatus>
+  where
+    <T as util::pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>,
+  {
     let mut frame_data =
       self.frame_data.remove(&cur_output_frameno).unwrap().unwrap();
 
@@ -1500,7 +1514,10 @@ impl<T: Pixel> ContextInner<T> {
   }
 
   #[profiling::function]
-  pub fn receive_packet(&mut self) -> Result<Packet<T>, EncoderStatus> {
+  pub fn receive_packet(&mut self) -> Result<Packet<T>, EncoderStatus>
+  where
+    <T as util::pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>,
+  {
     if self.done_processing() {
       return Err(EncoderStatus::LimitReached);
     }

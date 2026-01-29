@@ -777,7 +777,7 @@ impl ContextWriter<'_> {
     (tx_size.sqr() as usize + tx_size.sqr_up() as usize + 1) >> 1
   }
 
-  pub fn txb_init_levels<T: Coefficient>(
+  pub fn txb_init_levels<T: Coefficient + num_traits::AsPrimitive<u8>>(
     &self, coeffs: &[T], height: usize, levels: &mut [u8],
     levels_stride: usize,
   ) {

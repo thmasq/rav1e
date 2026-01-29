@@ -13,7 +13,7 @@ use rayon::{ThreadPool, ThreadPoolBuilder};
 use std::sync::Arc;
 
 use crate::api::{ChromaSampling, Context, ContextInner, PixelRange};
-use crate::util::Pixel;
+use crate::util::{self, Pixel};
 
 mod encoder;
 pub use encoder::*;
@@ -214,7 +214,11 @@ fn check_tile_log2(n: usize) -> bool {
 impl Config {
   pub(crate) fn new_inner<T: Pixel>(
     &self,
-  ) -> Result<ContextInner<T>, InvalidConfig> {
+  ) -> Result<ContextInner<T>, InvalidConfig>
+  where
+    u32: util::math::CastFromPrimitive<<T as util::pixel::Pixel>::Coeff>,
+    i32: util::math::CastFromPrimitive<<T as util::pixel::Pixel>::Coeff>,
+  {
     assert!(
       8 * std::mem::size_of::<T>() >= self.enc.bit_depth,
       "The Pixel u{} does not match the Config bit_depth {}",
@@ -289,7 +293,11 @@ impl Config {
   /// ```
   ///
   /// [`Context`]: struct.Context.html
-  pub fn new_context<T: Pixel>(&self) -> Result<Context<T>, InvalidConfig> {
+  pub fn new_context<T: Pixel>(&self) -> Result<Context<T>, InvalidConfig>
+  where
+    u32: util::math::CastFromPrimitive<<T as util::pixel::Pixel>::Coeff>,
+    i32: util::math::CastFromPrimitive<<T as util::pixel::Pixel>::Coeff>,
+  {
     let inner = self.new_inner()?;
     let config = (*inner.config).clone();
     let pool = self.new_thread_pool();
