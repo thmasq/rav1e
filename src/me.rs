@@ -558,7 +558,7 @@ pub fn estimate_motion<T: Pixel>(
       (mvx_min >> ssdec, mvx_max >> ssdec, mvy_min >> ssdec, mvy_max >> ssdec);
     let po = PlaneOffset { x: po.x >> ssdec, y: po.y >> ssdec };
     let p_ref = match ssdec {
-      0 => &rec.frame.planes[0],
+      0 => &rec.frame.y_plane,
       1 => &rec.input_hres,
       2 => &rec.input_qres,
       _ => unimplemented!(),
@@ -649,7 +649,7 @@ fn refine_subsampled_motion_estimate<T: Pixel>(
       (mvx_min >> ssdec, mvx_max >> ssdec, mvy_min >> ssdec, mvy_max >> ssdec);
     let po = PlaneOffset { x: po.x >> ssdec, y: po.y >> ssdec };
     let p_ref = match ssdec {
-      0 => &rec.frame.planes[0],
+      0 => &rec.frame.y_plane,
       1 => &rec.input_hres,
       2 => &rec.input_qres,
       _ => unimplemented!(),
@@ -1322,13 +1322,23 @@ fn subpel_diamond_search<T: Pixel>(
   let mc_h = (h + 1) & !1;
 
   // Metadata for subpel scratch pad.
-  let cfg = PlaneConfig::new(mc_w, mc_h, 0, 0, 0, 0, std::mem::size_of::<T>());
+  let cfg = PlaneConfig {
+    stride: mc_w,
+    alloc_height: mc_h,
+    width: mc_w,
+    height: mc_h,
+    xdec: 0,
+    ydec: 0,
+    xorigin: 0,
+    yorigin: 0,
+  };
+
   // Stack allocation for subpel scratch pad.
   // SAFETY: We write to the array below before reading from it.
   let mut buf: Aligned<[T; 128 * 128]> = unsafe { Aligned::uninitialized() };
   let mut tmp_region = PlaneRegionMut::from_slice(
     &mut buf.data,
-    &cfg,
+    cfg,
     Rect { x: 0, y: 0, width: cfg.width, height: cfg.height },
   );
 

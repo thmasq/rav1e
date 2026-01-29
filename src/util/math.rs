@@ -48,6 +48,12 @@ impl ILog for usize {
   }
 }
 
+impl ILog for i16 {
+  fn ilog(self) -> Self {
+    (i16::BITS - self.leading_zeros()) as Self
+  }
+}
+
 pub trait CastFromPrimitive<T> {
   fn cast_from(v: T) -> Self;
 }
@@ -56,6 +62,20 @@ impl CastFromPrimitive<u8> for i16 {
   #[inline(always)]
   fn cast_from(v: u8) -> Self {
     v as i16
+  }
+}
+
+impl CastFromPrimitive<i32> for u16 {
+  #[inline(always)]
+  fn cast_from(v: i32) -> Self {
+    v as u16
+  }
+}
+
+impl CastFromPrimitive<i32> for u8 {
+  #[inline(always)]
+  fn cast_from(v: i32) -> Self {
+    v as u8
   }
 }
 

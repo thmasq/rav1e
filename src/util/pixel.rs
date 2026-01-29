@@ -1,3 +1,4 @@
+use crate::util::CastFromPrimitive;
 use num_traits::{AsPrimitive, PrimInt, Signed};
 use std::fmt::Debug;
 use std::ops::AddAssign;
@@ -16,7 +17,11 @@ impl<T: PrimInt + Send + Sync + 'static> RegisteredPrimitive for T {}
 
 /// Extension trait for pixels (u8, u16)
 pub trait Pixel:
-  VFramePixel + AsPrimitive<i16> + AsPrimitive<i32> + Debug
+  VFramePixel
+  + AsPrimitive<i16>
+  + AsPrimitive<i32>
+  + Debug
+  + CastFromPrimitive<i32>
 {
   type Coeff: Coefficient<Pixel = Self>;
 

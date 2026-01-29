@@ -10,6 +10,7 @@
 use crate::frame::*;
 use crate::rdo::DistortionScale;
 use crate::tiling::*;
+use crate::util::math::Fixed;
 use crate::util::*;
 use itertools::izip;
 

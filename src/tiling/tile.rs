@@ -1,5 +1,3 @@
-// src/tiling/tile.rs
-
 // Copyright (c) 2019-2022, The rav1e contributors. All rights reserved
 //
 // This source code is subject to the terms of the BSD 2 Clause License and
@@ -124,6 +122,9 @@ macro_rules! tile_common {
         // Access the planes explicitly
         let Frame { y_plane, u_plane, v_plane, .. } = frame;
 
+        // Create a config from the Y plane to use for empty regions (monochrome handling)
+        let empty_cfg = PlaneConfig::new(&y_plane.geometry());
+
         Self {
           planes: [
             $pr_type::new(y_plane, luma_rect.into()),
@@ -131,18 +132,13 @@ macro_rules! tile_common {
                 let rect = luma_rect.decimated(xdec, ydec);
                 $pr_type::new(plane, rect.into())
             } else {
-                // If the plane is missing (Monochrome), create an empty region.
-                // We use the y_plane config as a placeholder since it lives long enough.
-                // The region will be empty/null so the config values shouldn't be accessed logic-wise.
-                // Note: v_frame 0.5.0 requires padding_api or direct access for geometry,
-                // assuming PlaneRegion handles accessing cfg correctly now.
-                $pr_type::empty(&y_plane)
+                $pr_type::empty(empty_cfg)
             },
             if let Some(plane) = v_plane {
                 let rect = luma_rect.decimated(xdec, ydec);
                 $pr_type::new(plane, rect.into())
             } else {
-                $pr_type::empty(&y_plane)
+                $pr_type::empty(empty_cfg)
             },
           ],
         }
@@ -173,9 +169,9 @@ macro_rules! tile_common {
               if plane.is_null() {
                   return plane.subregion(area); // Should return empty if already empty
               }
-              // v_frame 0.5.0 uses subsampling_x/y (NonZeroU8) instead of xdec/ydec
-              let xdec = plane.plane_cfg.subsampling_x.get().trailing_zeros() as usize;
-              let ydec = plane.plane_cfg.subsampling_y.get().trailing_zeros() as usize;
+
+              let xdec = plane.plane_cfg.xdec;
+              let ydec = plane.plane_cfg.ydec;
 
               let rect = tile_rect.decimated(xdec, ydec);
 

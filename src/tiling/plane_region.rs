@@ -9,9 +9,13 @@
 
 #![allow(clippy::iter_nth_zero)]
 
-use crate::context::*;
-use crate::frame::*;
-use crate::util::*;
+use crate::context::{
+  BlockOffset, PlaneBlockOffset, PlaneSuperBlockOffset, SuperBlockOffset,
+  TileBlockOffset, TileSuperBlockOffset, BLOCK_TO_PLANE_SHIFT, MI_SIZE,
+  MI_SIZE_LOG2,
+};
+use crate::frame::{AsRegion, Plane, PlaneConfig, PlaneOffset};
+use crate::util::Pixel;
 
 use std::iter::FusedIterator;
 use std::marker::PhantomData;
@@ -115,7 +119,7 @@ impl Area {
 #[derive(Debug)]
 pub struct PlaneRegion<'a, T: Pixel> {
   data: *const T, // points to (plane_cfg.x, plane_cfg.y)
-  pub plane_cfg: &'a PlaneConfig,
+  pub plane_cfg: PlaneConfig,
   // private to guarantee borrowing rules
   rect: Rect,
   phantom: PhantomData<&'a T>,
@@ -128,7 +132,7 @@ pub struct PlaneRegion<'a, T: Pixel> {
 #[derive(Debug)]
 pub struct PlaneRegionMut<'a, T: Pixel> {
   data: *mut T, // points to (plane_cfg.x, plane_cfg.y)
-  pub plane_cfg: &'a PlaneConfig,
+  pub plane_cfg: PlaneConfig,
   rect: Rect,
   phantom: PhantomData<&'a mut T>,
 }
@@ -137,8 +141,9 @@ pub struct PlaneRegionMut<'a, T: Pixel> {
 macro_rules! plane_region_common {
   // $name: PlaneRegion or PlaneRegionMut
   // $as_ptr: as_ptr or as_mut_ptr
+  // $data_fn: data or data_mut
   // $opt_mut: nothing or mut
-  ($name:ident, $as_ptr:ident $(,$opt_mut:tt)?) => {
+  ($name:ident, $as_ptr:ident, $data_fn:ident $(,$opt_mut:tt)?) => {
     impl<'a, T: Pixel> $name<'a, T> {
       #[inline(always)]
       pub fn is_null(&self) -> bool {
@@ -146,7 +151,7 @@ macro_rules! plane_region_common {
       }
 
       #[cold]
-      pub fn empty(plane_cfg : &'a PlaneConfig) -> Self {
+      pub fn empty(plane_cfg : PlaneConfig) -> Self {
         return Self {
           // SAFETY: This is actually pretty unsafe.
           // This means we need to ensure that no other method on this struct
@@ -162,9 +167,9 @@ macro_rules! plane_region_common {
       ///
       /// - If the configured dimensions are invalid
       #[inline(always)]
-      pub fn from_slice(data: &'a $($opt_mut)? [T], cfg: &'a PlaneConfig, rect: Rect) -> Self {
+      pub fn from_slice(data: &'a $($opt_mut)? [T], cfg: PlaneConfig, rect: Rect) -> Self {
         if cfg.width == 0 || cfg.height == 0 {
-          return Self::empty(&cfg);
+          return Self::empty(cfg);
         }
         assert!(rect.x >= -(cfg.xorigin as isize));
         assert!(rect.y >= -(cfg.yorigin as isize));
@@ -176,7 +181,7 @@ macro_rules! plane_region_common {
       }
 
       #[inline(always)]
-      pub unsafe fn from_slice_unsafe(data: &'a $($opt_mut)? [T], cfg: &'a PlaneConfig, rect: Rect) -> Self {
+      pub unsafe fn from_slice_unsafe(data: &'a $($opt_mut)? [T], cfg: PlaneConfig, rect: Rect) -> Self {
         debug_assert!(rect.x >= -(cfg.xorigin as isize));
         debug_assert!(rect.y >= -(cfg.yorigin as isize));
         debug_assert!(cfg.xorigin as isize + rect.x + rect.width as isize <= cfg.stride as isize);
@@ -193,20 +198,24 @@ macro_rules! plane_region_common {
 
       #[inline(always)]
       pub fn new(plane: &'a $($opt_mut)? Plane<T>, rect: Rect) -> Self {
-        Self::from_slice(& $($opt_mut)? plane.data, &plane.cfg, rect)
+        let cfg = PlaneConfig::new(&plane.geometry());
+        // Use the accessor method passed as $data_fn
+        Self::from_slice(plane.$data_fn(), cfg, rect)
       }
 
       #[inline(always)]
       pub fn new_from_plane(plane: &'a $($opt_mut)? Plane<T>) -> Self {
+        let cfg = PlaneConfig::new(&plane.geometry());
         let rect = Area::StartingAt { x: 0, y: 0 }.to_rect(
-          plane.cfg.xdec,
-          plane.cfg.ydec,
-          plane.cfg.stride - plane.cfg.xorigin,
-          plane.cfg.alloc_height - plane.cfg.yorigin,
+          cfg.xdec,
+          cfg.ydec,
+          cfg.stride - cfg.xorigin,
+          cfg.alloc_height - cfg.yorigin,
         );
 
         // SAFETY: Area::StartingAt{}.to_rect is guaranteed to be the entire plane
-        unsafe { Self::from_slice_unsafe(& $($opt_mut)? plane.data, &plane.cfg, rect) }
+        // Use the accessor method passed as $data_fn
+        unsafe { Self::from_slice_unsafe(plane.$data_fn(), cfg, rect) }
       }
 
       #[inline(always)]
@@ -240,7 +249,8 @@ macro_rules! plane_region_common {
             y: self.rect.y,
             width: self.rect.width,
             height: h
-          }
+          },
+          phantom: PhantomData,
         }
       }
 
@@ -254,7 +264,8 @@ macro_rules! plane_region_common {
             y: self.rect.y,
             width: w,
             height: self.rect.height
-          }
+          },
+          phantom: PhantomData,
         }
       }
 
@@ -290,7 +301,7 @@ macro_rules! plane_region_common {
       #[inline(always)]
       pub fn subregion(&self, area: Area) -> PlaneRegion<'_, T> {
         if self.data.is_null() {
-          return PlaneRegion::empty(&self.plane_cfg);
+          return PlaneRegion::empty(self.plane_cfg);
         }
         let rect = area.to_rect(
           self.plane_cfg.xdec,
@@ -312,7 +323,7 @@ macro_rules! plane_region_common {
         };
         PlaneRegion {
           data,
-          plane_cfg: &self.plane_cfg,
+          plane_cfg: self.plane_cfg,
           rect: absolute_rect,
           phantom: PhantomData,
         }
@@ -332,7 +343,7 @@ macro_rules! plane_region_common {
 
         Self {
           data: self.data,
-          plane_cfg: &self.plane_cfg,
+          plane_cfg: self.plane_cfg,
           rect: home_rect,
           phantom: PhantomData,
         }
@@ -389,8 +400,33 @@ macro_rules! plane_region_common {
 
       pub(crate) fn scratch_copy(&self) -> Plane<T> {
         let &Rect { width, height, .. } = self.rect();
-        let &PlaneConfig { xdec, ydec, .. } = self.plane_cfg;
-        let mut ret: Plane<T> = Plane::new(width, height, xdec, ydec, 0, 0);
+        let PlaneConfig { xdec, ydec, .. } = self.plane_cfg;
+
+        use v_frame::frame::FrameBuilder;
+        use v_frame::chroma::ChromaSubsampling;
+        use std::num::{NonZeroUsize, NonZeroU8};
+
+        let subsampling = match (xdec, ydec) {
+            (0, 0) => ChromaSubsampling::Yuv444,
+            (1, 0) => ChromaSubsampling::Yuv422,
+            (1, 1) => ChromaSubsampling::Yuv420,
+            _ => ChromaSubsampling::Yuv444,
+        };
+
+        let f_width = NonZeroUsize::new(width << xdec).unwrap_or(NonZeroUsize::new(1).unwrap());
+        let f_height = NonZeroUsize::new(height << ydec).unwrap_or(NonZeroUsize::new(1).unwrap());
+        let bit_depth = NonZeroU8::new(if std::mem::size_of::<T>() == 1 { 8 } else { 10 }).unwrap();
+
+        let frame = FrameBuilder::new(f_width, f_height, subsampling, bit_depth)
+            .build::<T>()
+            .expect("Failed to create scratch frame");
+
+        let mut ret = if xdec == 0 && ydec == 0 {
+            frame.y_plane
+        } else {
+            frame.u_plane.expect("Chroma plane missing for non-444 subsampling")
+        };
+
         let mut dst: PlaneRegionMut<T> = ret.as_region_mut();
         for (dst_row, src_row) in dst.rows_iter_mut().zip(self.rows_iter()) {
           for (out, input) in dst_row.iter_mut().zip(src_row) {
@@ -420,8 +456,9 @@ macro_rules! plane_region_common {
   }
 }
 
-plane_region_common!(PlaneRegion, as_ptr);
-plane_region_common!(PlaneRegionMut, as_mut_ptr, mut);
+// Invoke macro with the corresponding accessor method name: data (const) and data_mut (mut)
+plane_region_common!(PlaneRegion, as_ptr, data);
+plane_region_common!(PlaneRegionMut, as_mut_ptr, data_mut, mut);
 
 impl<T: Pixel> PlaneRegionMut<'_, T> {
   #[inline(always)]
@@ -597,16 +634,18 @@ impl<T: Pixel> FusedIterator for RowsIterMut<'_, T> {}
 
 pub struct VertWindows<'a, T: Pixel> {
   data: *const T,
-  plane_cfg: &'a PlaneConfig,
+  plane_cfg: PlaneConfig,
   remaining: usize,
   output_rect: Rect,
+  phantom: PhantomData<&'a T>,
 }
 
 pub struct HorzWindows<'a, T: Pixel> {
   data: *const T,
-  plane_cfg: &'a PlaneConfig,
+  plane_cfg: PlaneConfig,
   remaining: usize,
   output_rect: Rect,
+  phantom: PhantomData<&'a T>,
 }
 
 impl<'a, T: Pixel> Iterator for VertWindows<'a, T> {

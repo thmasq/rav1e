@@ -256,7 +256,8 @@ pub(crate) mod rust {
     assert_eq!(height & 1, 0);
     assert!(width.is_power_of_two() && (2..=128).contains(&width));
 
-    let ref_stride = src.plane.cfg.stride;
+    // v_frame 0.5.0: Plane::cfg removal
+    let ref_stride = src.plane.geometry().stride.get();
     let y_filter = get_filter(mode_y, row_frac, height);
     let x_filter = get_filter(mode_x, col_frac, width);
     let max_sample_val = (1 << bit_depth) - 1;
@@ -264,7 +265,7 @@ pub(crate) mod rust {
     match (col_frac, row_frac) {
       (0, 0) => {
         for r in 0..height {
-          let src_slice = &src[r];
+          let src_slice = src.row(r);
           let dst_slice = &mut dst[r];
           dst_slice[..width].copy_from_slice(&src_slice[..width]);
         }
@@ -272,7 +273,7 @@ pub(crate) mod rust {
       (0, _) => {
         let offset_slice = src.go_up(3);
         for r in 0..height {
-          let src_slice = &offset_slice[r];
+          let src_slice = offset_slice.row(r);
           let dst_slice = &mut dst[r];
           for c in 0..width {
             dst_slice[c] = T::cast_from(
@@ -292,7 +293,7 @@ pub(crate) mod rust {
       (_, 0) => {
         let offset_slice = src.go_left(3);
         for r in 0..height {
-          let src_slice = &offset_slice[r];
+          let src_slice = offset_slice.row(r);
           let dst_slice = &mut dst[r];
           for c in 0..width {
             dst_slice[c] = T::cast_from(
@@ -316,7 +317,7 @@ pub(crate) mod rust {
         let offset_slice = src.go_left(3).go_up(3);
         for cg in (0..width).step_by(8) {
           for r in 0..height + 7 {
-            let src_slice = &offset_slice[r];
+            let src_slice = offset_slice.row(r);
             for c in cg..(cg + 8).min(width) {
               intermediate[8 * r + (c - cg)] = round_shift(
                 // SAFETY: We pass this a raw pointer, but it's created from a
@@ -366,7 +367,7 @@ pub(crate) mod rust {
     assert_eq!(height & 1, 0);
     assert!(width.is_power_of_two() && (2..=128).contains(&width));
 
-    let ref_stride = src.plane.cfg.stride;
+    let ref_stride = src.plane.geometry().stride.get();
     let y_filter = get_filter(mode_y, row_frac, height);
     let x_filter = get_filter(mode_x, col_frac, width);
     let intermediate_bits = 4 - if bit_depth == 12 { 2 } else { 0 };
@@ -374,9 +375,9 @@ pub(crate) mod rust {
     match (col_frac, row_frac) {
       (0, 0) => {
         for r in 0..height {
-          let src_slice = &src[r];
+          let src_slice = src.row(r);
           for c in 0..width {
-            tmp[r * width + c] = (i16::cast_from(src_slice[c])
+            tmp[r * width + c] = (AsPrimitive::<i16>::as_(src_slice[c])
               << intermediate_bits)
               - prep_bias as i16;
           }
@@ -385,7 +386,7 @@ pub(crate) mod rust {
       (0, _) => {
         let offset_slice = src.go_up(3);
         for r in 0..height {
-          let src_slice = &offset_slice[r];
+          let src_slice = offset_slice.row(r);
           for c in 0..width {
             tmp[r * width + c] = (round_shift(
               // SAFETY: We pass this a raw pointer, but it's created from a
@@ -401,7 +402,7 @@ pub(crate) mod rust {
       (_, 0) => {
         let offset_slice = src.go_left(3);
         for r in 0..height {
-          let src_slice = &offset_slice[r];
+          let src_slice = offset_slice.row(r);
           for c in 0..width {
             tmp[r * width + c] = (round_shift(
               // SAFETY: We pass this a raw pointer, but it's created from a
@@ -418,7 +419,7 @@ pub(crate) mod rust {
         let offset_slice = src.go_left(3).go_up(3);
         for cg in (0..width).step_by(8) {
           for r in 0..height + 7 {
-            let src_slice = &offset_slice[r];
+            let src_slice = offset_slice.row(r);
             for c in cg..(cg + 8).min(width) {
               intermediate[8 * r + (c - cg)] = round_shift(
                 // SAFETY: We pass this a raw pointer, but it's created from a

@@ -7,6 +7,7 @@
 // Media Patent License 1.0 was not distributed with this source code in the
 // PATENTS file, you can obtain it at www.aomedia.org/license/patent.
 
+use crate::util::math::Fixed;
 use std::collections::VecDeque;
 use std::io::Write;
 use std::mem::MaybeUninit;
@@ -1700,7 +1701,7 @@ pub fn motion_compensate<T: Pixel>(
     };
 
     let rec = &mut ts.rec.planes[p];
-    let po = tile_bo.plane_offset(rec.plane_cfg);
+    let po = tile_bo.plane_offset(&rec.plane_cfg);
     let &PlaneConfig { xdec, ydec, .. } = rec.plane_cfg;
     let tile_rect = luma_tile_rect.decimated(xdec, ydec);
 

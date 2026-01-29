@@ -15,11 +15,9 @@ use crate::api::SGRComplexityLevel;
 use crate::color::ChromaSampling::Cs400;
 use crate::context::{MAX_PLANES, SB_SIZE};
 use crate::encoder::FrameInvariants;
-use crate::frame::{
-  AsRegion, Frame, Plane, PlaneConfig, PlaneOffset, PlaneSlice,
-};
+use crate::frame::{AsRegion, Frame, Plane, PlaneSlice};
 use crate::tiling::{Area, PlaneRegion, PlaneRegionMut, Rect};
-use crate::util::{clamp, CastFromPrimitive, ILog, Pixel};
+use crate::util::{clamp, ILog, Pixel};
 
 cfg_if::cfg_if! {
   if #[cfg(nasm_x86_64)] {
@@ -169,7 +167,6 @@ pub(crate) mod rust {
     get_integral_square, sgrproj_sum_finish, SGRPROJ_RST_BITS,
     SGRPROJ_SGR_BITS,
   };
-  use crate::util::CastFromPrimitive;
   use crate::Pixel;
 
   #[inline(always)]
@@ -252,7 +249,7 @@ pub(crate) mod rust {
   ) {
     let line = cdeffed.row(y);
     for (fp, &v) in f[start_x..w].iter_mut().zip(line[start_x..w].iter()) {
-      *fp = u32::cast_from(v) << SGRPROJ_RST_BITS;
+      *fp = (v.to_i32() as u32) << SGRPROJ_RST_BITS as usize;
     }
   }
 
@@ -285,7 +282,7 @@ pub(crate) mod rust {
             + bf[1][x + 1]
             + bf[2][x + 1]
             + bf[1][x + 2]);
-      let v = a * u32::cast_from(line[x]) + b;
+      let v = a * (line[x].to_i32() as u32) + b;
       f[x] = (v + (1 << shift >> 1)) >> shift;
     }
   }
@@ -333,9 +330,9 @@ pub(crate) mod rust {
       let b = 5 * (bf_0[0] + bf_0[2]) + 6 * bf_0[1];
       let ao = 5 * (af_1[0] + af_1[2]) + 6 * af_1[1];
       let bo = 5 * (bf_1[0] + bf_1[2]) + 6 * bf_1[1];
-      let v = (a + ao) * u32::cast_from(p0) + b + bo;
+      let v = (a + ao) * (p0.to_i32() as u32) + b + bo;
       *o0 = (v + (1 << shift >> 1)) >> shift;
-      let vo = ao * u32::cast_from(p1) + bo;
+      let vo = ao * (p1.to_i32() as u32) + bo;
       *o1 = (vo + (1 << shifto >> 1)) >> shifto;
     }
   }
@@ -457,10 +454,13 @@ impl<'a, T: Pixel> Iterator for VertPaddedIter<'a, T> {
       } else {
         self.deblocked
       };
-      // cannot directly return self.ps.row(row) due to lifetime issue
-      let range = src_plane.row_range(self.x, ly);
+
+      let stride = src_plane.geometry().stride.get();
+      // Calculate offset based on stride. self.x and ly should be valid for the plane data.
+      // Plane data is linear.
+      let offset = (ly as usize) * stride + (self.x as usize);
       self.y += 1;
-      Some(&src_plane.data[range])
+      Some(&src_plane.data()[offset..])
     } else {
       None
     }
@@ -577,7 +577,7 @@ pub fn setup_integral_image<T: Pixel>(
     for (src, (integral, sq_integral)) in
       row.zip(integral_image.iter_mut().zip(sq_integral_image.iter_mut()))
     {
-      let current = u32::cast_from(*src);
+      let current = (*src).to_i32() as u32;
 
       // Wrap adds to prevent undefined behaviour on overflow. Overflow is
       // cancelled out when calculating the sum of a region.
@@ -610,7 +610,7 @@ pub fn setup_integral_image<T: Pixel>(
         .zip(sq_integral_row_prev.iter())
         .zip(integral_row.iter_mut().zip(sq_integral_row.iter_mut())),
     ) {
-      let current = u32::cast_from(*src);
+      let current = (*src).to_i32() as u32;
       // Wrap adds to prevent undefined behaviour on overflow. Overflow is
       // cancelled out when calculating the sum of a region.
       sum = sum.wrapping_add(current);
@@ -791,7 +791,7 @@ pub fn sgrproj_stripe_filter<T: Pixel, U: Pixel>(
       let w1 = xqd[1] as i32;
       let w2 = (1 << SGRPROJ_PRJ_BITS) - w0 - w1;
 
-      let line = &cdeffed[y];
+      let line = cdeffed.row(y);
 
       #[inline(always)]
       fn apply_filter<U: Pixel>(
@@ -806,7 +806,7 @@ pub fn sgrproj_stripe_filter<T: Pixel, U: Pixel>(
         for ((o, &u), (&f_r2_ab, &f_r1)) in
           out_it.zip(line_it).zip(f_r2_ab_it.zip(f_r1_it))
         {
-          let u = i32::cast_from(u) << SGRPROJ_RST_BITS;
+          let u = u.to_i32() << SGRPROJ_RST_BITS;
           let v = w0 * f_r2_ab as i32 + w1 * u + w2 * f_r1 as i32;
           let s = (v + (1 << (SGRPROJ_RST_BITS + SGRPROJ_PRJ_BITS) >> 1))
             >> (SGRPROJ_RST_BITS + SGRPROJ_PRJ_BITS);
@@ -1013,8 +1013,8 @@ pub fn sgrproj_solve<T: Pixel>(
           .zip(input_it)
           .zip(f_r2_ab_it.zip(f_r1_it))
           .map(|((&u, &i), (&f2, &f1))| {
-            let u = i32::cast_from(u) << SGRPROJ_RST_BITS;
-            let s = (i32::cast_from(i) << SGRPROJ_RST_BITS) - u;
+            let u = u.to_i32() << SGRPROJ_RST_BITS;
+            let s = (i.to_i32() << SGRPROJ_RST_BITS) - u;
             let f2 = f2 as i32 - u;
             let f1 = f1 as i32 - u;
             (s as i64, f1 as i64, f2 as i64)
@@ -1039,7 +1039,7 @@ pub fn sgrproj_solve<T: Pixel>(
       process_line(
         &mut h,
         &mut c,
-        &cdeffed[y],
+        cdeffed.row(y),
         &input[y],
         &f_r1,
         f_r2_01[dy],
@@ -1147,8 +1147,15 @@ fn wiener_stripe_filter<T: Pixel>(
     },
   ) as usize;
 
-  let mut out_slice =
-    out.mut_slice(PlaneOffset { x: 0, y: start_yi as isize });
+  let out_width = out.geometry().width.get();
+  let out_height = out.geometry().height.get();
+  let out_rect = Rect {
+    x: 0,
+    y: start_yi as isize,
+    width: out_width,
+    height: out_height - start_yi,
+  };
+  let mut out_slice = PlaneRegionMut::new(out, out_rect);
 
   for xi in stripe_x..stripe_x + stripe_w {
     let n = cmp::min(7, crop_w as isize + 3 - xi as isize);
@@ -1156,19 +1163,19 @@ fn wiener_stripe_filter<T: Pixel>(
       let mut acc = 0;
       let src = if yi < stripe_y {
         let ly = cmp::max(clamp(yi, 0, crop_h as isize - 1), stripe_y - 2);
-        deblocked.row(ly)
+        deblocked.row(ly as usize).unwrap()
       } else if yi < stripe_y + stripe_h as isize {
         let ly = clamp(yi, 0, crop_h as isize - 1);
-        cdeffed.row(ly)
+        cdeffed.row(ly as usize).unwrap()
       } else {
         let ly = cmp::min(
           clamp(yi, 0, crop_h as isize - 1),
           stripe_y + stripe_h as isize + 1,
         );
-        deblocked.row(ly)
+        deblocked.row(ly as usize).unwrap()
       };
-      let start = i32::cast_from(src[0]);
-      let end = i32::cast_from(src[crop_w - 1]);
+      let start = src[0].to_i32();
+      let end = src[crop_w - 1].to_i32();
       for i in 0..3 - xi as isize {
         acc += hfilter[i as usize] * start;
       }
@@ -1179,7 +1186,7 @@ fn wiener_stripe_filter<T: Pixel>(
       let n1 = (n - off) as usize;
 
       for (hf, &v) in hfilter[s..n as usize].iter().zip(src[s1..n1].iter()) {
-        acc += hf * i32::cast_from(v);
+        acc += hf * v.to_i32();
       }
 
       for i in n..7 {
@@ -1319,7 +1326,13 @@ pub struct RestorationState {
 
 impl RestorationState {
   pub fn new<T: Pixel>(fi: &FrameInvariants<T>, input: &Frame<T>) -> Self {
-    let PlaneConfig { xdec, ydec, .. } = input.planes[1].cfg;
+    let (ydec, xdec) =
+      if let Some((sx, sy)) = input.subsampling.subsample_ratio() {
+        (sy.trailing_zeros() as usize, sx.trailing_zeros() as usize)
+      } else {
+        (0, 0)
+      };
+
     // stripe size is decimated in 4:2:0 (and only 4:2:0)
     let stripe_uv_decimate = usize::from(xdec > 0 && ydec > 0);
     let y_sb_log2 = if fi.sequence.use_128x128_superblock { 7 } else { 6 };
@@ -1501,8 +1514,34 @@ impl RestorationState {
 
     for pli in 0..planes {
       let rp = &self.planes[pli];
-      let xdec = out.planes[pli].cfg.xdec;
-      let ydec = out.planes[pli].cfg.ydec;
+      let (plane, cdef_plane, pre_plane) = match pli {
+        0 => (&mut out.y_plane, &cdeffed.y_plane, &pre_cdef.y_plane),
+        1 => (
+          out.u_plane.as_mut().unwrap(),
+          cdeffed.u_plane.as_ref().unwrap(),
+          pre_cdef.u_plane.as_ref().unwrap(),
+        ),
+        2 => (
+          out.v_plane.as_mut().unwrap(),
+          cdeffed.v_plane.as_ref().unwrap(),
+          pre_cdef.v_plane.as_ref().unwrap(),
+        ),
+        _ => unreachable!(),
+      };
+
+      let (xdec, ydec) = if pli == 0 {
+        (0, 0)
+      } else {
+        // Frame has subsampling field
+        let (ydec, xdec) =
+          if let Some((sx, sy)) = out.subsampling.subsample_ratio() {
+            (sy.trailing_zeros() as usize, sx.trailing_zeros() as usize)
+          } else {
+            (0, 0)
+          };
+        (xdec, ydec)
+      };
+
       let crop_w = (fi.width + (1 << xdec >> 1)) >> xdec;
       let crop_h = (fi.height + (1 << ydec >> 1)) >> ydec;
 
@@ -1536,9 +1575,9 @@ impl RestorationState {
                 stripe_size,
                 x,
                 stripe_start_y,
-                &cdeffed.planes[pli],
-                &pre_cdef.planes[pli],
-                &mut out.planes[pli],
+                cdef_plane,
+                pre_plane,
+                plane,
               );
             }
             RestorationFilter::Sgrproj { set, xqd } => {
@@ -1553,10 +1592,16 @@ impl RestorationState {
                 (crop_h as isize - stripe_start_y) as usize,
                 size,
                 stripe_size,
-                &cdeffed.planes[pli]
-                  .slice(PlaneOffset { x: x as isize, y: stripe_start_y }),
-                &pre_cdef.planes[pli]
-                  .slice(PlaneOffset { x: x as isize, y: stripe_start_y }),
+                &PlaneSlice {
+                  plane: cdef_plane,
+                  x: x as isize,
+                  y: stripe_start_y,
+                },
+                &PlaneSlice {
+                  plane: pre_plane,
+                  x: x as isize,
+                  y: stripe_start_y,
+                },
               );
 
               sgrproj_stripe_filter(
@@ -1565,9 +1610,12 @@ impl RestorationState {
                 fi,
                 &stripe_filter_buffer,
                 STRIPE_IMAGE_STRIDE,
-                &cdeffed.planes[pli]
-                  .slice(PlaneOffset { x: x as isize, y: stripe_start_y }),
-                &mut out.planes[pli].region_mut(Area::Rect {
+                &PlaneSlice {
+                  plane: cdef_plane,
+                  x: x as isize,
+                  y: stripe_start_y,
+                },
+                &mut plane.region_mut(Area::Rect {
                   x: x as isize,
                   y: stripe_start_y,
                   width: size,

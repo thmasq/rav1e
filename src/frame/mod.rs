@@ -18,7 +18,7 @@ use std::{fmt, iter};
 use v_frame::chroma::ChromaSubsampling;
 
 mod plane;
-pub use plane::*;
+pub use plane::{AsRegion, Plane, PlaneConfig, PlaneGeometry};
 
 const FRAME_MARGIN: usize = 16 + SUBPEL_FILTER_SIZE;
 const LUMA_PADDING: usize = SB_SIZE + FRAME_MARGIN;

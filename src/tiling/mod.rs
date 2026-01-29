@@ -17,10 +17,19 @@ mod tile_restoration_state;
 mod tile_state;
 mod tiler;
 
-pub use self::plane_region::*;
-pub use self::tile::*;
-pub use self::tile_blocks::*;
-pub use self::tile_motion_stats::*;
-pub use self::tile_restoration_state::*;
-pub use self::tile_state::*;
-pub use self::tiler::*;
+pub use self::plane_region::{
+  Area, HorzWindows, PlaneRegion, PlaneRegionMut, Rect, RowsIter, RowsIterMut,
+  VertWindows,
+};
+pub use self::tile::{Tile, TileMut, TileRect};
+pub use self::tile_blocks::{TileBlocks, TileBlocksMut};
+pub use self::tile_motion_stats::{TileMEStats, TileMEStatsMut};
+pub use self::tile_restoration_state::{
+  TileRestorationPlane, TileRestorationPlaneMut, TileRestorationState,
+  TileRestorationStateMut, TileRestorationUnits, TileRestorationUnitsMut,
+};
+pub use self::tile_state::{CodedBlockInfo, MiTileState, TileStateMut};
+pub use self::tiler::{
+  TileContextIterMut, TileContextMut, TilingInfo, MAX_TILE_AREA,
+  MAX_TILE_COLS, MAX_TILE_RATE, MAX_TILE_ROWS, MAX_TILE_WIDTH,
+};

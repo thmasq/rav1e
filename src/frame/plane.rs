@@ -7,10 +7,37 @@
 // Media Patent License 1.0 was not distributed with this source code in the
 // PATENTS file, you can obtain it at www.aomedia.org/license/patent.
 
-use crate::tiling::*;
-use crate::util::*;
+use crate::tiling::{Area, PlaneRegion, PlaneRegionMut};
+use crate::util::Pixel;
 
-pub use v_frame::plane::*;
+pub use v_frame::plane::{Plane, PlaneGeometry};
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct PlaneConfig {
+  pub stride: usize,
+  pub alloc_height: usize,
+  pub width: usize,
+  pub height: usize,
+  pub xdec: usize,
+  pub ydec: usize,
+  pub xorigin: usize,
+  pub yorigin: usize,
+}
+
+impl PlaneConfig {
+  pub fn new(geo: &PlaneGeometry) -> Self {
+    Self {
+      stride: geo.stride.get(),
+      alloc_height: geo.alloc_height().get(),
+      width: geo.width.get(),
+      height: geo.height.get(),
+      xdec: geo.subsampling_x.get().trailing_zeros() as usize,
+      ydec: geo.subsampling_y.get().trailing_zeros() as usize,
+      xorigin: geo.pad_left,
+      yorigin: geo.pad_top,
+    }
+  }
+}
 
 pub trait AsRegion<T: Pixel> {
   fn as_region(&self) -> PlaneRegion<'_, T>;
