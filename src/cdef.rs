@@ -10,8 +10,10 @@
 use crate::color::ChromaSampling::Cs400;
 use crate::context::*;
 use crate::encoder::FrameInvariants;
+use crate::frame::AsRegion;
 use crate::frame::*;
 use crate::tiling::*;
+use crate::util;
 use crate::util::{clamp, msb, CastFromPrimitive, Pixel};
 
 use crate::cpu_features::CpuFeatureLevel;
@@ -44,12 +46,12 @@ pub struct CdefDirections {
 }
 
 pub(crate) mod rust {
-  use crate::util;
+  use crate::{tiling::PlaneRegion, util};
 
   use super::{
     clamp, cmp, msb, CastFromPrimitive, CpuFeatureLevel, Pixel,
-    PlaneRegionMut, PlaneSlice, CDEF_HAVE_ALL, CDEF_HAVE_BOTTOM,
-    CDEF_HAVE_LEFT, CDEF_HAVE_RIGHT, CDEF_HAVE_TOP, CDEF_VERY_LARGE,
+    PlaneRegionMut, CDEF_HAVE_ALL, CDEF_HAVE_BOTTOM, CDEF_HAVE_LEFT,
+    CDEF_HAVE_RIGHT, CDEF_HAVE_TOP, CDEF_VERY_LARGE,
   };
 
   use simd_helpers::cold_for_target_arch;
@@ -88,9 +90,12 @@ pub(crate) mod rust {
   // that term is never computed. See Section 2, step 2, of:
   // http://jmvalin.ca/notes/intra_paint.pdf
   pub fn cdef_find_dir<T: Pixel>(
-    img: &PlaneSlice<'_, T>, var: &mut u32, coeff_shift: usize,
+    img: &PlaneRegion<'_, T>, var: &mut u32, coeff_shift: usize,
     _cpu: CpuFeatureLevel,
-  ) -> i32 {
+  ) -> i32
+  where
+    i32: util::math::CastFromPrimitive<T>,
+  {
     let mut cost: [i32; 8] = [0; 8];
     let mut partial: [[i32; 15]; 8] = [[0; 15]; 8];
     for i in 0..8 {
@@ -167,7 +172,9 @@ pub(crate) mod rust {
   pub unsafe fn pad_into_tmp16<T: Pixel>(
     dst: *mut u16, dst_stride: isize, src: *const T, src_stride: isize,
     block_width: usize, block_height: usize, edges: u8,
-  ) {
+  ) where
+    i32: util::math::CastFromPrimitive<T>,
+  {
     let mut w = block_width;
     let mut h = block_height;
     let (dst_col, src_col) = if (edges & CDEF_HAVE_LEFT) != 0 {
@@ -192,7 +199,7 @@ pub(crate) mod rust {
 
     for _y in 0..h {
       for x in 0..w {
-        *dst_ptr.add(x) = u16::cast_from(*src_ptr.add(x));
+        *dst_ptr.add(x) = u16::cast_from(i32::cast_from(*src_ptr.add(x)));
       }
       src_ptr = src_ptr.offset(src_stride);
       dst_ptr = dst_ptr.offset(dst_stride);
@@ -223,7 +230,7 @@ pub(crate) mod rust {
         8 >> ydec,
         edges,
       );
-      cdef_filter_block(
+      cdef_filter_block::<T, u16>(
         dst,
         tmp.as_ptr().offset(2 * tmpstride + 2),
         tmpstride,
@@ -333,7 +340,10 @@ fn adjust_strength(strength: i32, var: i32) -> i32 {
 pub fn cdef_analyze_superblock_range<T: Pixel>(
   fi: &FrameInvariants<T>, in_frame: &Frame<T>, blocks: &TileBlocks<'_>,
   sb_w: usize, sb_h: usize,
-) -> Vec<CdefDirections> {
+) -> Vec<CdefDirections>
+where
+  i32: util::math::CastFromPrimitive<T>,
+{
   let mut ret = Vec::<CdefDirections>::with_capacity(sb_h * sb_w);
   for sby in 0..sb_h {
     for sbx in 0..sb_w {
@@ -348,7 +358,10 @@ pub fn cdef_analyze_superblock_range<T: Pixel>(
 pub fn cdef_analyze_superblock<T: Pixel>(
   fi: &FrameInvariants<T>, in_frame: &Frame<T>, blocks: &TileBlocks<'_>,
   sbo: TileSuperBlockOffset,
-) -> CdefDirections {
+) -> CdefDirections
+where
+  i32: util::math::CastFromPrimitive<T>,
+{
   let coeff_shift = fi.sequence.bit_depth - 8;
   let mut dir: CdefDirections =
     CdefDirections { dir: [[0; 8]; 8], var: [[0; 8]; 8] };
@@ -364,11 +377,17 @@ pub fn cdef_analyze_superblock<T: Pixel>(
 
         if !skip {
           let mut var: u32 = 0;
-          let in_plane = &in_frame.planes[0];
-          let in_po = sbo.plane_offset(&in_plane.cfg);
-          let in_slice = in_plane.slice(in_po);
+          let in_plane = in_frame.planes().next().unwrap();
+          let in_po =
+            sbo.plane_offset(&PlaneConfig::new(&in_plane.geometry()));
+          let in_slice =
+            in_plane.region(Area::StartingAt { x: in_po.x, y: in_po.y });
+
           dir.dir[bx][by] = cdef_find_dir::<T>(
-            &in_slice.reslice(8 * bx as isize, 8 * by as isize),
+            &in_slice.subregion(Area::StartingAt {
+              x: 8 * bx as isize,
+              y: 8 * by as isize,
+            }),
             &mut var,
             coeff_shift,
             fi.cpu_feature_level,
@@ -430,12 +449,16 @@ pub fn cdef_filter_superblock<T: Pixel>(
   }
 
   let tile_rect = *output.planes[0].rect();
+  let p0 = input.planes().next().unwrap();
+  let p0_cfg = PlaneConfig::new(&p0.geometry());
+
   let input_xoffset =
-    tile_rect.x + tile_sbo.plane_offset(&input.planes[0].cfg).x;
+    (tile_rect.x as isize) + tile_sbo.plane_offset(&p0_cfg).x;
   let input_yoffset =
-    tile_rect.y + tile_sbo.plane_offset(&input.planes[0].cfg).y;
-  let input_xavail = input.planes[0].cfg.width as isize - input_xoffset;
-  let input_yavail = input.planes[0].cfg.height as isize - input_yoffset;
+    (tile_rect.y as isize) + tile_sbo.plane_offset(&p0_cfg).y;
+
+  let input_xavail = p0.geometry().width.get() as isize - input_xoffset;
+  let input_yavail = p0.geometry().height.get() as isize - input_yoffset;
 
   /* determine what edge padding we have, and what padding we don't.
    * We don't pad here, but rather tell the filter_block call what it
@@ -475,17 +498,19 @@ pub fn cdef_filter_superblock<T: Pixel>(
         let var = cdef_dirs.var[bx][by];
         for p in 0..planes {
           let out_plane = &mut output.planes[p];
-          let in_plane = &input.planes[p];
-          let xdec = in_plane.cfg.xdec;
-          let ydec = in_plane.cfg.ydec;
+          let in_plane = input.planes().nth(p).unwrap();
+          let in_plane_cfg = PlaneConfig::new(&in_plane.geometry());
+          let xdec = in_plane_cfg.xdec;
+          let ydec = in_plane_cfg.ydec;
           let xsize = 8 >> xdec;
           let ysize = 8 >> ydec;
           let in_po = PlaneOffset {
             x: (input_xoffset >> xdec) + (bx * xsize) as isize,
             y: (input_yoffset >> ydec) + (by * ysize) as isize,
           };
-          let in_stride = in_plane.cfg.stride;
-          let in_slice = &in_plane.slice(in_po);
+          let in_stride = in_plane_cfg.stride;
+          let in_slice =
+            in_plane.region(Area::StartingAt { x: in_po.x, y: in_po.y });
 
           let out_block = &mut out_plane.subregion_mut(Area::BlockRect {
             bo: tile_sbo.block_offset(2 * bx, 2 * by).0,
@@ -528,7 +553,7 @@ pub fn cdef_filter_superblock<T: Pixel>(
             // with invalid parameters.
             unsafe {
               assert!(
-                input.planes[p].cfg.width as isize
+                in_plane.geometry().width.get() as isize
                   >= in_po.x
                     + xsize as isize
                     + if edges & CDEF_HAVE_RIGHT > 0 { 2 } else { 0 }
@@ -537,7 +562,7 @@ pub fn cdef_filter_superblock<T: Pixel>(
                 0 <= in_po.x - if edges & CDEF_HAVE_LEFT > 0 { 2 } else { 0 }
               );
               assert!(
-                input.planes[p].cfg.height as isize
+                in_plane.geometry().height.get() as isize
                   >= in_po.y
                     + ysize as isize
                     + if edges & CDEF_HAVE_BOTTOM > 0 { 2 } else { 0 }
@@ -548,7 +573,7 @@ pub fn cdef_filter_superblock<T: Pixel>(
 
               cdef_filter_block(
                 out_block,
-                in_slice.as_ptr(),
+                &in_slice[0][0] as *const T,
                 in_stride as isize,
                 local_pri_strength,
                 local_sec_strength,
@@ -605,7 +630,9 @@ pub fn cdef_filter_superblock<T: Pixel>(
 pub fn cdef_filter_tile<T: Pixel>(
   fi: &FrameInvariants<T>, input: &Frame<T>, tb: &TileBlocks,
   output: &mut TileMut<'_, T>,
-) {
+) where
+  i32: util::math::CastFromPrimitive<T>,
+{
   // Each filter block is 64x64, except right and/or bottom for non-multiple-of-64 sizes.
   // FIXME: 128x128 SB support will break this, we need FilterBlockOffset etc.
 

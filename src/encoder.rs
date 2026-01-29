@@ -3382,13 +3382,14 @@ fn get_initial_cdfcontext<T: Pixel>(fi: &FrameInvariants<T>) -> CDFContext {
 }
 
 #[profiling::function]
-fn encode_tile_group<T: Pixel>(
+fn encode_tile_group<T: Pixel<Coeff = T>>(
   fi: &FrameInvariants<T>, fs: &mut FrameState<T>, inter_cfg: &InterConfig,
 ) -> Vec<u8>
 where
   u32: util::math::CastFromPrimitive<<T as util::pixel::Pixel>::Coeff>,
   i32: util::math::CastFromPrimitive<<T as util::pixel::Pixel>::Coeff>,
   <T as util::pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>,
+  <T as util::pixel::Pixel>::Coeff: util::pixel::Pixel,
 {
   let planes =
     if fi.sequence.chroma_sampling == ChromaSampling::Cs400 { 1 } else { 3 };
@@ -3930,13 +3931,14 @@ fn get_initial_segmentation<T: Pixel>(
 ///
 /// - If the frame packets cannot be written
 #[profiling::function]
-pub fn encode_frame<T: Pixel>(
+pub fn encode_frame<T: Pixel<Coeff = T>>(
   fi: &FrameInvariants<T>, fs: &mut FrameState<T>, inter_cfg: &InterConfig,
 ) -> Vec<u8>
 where
   u32: util::math::CastFromPrimitive<<T as util::pixel::Pixel>::Coeff>,
   i32: util::math::CastFromPrimitive<<T as util::pixel::Pixel>::Coeff>,
   <T as util::pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>,
+  <T as util::pixel::Pixel>::Coeff: util::pixel::Pixel,
 {
   debug_assert!(!fi.is_show_existing_frame());
   let obu_extension = 0;

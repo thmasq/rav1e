@@ -265,7 +265,7 @@ pub(crate) struct ContextInner<T: Pixel> {
   t35_q: BTreeMap<u64, Box<[T35]>>,
 }
 
-impl<T: Pixel> ContextInner<T>
+impl<T: Pixel<Coeff = T>> ContextInner<T>
 where
   u32: util::math::CastFromPrimitive<<T as util::pixel::Pixel>::Coeff>,
   i32: util::math::CastFromPrimitive<<T as util::pixel::Pixel>::Coeff>,
@@ -1276,6 +1276,7 @@ where
   ) -> Result<Packet<T>, EncoderStatus>
   where
     <T as util::pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>,
+    <T as util::pixel::Pixel>::Coeff: util::pixel::Pixel,
   {
     if self
       .frame_data
@@ -1353,6 +1354,7 @@ where
   ) -> Result<Packet<T>, EncoderStatus>
   where
     <T as util::pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>,
+    <T as util::pixel::Pixel>::Coeff: util::pixel::Pixel,
   {
     let mut frame_data =
       self.frame_data.remove(&cur_output_frameno).unwrap().unwrap();
@@ -1517,6 +1519,7 @@ where
   pub fn receive_packet(&mut self) -> Result<Packet<T>, EncoderStatus>
   where
     <T as util::pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>,
+    <T as util::pixel::Pixel>::Coeff: util::pixel::Pixel,
   {
     if self.done_processing() {
       return Err(EncoderStatus::LimitReached);

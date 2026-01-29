@@ -7,11 +7,10 @@
 // Media Patent License 1.0 was not distributed with this source code in the
 // PATENTS file, you can obtain it at www.aomedia.org/license/patent.
 
-use crate::cdef::*;
 use crate::cpu_features::CpuFeatureLevel;
-use crate::frame::*;
-use crate::tiling::PlaneRegionMut;
+use crate::tiling::{PlaneRegion, PlaneRegionMut};
 use crate::util::*;
+use crate::{cdef::*, util};
 
 type CdefFilterFn = unsafe extern fn(
   dst: *mut u8,
@@ -193,9 +192,12 @@ type CdefDirHBDFn = unsafe extern fn(
 #[inline(always)]
 #[allow(clippy::let_and_return)]
 pub(crate) fn cdef_find_dir<T: Pixel>(
-  img: &PlaneSlice<'_, T>, var: &mut u32, coeff_shift: usize,
+  img: &PlaneRegion<'_, T>, var: &mut u32, coeff_shift: usize,
   cpu: CpuFeatureLevel,
-) -> i32 {
+) -> i32
+where
+  i32: util::math::CastFromPrimitive<T>,
+{
   let call_rust =
     |var: &mut u32| rust::cdef_find_dir::<T>(img, var, coeff_shift, cpu);
 
@@ -212,8 +214,8 @@ pub(crate) fn cdef_find_dir<T: Pixel>(
         // SAFETY: Calls Assembly code.
         unsafe {
           (func)(
-            img.as_ptr() as *const _,
-            T::to_asm_stride(img.plane.cfg.stride),
+            img.data_ptr() as *const _, // Use data_ptr()
+            T::to_asm_stride(img.plane_cfg.stride), // Use plane_cfg.stride
             var as *mut u32,
           )
         }
@@ -226,8 +228,8 @@ pub(crate) fn cdef_find_dir<T: Pixel>(
         // SAFETY: Calls Assembly code.
         unsafe {
           (func)(
-            img.as_ptr() as *const _,
-            T::to_asm_stride(img.plane.cfg.stride),
+            img.data_ptr() as *const _, // Use data_ptr()
+            T::to_asm_stride(img.plane_cfg.stride), // Use plane_cfg.stride
             var as *mut u32,
             (1 << (coeff_shift + 8)) - 1,
           )

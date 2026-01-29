@@ -307,6 +307,7 @@ where
   pub fn receive_packet(&mut self) -> Result<Packet<T>, EncoderStatus>
   where
     <T as util::pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>,
+    <T as util::pixel::Pixel>::Coeff: util::pixel::Pixel,
   {
     let inner = &mut self.inner;
     let mut run = move || inner.receive_packet();
