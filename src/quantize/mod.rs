@@ -11,9 +11,10 @@
 
 mod tables;
 
+use crate::util::Coefficient;
+
 cfg_if::cfg_if! {
   if #[cfg(nasm_x86_64)] {
-    use crate::util::Coefficient;
     pub use crate::asm::x86::quantize::*;
   } else {
     pub use self::rust::*;
