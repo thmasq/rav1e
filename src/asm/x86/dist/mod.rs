@@ -13,6 +13,7 @@ use crate::cpu_features::CpuFeatureLevel;
 use crate::dist::*;
 use crate::partition::BlockSize;
 use crate::tiling::*;
+use crate::util;
 use crate::util::*;
 
 mod cdef_dist;
@@ -287,7 +288,10 @@ pub(crate) const fn to_index(bsize: BlockSize) -> usize {
 pub fn get_sad<T: Pixel>(
   src: &PlaneRegion<'_, T>, dst: &PlaneRegion<'_, T>, w: usize, h: usize,
   bit_depth: usize, cpu: CpuFeatureLevel,
-) -> u32 {
+) -> u32
+where
+  i32: util::math::CastFromPrimitive<T>,
+{
   let bsize_opt = BlockSize::from_width_and_height_opt(w, h);
 
   let call_rust = || -> u32 { rust::get_sad(dst, src, w, h, bit_depth, cpu) };
@@ -341,7 +345,10 @@ pub fn get_sad<T: Pixel>(
 pub fn get_satd<T: Pixel>(
   src: &PlaneRegion<'_, T>, dst: &PlaneRegion<'_, T>, w: usize, h: usize,
   bit_depth: usize, cpu: CpuFeatureLevel,
-) -> u32 {
+) -> u32
+where
+  i32: util::math::CastFromPrimitive<T>,
+{
   let bsize_opt = BlockSize::from_width_and_height_opt(w, h);
 
   let call_rust = || -> u32 { rust::get_satd(dst, src, w, h, bit_depth, cpu) };

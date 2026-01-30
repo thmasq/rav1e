@@ -726,7 +726,8 @@ pub fn get_intra_edges<'a, T: Pixel>(
           }
         }
       } else {
-        let val = if y != 0 { dst[y - 1][0] } else { T::cast_from(base + 1) };
+        let val =
+          if y != 0 { dst[y - 1][0] } else { T::cast_from((base + 1) as i32) };
         for v in left[2 * MAX_TX_SIZE - tx_size.height()..].iter_mut() {
           v.write(val);
         }
@@ -755,7 +756,8 @@ pub fn get_intra_edges<'a, T: Pixel>(
           }
         }
       } else {
-        let val = if x != 0 { dst[0][x - 1] } else { T::cast_from(base - 1) };
+        let val =
+          if x != 0 { dst[0][x - 1] } else { T::cast_from((base - 1) as i32) };
         for v in above[..tx_size.width()].iter_mut() {
           v.write(val);
         }
@@ -876,7 +878,7 @@ pub fn get_intra_edges<'a, T: Pixel>(
     // Needs top-left
     if needs_topleft {
       let top_left = top_left[0].write(match (x, y) {
-        (0, 0) => T::cast_from(base),
+        (0, 0) => T::cast_from(base as i32),
         (_, 0) => dst[0][x - 1],
         (0, _) => dst[y - 1][0],
         _ => dst[y - 1][x - 1],
@@ -884,14 +886,17 @@ pub fn get_intra_edges<'a, T: Pixel>(
 
       let (w, h) = (tx_size.width(), tx_size.height());
       if needs_topleft_filter && w + h >= 24 {
-        let (l, a, tl): (u32, u32, u32) =
-          (left[left.len() - 1].into(), above[0].into(), (*top_left).into());
+        let (l, a, tl): (u32, u32, u32) = (
+          left[left.len() - 1].to_i32() as u32,
+          above[0].to_i32() as u32,
+          (*top_left).to_i32() as u32,
+        );
         let s = l * 5 + tl * 6 + a * 5;
 
-        *top_left = T::cast_from((s + (1 << 3)) >> 4);
+        *top_left = T::cast_from(((s + (1 << 3)) >> 4) as i32);
       }
     } else {
-      top_left[0].write(T::cast_from(base));
+      top_left[0].write(T::cast_from(base as i32));
     }
   }
   IntraEdge::new(edge_buf, init_left, init_above)

@@ -7,7 +7,8 @@
 // Media Patent License 1.0 was not distributed with this source code in the
 // PATENTS file, you can obtain it at www.aomedia.org/license/patent.
 
-use crate::color::ChromaSampling::Cs400;
+use v_frame::chroma::ChromaSubsampling;
+
 use crate::context::*;
 use crate::encoder::FrameInvariants;
 use crate::frame::AsRegion;
@@ -429,7 +430,9 @@ pub fn cdef_filter_superblock<T: Pixel>(
   fi: &FrameInvariants<T>, input: &Frame<T>, output: &mut TileMut<'_, T>,
   blocks: &TileBlocks<'_>, tile_sbo: TileSuperBlockOffset, cdef_index: u8,
   cdef_dirs: &CdefDirections,
-) {
+) where
+  i32: util::math::CastFromPrimitive<T>,
+{
   let bit_depth = fi.sequence.bit_depth;
   let coeff_shift = fi.sequence.bit_depth as i32 - 8;
   let cdef_damping = fi.cdef_damping as i32;
@@ -438,7 +441,12 @@ pub fn cdef_filter_superblock<T: Pixel>(
   let cdef_pri_y_strength = (cdef_y_strength / CDEF_SEC_STRENGTHS) as i32;
   let mut cdef_sec_y_strength = (cdef_y_strength % CDEF_SEC_STRENGTHS) as i32;
   let cdef_pri_uv_strength = (cdef_uv_strength / CDEF_SEC_STRENGTHS) as i32;
-  let planes = if fi.sequence.chroma_sampling == Cs400 { 1 } else { 3 };
+  let planes = if fi.sequence.chroma_sampling == ChromaSubsampling::Monochrome
+  {
+    1
+  } else {
+    3
+  };
   let mut cdef_sec_uv_strength =
     (cdef_uv_strength % CDEF_SEC_STRENGTHS) as i32;
   if cdef_sec_y_strength == 3 {

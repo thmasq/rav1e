@@ -7,6 +7,8 @@
 // Media Patent License 1.0 was not distributed with this source code in the
 // PATENTS file, you can obtain it at www.aomedia.org/license/patent.
 
+use v_frame::chroma::ChromaSubsampling;
+
 use super::*;
 use crate::predict::PredictionMode;
 use crate::predict::PredictionMode::*;
@@ -107,9 +109,9 @@ pub static sub_tx_size_map: [TxSize; TxSize::TX_SIZES_ALL] = [
 #[inline]
 pub fn has_chroma(
   bo: TileBlockOffset, bsize: BlockSize, subsampling_x: usize,
-  subsampling_y: usize, chroma_sampling: ChromaSampling,
+  subsampling_y: usize, chroma_sampling: ChromaSubsampling,
 ) -> bool {
-  if chroma_sampling == ChromaSampling::Cs400 {
+  if chroma_sampling == ChromaSubsampling::Monochrome {
     return false;
   };
 

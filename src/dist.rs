@@ -21,6 +21,7 @@ pub(crate) mod rust {
   use crate::activity::apply_ssim_boost;
   use crate::cpu_features::CpuFeatureLevel;
   use crate::tiling::*;
+  use crate::util;
   use crate::util::*;
 
   use crate::encoder::IMPORTANCE_BLOCK_SIZE;
@@ -31,7 +32,10 @@ pub(crate) mod rust {
   pub fn get_sad<T: Pixel>(
     plane_org: &PlaneRegion<'_, T>, plane_ref: &PlaneRegion<'_, T>, w: usize,
     h: usize, _bit_depth: usize, _cpu: CpuFeatureLevel,
-  ) -> u32 {
+  ) -> u32
+  where
+    i32: util::math::CastFromPrimitive<T>,
+  {
     debug_assert!(w <= 128 && h <= 128);
     let plane_org =
       plane_org.subregion(Area::Rect { x: 0, y: 0, width: w, height: h });
@@ -156,7 +160,10 @@ pub(crate) mod rust {
   pub fn get_satd<T: Pixel>(
     plane_org: &PlaneRegion<'_, T>, plane_ref: &PlaneRegion<'_, T>, w: usize,
     h: usize, _bit_depth: usize, _cpu: CpuFeatureLevel,
-  ) -> u32 {
+  ) -> u32
+  where
+    i32: util::math::CastFromPrimitive<T>,
+  {
     assert!(w <= 128 && h <= 128);
     assert!(plane_org.rect().width >= w && plane_org.rect().height >= h);
     assert!(plane_ref.rect().width >= w && plane_ref.rect().height >= h);
@@ -235,7 +242,10 @@ pub(crate) mod rust {
     src1: &PlaneRegion<'_, T>, src2: &PlaneRegion<'_, T>, scale: &[u32],
     scale_stride: usize, w: usize, h: usize, _bit_depth: usize,
     _cpu: CpuFeatureLevel,
-  ) -> u64 {
+  ) -> u64
+  where
+    i32: util::math::CastFromPrimitive<T>,
+  {
     let src1 = src1.subregion(Area::Rect { x: 0, y: 0, width: w, height: h });
     // Always chunk and apply scaling on the sse of squares the size of
     // decimated/sub-sampled importance block sizes.
@@ -302,7 +312,10 @@ pub(crate) mod rust {
   pub fn cdef_dist_kernel<T: Pixel>(
     src: &PlaneRegion<'_, T>, dst: &PlaneRegion<'_, T>, w: usize, h: usize,
     bit_depth: usize, _cpu: CpuFeatureLevel,
-  ) -> u32 {
+  ) -> u32
+  where
+    u32: util::math::CastFromPrimitive<T>,
+  {
     // TODO: Investigate using different constants in ssim boost for block sizes
     // smaller than 8x8.
 

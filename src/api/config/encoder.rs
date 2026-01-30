@@ -39,7 +39,7 @@ pub struct EncoderConfig {
   /// Bit depth.
   pub bit_depth: usize,
   /// Chroma subsampling.
-  pub chroma_sampling: ChromaSampling,
+  pub chroma_sampling: ChromaSubsampling,
   /// Chroma sample position.
   pub chroma_sample_position: ChromaSamplePosition,
   /// Pixel value range.
@@ -142,7 +142,7 @@ impl EncoderConfig {
       time_base: Rational { num: 1, den: 30 },
 
       bit_depth: 8,
-      chroma_sampling: ChromaSampling::Cs420,
+      chroma_sampling: ChromaSubsampling::Yuv420,
       chroma_sample_position: ChromaSamplePosition::Unknown,
       pixel_range: Default::default(),
       color_description: None,

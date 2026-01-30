@@ -10,7 +10,7 @@
 use crate::cpu_features::CpuFeatureLevel;
 use crate::tiling::PlaneRegionMut;
 use crate::transform::inverse::*;
-use crate::transform::*;
+use crate::{transform::*, util};
 use crate::{Pixel, PixelType};
 
 use crate::asm::shared::transform::inverse::*;
@@ -18,7 +18,9 @@ use crate::asm::shared::transform::inverse::*;
 pub fn inverse_transform_add<T: Pixel>(
   input: &[T::Coeff], output: &mut PlaneRegionMut<'_, T>, eob: u16,
   tx_size: TxSize, tx_type: TxType, bd: usize, cpu: CpuFeatureLevel,
-) {
+) where
+  i32: util::math::CastFromPrimitive<<T as util::pixel::Pixel>::Coeff>,
+{
   match T::type_enum() {
     PixelType::U8 => {
       if let Some(func) = INV_TXFM_FNS[cpu.as_index()][tx_size][tx_type] {

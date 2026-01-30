@@ -39,7 +39,7 @@ pub enum ChromaSamplePosition {
   Colocated,
 }
 
-pub use v_frame::pixel::ChromaSampling;
+pub use v_frame::chroma::ChromaSubsampling;
 
 /// Supported Color Primaries
 ///

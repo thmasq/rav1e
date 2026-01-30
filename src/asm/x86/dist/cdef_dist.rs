@@ -11,6 +11,7 @@ use crate::activity::apply_ssim_boost;
 use crate::cpu_features::CpuFeatureLevel;
 use crate::dist::*;
 use crate::tiling::PlaneRegion;
+use crate::util;
 use crate::util::Pixel;
 use crate::util::PixelType;
 use std::arch::x86_64::*;
@@ -56,7 +57,10 @@ extern {
 pub fn cdef_dist_kernel<T: Pixel>(
   src: &PlaneRegion<'_, T>, dst: &PlaneRegion<'_, T>, w: usize, h: usize,
   bit_depth: usize, cpu: CpuFeatureLevel,
-) -> u32 {
+) -> u32
+where
+  u32: util::math::CastFromPrimitive<T>,
+{
   debug_assert!(src.plane_cfg.xdec == 0);
   debug_assert!(src.plane_cfg.ydec == 0);
   debug_assert!(dst.plane_cfg.xdec == 0);

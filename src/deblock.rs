@@ -8,7 +8,6 @@
 // PATENTS file, you can obtain it at www.aomedia.org/license/patent.
 
 use crate::api::FrameType;
-use crate::color::ChromaSampling::Cs400;
 use crate::context::*;
 use crate::encoder::FrameInvariants;
 use crate::partition::RefType::*;
@@ -19,6 +18,7 @@ use crate::util::{clamp, ILog, Pixel};
 use crate::DeblockState;
 use rayon::iter::*;
 use std::cmp;
+use v_frame::chroma::ChromaSubsampling;
 
 fn deblock_adjusted_level(
   deblock: &DeblockState, block: &Block, pli: usize, vertical: bool,
@@ -1662,7 +1662,7 @@ pub fn deblock_filter_optimize<T: Pixel, U: Pixel>(
       crop_w,
       crop_h,
       fi.sequence.bit_depth,
-      fi.sequence.chroma_sampling == Cs400,
+      fi.sequence.chroma_sampling == ChromaSubsampling::Monochrome,
     )
   }
 }

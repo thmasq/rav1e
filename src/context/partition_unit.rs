@@ -8,6 +8,7 @@
 // PATENTS file, you can obtain it at www.aomedia.org/license/patent.
 
 use super::*;
+use v_frame::chroma::ChromaSubsampling;
 
 // Generates 4 bit field in which each bit set to 1 represents
 // a blocksize partition  1111 means we split 64x64, 32x32, 16x16
@@ -433,9 +434,9 @@ impl BlockContext<'_> {
   /// - If the block size is invalid for subsampling
   pub fn reset_skip_context(
     &mut self, bo: TileBlockOffset, bsize: BlockSize, xdec: usize,
-    ydec: usize, cs: ChromaSampling,
+    ydec: usize, cs: ChromaSubsampling,
   ) {
-    let num_planes = if cs == ChromaSampling::Cs400 { 1 } else { 3 };
+    let num_planes = if cs == ChromaSubsampling::Monochrome { 1 } else { 3 };
     let nplanes = if bsize >= BLOCK_8X8 {
       num_planes
     } else {

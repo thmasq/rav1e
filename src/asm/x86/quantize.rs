@@ -16,6 +16,7 @@ use crate::context::av1_get_coded_tx_size;
 use crate::cpu_features::CpuFeatureLevel;
 use crate::quantize::*;
 use crate::transform::TxSize;
+use crate::util;
 use crate::util::Coefficient;
 use crate::Pixel;
 use crate::PixelType;
@@ -43,7 +44,9 @@ pub fn dequantize<T: Coefficient>(
   qindex: u8, coeffs: &[T], eob: u16, rcoeffs: &mut [MaybeUninit<T>],
   tx_size: TxSize, bit_depth: usize, dc_delta_q: i8, ac_delta_q: i8,
   cpu: CpuFeatureLevel,
-) {
+) where
+  i32: util::math::CastFromPrimitive<T>,
+{
   let call_rust = |rcoeffs: &mut [MaybeUninit<T>]| {
     crate::quantize::rust::dequantize(
       qindex, coeffs, eob, rcoeffs, tx_size, bit_depth, dc_delta_q,

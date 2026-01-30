@@ -13,8 +13,8 @@ use std::io;
 use std::sync::Arc;
 
 use bitstream_io::{BigEndian, BitWrite, BitWriter};
+use v_frame::chroma::ChromaSubsampling;
 
-use crate::api::color::*;
 use crate::api::config::*;
 use crate::api::internal::*;
 use crate::api::util::*;
@@ -359,9 +359,9 @@ where
         bw.write_bit(false)?; // tier
         bw.write_bit(seq.bit_depth > 8)?; // high_bitdepth
         bw.write_bit(seq.bit_depth == 12)?; // twelve_bit
-        bw.write_bit(seq.chroma_sampling == ChromaSampling::Cs400)?; // monochrome
-        bw.write_bit(seq.chroma_sampling != ChromaSampling::Cs444)?; // chroma_subsampling_x
-        bw.write_bit(seq.chroma_sampling == ChromaSampling::Cs420)?; // chroma_subsampling_y
+        bw.write_bit(seq.chroma_sampling == ChromaSubsampling::Monochrome)?; // monochrome
+        bw.write_bit(seq.chroma_sampling != ChromaSubsampling::Yuv444)?; // chroma_subsampling_x
+        bw.write_bit(seq.chroma_sampling == ChromaSubsampling::Yuv420)?; // chroma_subsampling_y
         bw.write::<2, u8>(0)?; // chroma_sample_position
         bw.write::<3, u8>(0)?; // reserved
         bw.write_bit(false)?; // initial_presentation_delay_present

@@ -1624,7 +1624,7 @@ static INV_TXFM_FNS: [[InvTxfmFn; 5]; 5] = [
 
 pub(crate) mod rust {
   use super::*;
-  use crate::cpu_features::CpuFeatureLevel;
+  use crate::{cpu_features::CpuFeatureLevel, util};
 
   use simd_helpers::cold_for_target_arch;
   use std::cmp;
@@ -1633,7 +1633,9 @@ pub(crate) mod rust {
   pub fn inverse_transform_add<T: Pixel>(
     input: &[T::Coeff], output: &mut PlaneRegionMut<'_, T>, _eob: u16,
     tx_size: TxSize, tx_type: TxType, bd: usize, _cpu: CpuFeatureLevel,
-  ) {
+  ) where
+    i32: util::math::CastFromPrimitive<<T as util::pixel::Pixel>::Coeff>,
+  {
     let width: usize = tx_size.width();
     let height: usize = tx_size.height();
 

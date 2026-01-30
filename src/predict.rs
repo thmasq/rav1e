@@ -28,12 +28,12 @@ use aligned_vec::{avec, ABox};
 use crate::context::{TileBlockOffset, MAX_SB_SIZE_LOG2, MAX_TX_SIZE};
 use crate::cpu_features::CpuFeatureLevel;
 use crate::encoder::FrameInvariants;
-use crate::frame::*;
 use crate::mc::*;
 use crate::partition::*;
 use crate::tiling::*;
 use crate::transform::*;
 use crate::util::*;
+use crate::{frame::*, util};
 
 pub const ANGLE_STEP: i8 = 3;
 
@@ -284,7 +284,8 @@ impl PredictionMode {
   fn get_mv_params<T: Pixel>(
     rec_plane: &Plane<T>, po: PlaneOffset, mv: MotionVector,
   ) -> (i32, i32, PlaneSlice<'_, T>) {
-    let &PlaneConfig { xdec, ydec, .. } = &rec_plane.cfg;
+    let PlaneConfig { xdec, ydec, .. } =
+      PlaneConfig::new(&rec_plane.geometry());
     let row_offset = mv.row as i32 >> (3 + ydec);
     let col_offset = mv.col as i32 >> (3 + xdec);
     let row_frac = ((mv.row as i32) << (1 - ydec)) & 0xf;
@@ -293,7 +294,11 @@ impl PredictionMode {
       x: po.x + col_offset as isize - 3,
       y: po.y + row_offset as isize - 3,
     };
-    (row_frac, col_frac, rec_plane.slice(qo).clamp().subslice(3, 3))
+    (
+      row_frac,
+      col_frac,
+      PlaneSlice::new(rec_plane, qo.x, qo.y).clamp().subslice(3, 3),
+    )
   }
 
   /// Inter prediction with a single reference (i.e. not compound mode)
@@ -314,8 +319,11 @@ impl PredictionMode {
     if let Some(ref rec) =
       fi.rec_buffer.frames[fi.ref_frames[ref_frame.to_index()] as usize]
     {
-      let (row_frac, col_frac, src) =
-        PredictionMode::get_mv_params(&rec.frame.planes[p], frame_po, mv);
+      let (row_frac, col_frac, src) = PredictionMode::get_mv_params(
+        &rec.frame.planes().nth(p).unwrap(),
+        frame_po,
+        mv,
+      );
       put_8tap(
         dst,
         src,
@@ -352,7 +360,7 @@ impl PredictionMode {
         fi.rec_buffer.frames[fi.ref_frames[ref_frames[i].to_index()] as usize]
       {
         let (row_frac, col_frac, src) = PredictionMode::get_mv_params(
-          &rec.frame.planes[p],
+          &rec.frame.planes().nth(p).unwrap(),
           frame_po,
           mvs[i],
         );
@@ -645,10 +653,14 @@ pub fn luma_ac<'ac, T: Pixel>(
   ac: &'ac mut [MaybeUninit<i16>], ts: &mut TileStateMut<'_, T>,
   tile_bo: TileBlockOffset, bsize: BlockSize, tx_size: TxSize,
   fi: &FrameInvariants<T>,
-) -> &'ac mut [i16] {
+) -> &'ac mut [i16]
+where
+  i16: util::math::CastFromPrimitive<T>,
+{
   use crate::context::MI_SIZE_LOG2;
 
-  let PlaneConfig { xdec, ydec, .. } = ts.input.planes[1].cfg;
+  let PlaneConfig { xdec, ydec, .. } =
+    PlaneConfig::new(&ts.input.planes().nth(1).unwrap().geometry());
   let plane_bsize = bsize.subsampled_size(xdec, ydec).unwrap();
 
   // ensure ac has the right length, so there aren't any uninitialized elements at the end
@@ -698,6 +710,8 @@ pub fn luma_ac<'ac, T: Pixel>(
 }
 
 pub(crate) mod rust {
+  use crate::util;
+
   use super::*;
   use std::mem::size_of;
 
@@ -790,11 +804,11 @@ pub(crate) mod rust {
     let edges = left[..height].iter().chain(above[..width].iter());
     let len = (width + height) as u32;
     let avg = (edges.fold(0u32, |acc, &v| {
-      let v: u32 = v.into();
+      let v: u32 = v.to_i32() as u32;
       v + acc
     }) + (len >> 1))
       / len;
-    let avg = T::cast_from(avg);
+    let avg = T::cast_from(avg as i32);
 
     for line in output.rows_iter_mut().take(height) {
       line[..width].fill(avg);
@@ -805,7 +819,7 @@ pub(crate) mod rust {
     output: &mut PlaneRegionMut<'_, T>, _above: &[T], _left: &[T],
     width: usize, height: usize, bit_depth: usize,
   ) {
-    let v = T::cast_from(128u32 << (bit_depth - 8));
+    let v = T::cast_from((128u32 << (bit_depth - 8)) as i32);
     for line in output.rows_iter_mut().take(height) {
       line[..width].fill(v);
     }
@@ -816,10 +830,11 @@ pub(crate) mod rust {
     width: usize, height: usize, _bit_depth: usize,
   ) {
     let sum = left[..].iter().fold(0u32, |acc, &v| {
-      let v: u32 = v.into();
+      let v: u32 = v.to_i32() as u32;
       v + acc
     });
-    let avg = T::cast_from((sum + (height >> 1) as u32) / height as u32);
+    let avg =
+      T::cast_from(((sum + (height >> 1) as u32) / height as u32) as i32);
     for line in output.rows_iter_mut().take(height) {
       line[..width].fill(avg);
     }
@@ -830,10 +845,11 @@ pub(crate) mod rust {
     width: usize, height: usize, _bit_depth: usize,
   ) {
     let sum = above[..width].iter().fold(0u32, |acc, &v| {
-      let v: u32 = v.into();
+      let v: u32 = v.to_i32() as u32;
       v + acc
     });
-    let avg = T::cast_from((sum + (width >> 1) as u32) / width as u32);
+    let avg =
+      T::cast_from(((sum + (width >> 1) as u32) / width as u32) as i32);
     for line in output.rows_iter_mut().take(height) {
       line[..width].fill(avg);
     }
@@ -865,9 +881,9 @@ pub(crate) mod rust {
       let row = &mut output[r];
       for c in 0..width {
         // Top-left pixel is fixed in libaom
-        let raw_top_left: i32 = above_left.into();
-        let raw_left: i32 = left[height - 1 - r].into();
-        let raw_top: i32 = above[c].into();
+        let raw_top_left: i32 = above_left.to_i32();
+        let raw_left: i32 = left[height - 1 - r].to_i32();
+        let raw_top: i32 = above[c].to_i32();
 
         let p_base = raw_top + raw_left - raw_top_left;
         let p_left = (p_base - raw_left).abs();
@@ -928,13 +944,13 @@ pub(crate) mod rust {
           .iter()
           .zip(pixels.iter())
           .map(|(w, p)| {
-            let p: u32 = (*p).into();
+            let p: u32 = (*p).to_i32() as u32;
             (*w as u32) * p
           })
           .sum();
         this_pred = (this_pred + (1 << (log2_scale - 1))) >> log2_scale;
 
-        row[c] = T::cast_from(this_pred);
+        row[c] = T::cast_from(this_pred as i32);
       }
     }
   }
@@ -967,13 +983,13 @@ pub(crate) mod rust {
           .iter()
           .zip(pixels.iter())
           .map(|(w, p)| {
-            let p: u32 = (*p).into();
+            let p: u32 = (*p).to_i32() as u32;
             (*w as u32) * p
           })
           .sum();
         this_pred = (this_pred + (1 << (log2_scale - 1))) >> log2_scale;
 
-        row[c] = T::cast_from(this_pred);
+        row[c] = T::cast_from(this_pred as i32);
       }
     }
   }
@@ -1006,13 +1022,13 @@ pub(crate) mod rust {
           .iter()
           .zip(pixels.iter())
           .map(|(w, p)| {
-            let p: u32 = (*p).into();
+            let p: u32 = (*p).to_i32() as u32;
             (*w as u32) * p
           })
           .sum();
         this_pred = (this_pred + (1 << (log2_scale - 1))) >> log2_scale;
 
-        row[c] = T::cast_from(this_pred);
+        row[c] = T::cast_from(this_pred as i32);
       }
     }
   }
@@ -1020,7 +1036,9 @@ pub(crate) mod rust {
   pub(crate) fn pred_cfl_ac<T: Pixel, const XDEC: usize, const YDEC: usize>(
     ac: &mut [MaybeUninit<i16>], luma: &PlaneRegion<'_, T>,
     plane_bsize: BlockSize, w_pad: usize, h_pad: usize, _cpu: CpuFeatureLevel,
-  ) {
+  ) where
+    i16: util::math::CastFromPrimitive<T>,
+  {
     let max_luma_w = (plane_bsize.width() - w_pad * 4) << XDEC;
     let max_luma_h = (plane_bsize.height() - h_pad * 4) << YDEC;
     let max_luma_x: usize = max_luma_w.max(8) - (1 << XDEC);
@@ -1074,7 +1092,7 @@ pub(crate) mod rust {
     assert!(output.rows_iter().len() >= height);
 
     let sample_max = (1 << bit_depth) - 1;
-    let avg: i32 = output[0][0].into();
+    let avg: i32 = output[0][0].to_i32();
 
     for (line, luma) in
       output.rows_iter_mut().zip(ac.chunks_exact(width)).take(height)
@@ -1226,7 +1244,7 @@ pub(crate) mod rust {
           * edge[k].to_u32().unwrap();
       }
 
-      edge_filtered[i] = T::cast_from((s + 8) >> 4);
+      edge_filtered[i] = T::cast_from(((s + 8) >> 4) as i32);
     }
     edge.copy_from_slice(edge_filtered);
   }
@@ -1254,10 +1272,10 @@ pub(crate) mod rust {
     edge[0] = dup[0];
 
     for i in 0..size {
-      let mut s = -dup[i].to_i32().unwrap()
-        + (9 * dup[i + 1].to_i32().unwrap())
-        + (9 * dup[i + 2].to_i32().unwrap())
-        - dup[i + 3].to_i32().unwrap();
+      let mut s = -dup[i].to_i32()
+        + (9 * dup[i + 1].to_i32())
+        + (9 * dup[i + 2].to_i32())
+        - dup[i + 3].to_i32();
       s = ((s + 8) / 16).clamp(0, (1 << bit_depth) - 1);
 
       edge[2 * i + 1] = T::cast_from(s);
@@ -1430,11 +1448,11 @@ pub(crate) mod rust {
           let shift = (((idx << upsample_above) >> 1) & 31) as i32;
           let max_base_x = (height + width - 1) << upsample_above;
           let v = (if base < max_base_x {
-            let a: i32 = above_edge[base + offset_above].into();
-            let b: i32 = above_edge[base + 1 + offset_above].into();
+            let a: i32 = above_edge[base + offset_above].to_i32();
+            let b: i32 = above_edge[base + 1 + offset_above].to_i32();
             round_shift(a * (32 - shift) + b * shift, 5)
           } else {
-            let c: i32 = above_edge[max_base_x + offset_above].into();
+            let c: i32 = above_edge[max_base_x + offset_above].to_i32();
             c
           })
           .clamp(0, sample_max);
@@ -1454,9 +1472,9 @@ pub(crate) mod rust {
             } else {
               above_edge[(base + offset_above as isize) as usize]
             }
-            .into();
+            .to_i32();
             let b: i32 =
-              above_edge[(base + 1 + offset_above as isize) as usize].into();
+              above_edge[(base + 1 + offset_above as isize) as usize].to_i32();
             let v = round_shift(a * (32 - shift) + b * shift, 5)
               .clamp(0, sample_max);
             row[j] = T::cast_from(v);
@@ -1472,13 +1490,13 @@ pub(crate) mod rust {
             } else {
               left_edge[l - (base + offset_left as isize) as usize]
             }
-            .into();
+            .to_i32();
             let b: i32 = if (base + offset_left as isize) == -2 {
               left_edge[1]
             } else {
               left_edge[l - (base + offset_left as isize + 1) as usize]
             }
-            .into();
+            .to_i32();
             let v = round_shift(a * (32 - shift) + b * shift, 5)
               .clamp(0, sample_max);
             row[j] = T::cast_from(v);
@@ -1493,9 +1511,10 @@ pub(crate) mod rust {
           let base = (idx >> (6 - upsample_left)) + (i << upsample_left);
           let shift = (((idx << upsample_left) >> 1) & 31) as i32;
           let l = left_edge.len() - 1;
-          let a: i32 = left_edge[l.saturating_sub(base + offset_left)].into();
+          let a: i32 =
+            left_edge[l.saturating_sub(base + offset_left)].to_i32();
           let b: i32 =
-            left_edge[l.saturating_sub(base + offset_left + 1)].into();
+            left_edge[l.saturating_sub(base + offset_left + 1)].to_i32();
           let v =
             round_shift(a * (32 - shift) + b * shift, 5).clamp(0, sample_max);
           row[j] = T::cast_from(v);

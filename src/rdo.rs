@@ -43,6 +43,7 @@ use crate::predict::{
 use crate::rdo_tables::*;
 use crate::tiling::*;
 use crate::transform::{TxSet, TxSize, TxType, RAV1E_TX_TYPES};
+use crate::util;
 use crate::util::{init_slice_repeat_mut, Aligned, Pixel};
 use crate::write_tx_blocks;
 use crate::write_tx_tree;
@@ -142,7 +143,10 @@ pub fn estimate_rate(qindex: u8, ts: TxSize, fast_distortion: u64) -> u64 {
 pub fn cdef_dist_wxh<T: Pixel, F: Fn(Area, BlockSize) -> DistortionScale>(
   src1: &PlaneRegion<'_, T>, src2: &PlaneRegion<'_, T>, w: usize, h: usize,
   bit_depth: usize, compute_bias: F, cpu: CpuFeatureLevel,
-) -> Distortion {
+) -> Distortion
+where
+  u32: util::math::CastFromPrimitive<T>,
+{
   debug_assert!(src1.plane_cfg.xdec == 0);
   debug_assert!(src1.plane_cfg.ydec == 0);
   debug_assert!(src2.plane_cfg.xdec == 0);
@@ -177,7 +181,10 @@ pub fn cdef_dist_wxh<T: Pixel, F: Fn(Area, BlockSize) -> DistortionScale>(
 pub fn sse_wxh<T: Pixel, F: Fn(Area, BlockSize) -> DistortionScale>(
   src1: &PlaneRegion<'_, T>, src2: &PlaneRegion<'_, T>, w: usize, h: usize,
   compute_bias: F, bit_depth: usize, cpu: CpuFeatureLevel,
-) -> Distortion {
+) -> Distortion
+where
+  i32: util::math::CastFromPrimitive<T>,
+{
   // See get_weighted_sse in src/dist.rs.
   // Provide a scale to get_weighted_sse for each square region of this size.
   const CHUNK_SIZE: usize = IMPORTANCE_BLOCK_SIZE >> 1;
@@ -254,7 +261,11 @@ pub const fn clip_visible_bsize(
 fn compute_distortion<T: Pixel>(
   fi: &FrameInvariants<T>, ts: &TileStateMut<'_, T>, bsize: BlockSize,
   is_chroma_block: bool, tile_bo: TileBlockOffset, luma_only: bool,
-) -> ScaledDistortion {
+) -> ScaledDistortion
+where
+  i32: util::math::CastFromPrimitive<T>,
+  u32: util::math::CastFromPrimitive<T>,
+{
   let area = Area::BlockStartingAt { bo: tile_bo.0 };
   let input_region = ts.input_tile.planes[0].subregion(area);
   let rec_region = ts.rec.planes[0].subregion(area);
@@ -308,9 +319,10 @@ fn compute_distortion<T: Pixel>(
 
   if is_chroma_block
     && !luma_only
-    && fi.sequence.chroma_sampling != ChromaSampling::Cs400
+    && fi.sequence.chroma_sampling != ChromaSubsampling::Monochrome
   {
-    let PlaneConfig { xdec, ydec, .. } = ts.input.planes[1].cfg;
+    let PlaneConfig { xdec, ydec, .. } =
+      PlaneConfig::new(&ts.input.planes().nth(1).unwrap().geometry());
     let chroma_w = if bsize.width() >= 8 || xdec == 0 {
       (visible_w + xdec) >> xdec
     } else {
@@ -350,7 +362,10 @@ fn compute_tx_distortion<T: Pixel>(
   fi: &FrameInvariants<T>, ts: &TileStateMut<'_, T>, bsize: BlockSize,
   is_chroma_block: bool, tile_bo: TileBlockOffset, tx_dist: ScaledDistortion,
   skip: bool, luma_only: bool,
-) -> ScaledDistortion {
+) -> ScaledDistortion
+where
+  i32: util::math::CastFromPrimitive<T>,
+{
   assert!(fi.config.tune == Tune::Psnr);
   let area = Area::BlockStartingAt { bo: tile_bo.0 };
   let input_region = ts.input_tile.planes[0].subregion(area);
@@ -396,9 +411,10 @@ fn compute_tx_distortion<T: Pixel>(
   if is_chroma_block
     && !luma_only
     && skip
-    && fi.sequence.chroma_sampling != ChromaSampling::Cs400
+    && fi.sequence.chroma_sampling != ChromaSubsampling::Monochrome
   {
-    let PlaneConfig { xdec, ydec, .. } = ts.input.planes[1].cfg;
+    let PlaneConfig { xdec, ydec, .. } =
+      PlaneConfig::new(&ts.input.planes().nth(1).unwrap().geometry());
     let chroma_w = if bsize.width() >= 8 || xdec == 0 {
       (visible_w + xdec) >> xdec
     } else {
@@ -738,6 +754,7 @@ where
   <T as crate::util::pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>,
   i32: crate::util::math::CastFromPrimitive<T>,
   u32: crate::util::math::CastFromPrimitive<T>,
+  i16: util::math::CastFromPrimitive<T>,
 {
   let is_inter = !luma_mode.is_intra();
   let mut tx_size = max_txsize_rect_lookup[bsize as usize];
@@ -843,8 +860,10 @@ fn luma_chroma_mode_rdo<T: Pixel>(
   <T as crate::util::pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>,
   i32: crate::util::math::CastFromPrimitive<T>,
   u32: crate::util::math::CastFromPrimitive<T>,
+  i16: util::math::CastFromPrimitive<T>,
 {
-  let PlaneConfig { xdec, ydec, .. } = ts.input.planes[1].cfg;
+  let PlaneConfig { xdec, ydec, .. } =
+    PlaneConfig::new(&ts.input.planes().nth(1).unwrap().geometry());
 
   let is_chroma_block =
     has_chroma(tile_bo, bsize, xdec, ydec, fi.sequence.chroma_sampling);
@@ -996,8 +1015,10 @@ where
   <T as crate::util::pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>,
   i32: crate::util::math::CastFromPrimitive<T>,
   u32: crate::util::math::CastFromPrimitive<T>,
+  i16: util::math::CastFromPrimitive<T>,
 {
-  let PlaneConfig { xdec, ydec, .. } = ts.input.planes[1].cfg;
+  let PlaneConfig { xdec, ydec, .. } =
+    PlaneConfig::new(&ts.input.planes().nth(1).unwrap().geometry());
   let cw_checkpoint = cw.checkpoint(&tile_bo, fi.sequence.chroma_sampling);
 
   let rdo_type = if fi.use_tx_domain_rate {
@@ -1069,7 +1090,7 @@ where
       true,
     );
     cw.rollback(&cw_checkpoint);
-    if fi.sequence.chroma_sampling != ChromaSampling::Cs400 {
+    if fi.sequence.chroma_sampling != ChromaSubsampling::Monochrome {
       if let Some(cfl) = rdo_cfl_alpha(ts, tile_bo, bsize, best.tx_size, fi) {
         let mut wr = WriterCounter::new();
         let tell = wr.tell_frac();
@@ -1166,6 +1187,7 @@ where
   <T as crate::util::pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>,
   i32: crate::util::math::CastFromPrimitive<T>,
   u32: crate::util::math::CastFromPrimitive<T>,
+  i16: util::math::CastFromPrimitive<T>,
 {
   let mut best = PartitionParameters::default();
 
@@ -1450,6 +1472,7 @@ where
   <T as crate::util::pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>,
   i32: crate::util::math::CastFromPrimitive<T>,
   u32: crate::util::math::CastFromPrimitive<T>,
+  i16: util::math::CastFromPrimitive<T>,
 {
   let mut modes = ArrayVec::<_, INTRA_MODES>::new();
 
@@ -1647,8 +1670,13 @@ where
 pub fn rdo_cfl_alpha<T: Pixel>(
   ts: &mut TileStateMut<'_, T>, tile_bo: TileBlockOffset, bsize: BlockSize,
   luma_tx_size: TxSize, fi: &FrameInvariants<T>,
-) -> Option<CFLParams> {
-  let PlaneConfig { xdec, ydec, .. } = ts.input.planes[1].cfg;
+) -> Option<CFLParams>
+where
+  i16: util::math::CastFromPrimitive<T>,
+  i32: util::math::CastFromPrimitive<T>,
+{
+  let PlaneConfig { xdec, ydec, .. } =
+    PlaneConfig::new(&ts.input.planes().nth(1).unwrap().geometry());
   let uv_tx_size = bsize.largest_chroma_tx_size(xdec, ydec);
   debug_assert!(
     bsize.subsampled_size(xdec, ydec).unwrap() == uv_tx_size.block_size()
@@ -1769,11 +1797,13 @@ where
   <T as crate::util::pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>,
   i32: crate::util::math::CastFromPrimitive<T>,
   u32: crate::util::math::CastFromPrimitive<T>,
+  i16: util::math::CastFromPrimitive<T>,
 {
   let mut best_type = TxType::DCT_DCT;
   let mut best_rd = f64::MAX;
 
-  let PlaneConfig { xdec, ydec, .. } = ts.input.planes[1].cfg;
+  let PlaneConfig { xdec, ydec, .. } =
+    PlaneConfig::new(&ts.input.planes().nth(1).unwrap().geometry());
   let is_chroma_block =
     has_chroma(tile_bo, bsize, xdec, ydec, fi.sequence.chroma_sampling);
 
@@ -1926,6 +1956,7 @@ where
   <T as crate::util::pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>,
   i32: crate::util::math::CastFromPrimitive<T>,
   u32: crate::util::math::CastFromPrimitive<T>,
+  i16: util::math::CastFromPrimitive<T>,
 {
   debug_assert!(tile_bo.0.x < ts.mi_width && tile_bo.0.y < ts.mi_height);
 
@@ -1956,6 +1987,7 @@ where
   <T as crate::util::pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>,
   i32: crate::util::math::CastFromPrimitive<T>,
   u32: crate::util::math::CastFromPrimitive<T>,
+  i16: util::math::CastFromPrimitive<T>,
 {
   debug_assert!(tile_bo.0.x < ts.mi_width && tile_bo.0.y < ts.mi_height);
   let subsize = bsize.subsize(partition).unwrap();
@@ -2050,6 +2082,7 @@ where
   <T as crate::util::pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>,
   i32: crate::util::math::CastFromPrimitive<T>,
   u32: crate::util::math::CastFromPrimitive<T>,
+  i16: util::math::CastFromPrimitive<T>,
 {
   let mut best_partition = cached_block.part_type;
   let mut best_rd = cached_block.rd_cost;
@@ -2126,7 +2159,11 @@ fn rdo_loop_plane_error<T: Pixel>(
   base_sbo: TileSuperBlockOffset, offset_sbo: TileSuperBlockOffset,
   sb_w: usize, sb_h: usize, fi: &FrameInvariants<T>, ts: &TileStateMut<'_, T>,
   blocks: &TileBlocks<'_>, test: &Frame<T>, src: &Tile<'_, T>, pli: usize,
-) -> ScaledDistortion {
+) -> ScaledDistortion
+where
+  i32: util::math::CastFromPrimitive<T>,
+  u32: util::math::CastFromPrimitive<T>,
+{
   let sb_w_blocks =
     if fi.sequence.use_128x128_superblock { 16 } else { 8 } * sb_w;
   let sb_h_blocks =
@@ -2139,10 +2176,11 @@ fn rdo_loop_plane_error<T: Pixel>(
       let loop_bo = offset_sbo.block_offset(bx << 1, by << 1);
       if loop_bo.0.x < blocks.cols() && loop_bo.0.y < blocks.rows() {
         let src_plane = &src.planes[pli];
-        let test_plane = &test.planes[pli];
-        let PlaneConfig { xdec, ydec, .. } = *src_plane.plane_cfg;
-        debug_assert_eq!(xdec, test_plane.cfg.xdec);
-        debug_assert_eq!(ydec, test_plane.cfg.ydec);
+        let test_plane = test.planes().nth(pli).unwrap();
+        let PlaneConfig { xdec, ydec, .. } = src_plane.plane_cfg;
+        let test_plane_cfg = PlaneConfig::new(&test_plane.geometry());
+        debug_assert_eq!(xdec, test_plane_cfg.xdec);
+        debug_assert_eq!(ydec, test_plane_cfg.ydec);
 
         // Unfortunately, our distortion biases are only available via
         // Frame-absolute addressing, so we need a block offset
@@ -2205,8 +2243,10 @@ pub fn rdo_loop_decision<T: Pixel, W: Writer>(
   deblock_p: bool,
 ) where
   i32: crate::util::math::CastFromPrimitive<T>,
+  u32: util::math::CastFromPrimitive<T>,
 {
-  let planes = if fi.sequence.chroma_sampling == ChromaSampling::Cs400 {
+  let planes = if fi.sequence.chroma_sampling == ChromaSubsampling::Monochrome
+  {
     1
   } else {
     MAX_PLANES
@@ -2504,16 +2544,16 @@ pub fn rdo_loop_decision<T: Pixel, W: Writer>(
               // We need the cropped-to-visible-frame area of this SB
               let wh =
                 if fi.sequence.use_128x128_superblock { 128 } else { 64 };
-              let PlaneConfig { xdec, ydec, .. } = cdef_ref.planes[pli].cfg;
+              let cdef_ref_plane = cdef_ref.planes().nth(pli).unwrap();
+              let cdef_ref_cfg = PlaneConfig::new(&cdef_ref_plane.geometry());
+              let PlaneConfig { xdec, ydec, .. } = cdef_ref_cfg;
               let vis_width = (wh >> xdec).min(
                 (crop_w >> xdec)
-                  - loop_sbo.plane_offset(&cdef_ref.planes[pli].cfg).x
-                    as usize,
+                  - loop_sbo.plane_offset(&cdef_ref_cfg).x as usize,
               );
               let vis_height = (wh >> ydec).min(
                 (crop_h >> ydec)
-                  - loop_sbo.plane_offset(&cdef_ref.planes[pli].cfg).y
-                    as usize,
+                  - loop_sbo.plane_offset(&cdef_ref_cfg).y as usize,
               );
               // which LRU are we currently testing against?
               if let (Some((lru_x, lru_y)), Some(lrf_ref)) = {
@@ -2552,8 +2592,7 @@ pub fn rdo_loop_decision<T: Pixel, W: Writer>(
                   }
                   RestorationFilter::Sgrproj { set, xqd } => {
                     // only run on this single superblock
-                    let loop_po =
-                      loop_sbo.plane_offset(&cdef_ref.planes[pli].cfg);
+                    let loop_po = loop_sbo.plane_offset(&cdef_ref_cfg);
                     // todo: experiment with borrowing border pixels
                     // rather than edge-extending. Right now this is
                     // hard-clipping to the superblock boundary.
@@ -2564,8 +2603,8 @@ pub fn rdo_loop_decision<T: Pixel, W: Writer>(
                       vis_height,
                       vis_width,
                       vis_height,
-                      &cdef_ref.planes[pli].slice(loop_po),
-                      &cdef_ref.planes[pli].slice(loop_po),
+                      &PlaneSlice::new(cdef_ref_plane, loop_po.x, loop_po.y),
+                      &PlaneSlice::new(cdef_ref_plane, loop_po.x, loop_po.y),
                     );
                     sgrproj_stripe_filter(
                       set,
@@ -2573,13 +2612,15 @@ pub fn rdo_loop_decision<T: Pixel, W: Writer>(
                       fi,
                       &ts.integral_buffer,
                       SOLVE_IMAGE_STRIDE,
-                      &cdef_ref.planes[pli].slice(loop_po),
-                      &mut lrf_ref.planes[pli].region_mut(Area::Rect {
-                        x: loop_po.x,
-                        y: loop_po.y,
-                        width: vis_width,
-                        height: vis_height,
-                      }),
+                      &PlaneSlice::new(cdef_ref_plane, loop_po.x, loop_po.y),
+                      &mut lrf_ref.planes_mut().nth(pli).unwrap().region_mut(
+                        Area::Rect {
+                          x: loop_po.x,
+                          y: loop_po.y,
+                          width: vis_width,
+                          height: vis_height,
+                        },
+                      ),
                     );
                     err += rdo_loop_plane_error(
                       base_sbo,
@@ -2641,8 +2682,8 @@ pub fn rdo_loop_decision<T: Pixel, W: Writer>(
             TileRect {
               x: 0,
               y: 0,
-              width: cdef_ref.planes[0].cfg.width,
-              height: cdef_ref.planes[0].cfg.height,
+              width: cdef_ref.y_plane.width().get(),
+              height: cdef_ref.y_plane.height().get(),
             },
           );
 
@@ -2684,7 +2725,8 @@ pub fn rdo_loop_decision<T: Pixel, W: Writer>(
         let lru_sb_w = 1 << ts.restoration.planes[pli].rp_cfg.sb_h_shift;
         // height, in sb, of an LRU in this plane
         let lru_sb_h = 1 << ts.restoration.planes[pli].rp_cfg.sb_v_shift;
-        let PlaneConfig { xdec, ydec, .. } = lrf_ref.planes[pli].cfg;
+        let PlaneConfig { xdec, ydec, .. } =
+          PlaneConfig::new(&lrf_ref.planes().nth(pli).unwrap().geometry());
         for lru_y in 0..lru_h[pli] {
           // number of LRUs vertically
           for lru_x in 0..lru_w[pli] {
@@ -2705,7 +2747,7 @@ pub fn rdo_loop_decision<T: Pixel, W: Writer>(
               false,
             ) {
               let src_plane = &src_subset.planes[pli]; // uncompressed input for reference
-              let lrf_in_plane = &lrf_input.planes[pli];
+              let lrf_in_plane = lrf_input.planes().nth(pli).unwrap();
               let lrf_po = loop_sbo.plane_offset(&src_plane.plane_cfg);
               let mut best_new_lrf = best_lrf[lru_y * lru_w[pli] + lru_x][pli];
               let mut best_cost =
@@ -2743,13 +2785,15 @@ pub fn rdo_loop_decision<T: Pixel, W: Writer>(
 
               // Look for a self guided filter
               // We need the cropped-to-visible-frame computation area of this LRU
+              let lrf_ref_plane = lrf_ref.planes().nth(pli).unwrap();
+              let lrf_ref_cfg = PlaneConfig::new(&lrf_ref_plane.geometry());
               let vis_width = unit_size.min(
                 (crop_w >> xdec)
-                  - loop_sbo.plane_offset(&lrf_ref.planes[pli].cfg).x as usize,
+                  - loop_sbo.plane_offset(&lrf_ref_cfg).x as usize,
               );
               let vis_height = unit_size.min(
                 (crop_h >> ydec)
-                  - loop_sbo.plane_offset(&lrf_ref.planes[pli].cfg).y as usize,
+                  - loop_sbo.plane_offset(&lrf_ref_cfg).y as usize,
               );
 
               // todo: experiment with borrowing border pixels
@@ -2762,8 +2806,8 @@ pub fn rdo_loop_decision<T: Pixel, W: Writer>(
                 vis_height,
                 vis_width,
                 vis_height,
-                &lrf_in_plane.slice(lrf_po),
-                &lrf_in_plane.slice(lrf_po),
+                &PlaneSlice::new(lrf_in_plane, lrf_po.x, lrf_po.y),
+                &PlaneSlice::new(lrf_in_plane, lrf_po.x, lrf_po.y),
               );
 
               for &set in get_sgr_sets(fi.config.speed_settings.sgr_complexity)
@@ -2774,7 +2818,7 @@ pub fn rdo_loop_decision<T: Pixel, W: Writer>(
                   &ts.integral_buffer,
                   &src_plane
                     .subregion(Area::StartingAt { x: lrf_po.x, y: lrf_po.y }),
-                  &lrf_in_plane.slice(lrf_po),
+                  &PlaneSlice::new(lrf_in_plane, lrf_po.x, lrf_po.y),
                   vis_width,
                   vis_height,
                 );
@@ -2787,13 +2831,15 @@ pub fn rdo_loop_decision<T: Pixel, W: Writer>(
                     fi,
                     &ts.integral_buffer,
                     SOLVE_IMAGE_STRIDE,
-                    &lrf_in_plane.slice(lrf_po),
-                    &mut lrf_ref.planes[pli].region_mut(Area::Rect {
-                      x: lrf_po.x,
-                      y: lrf_po.y,
-                      width: vis_width,
-                      height: vis_height,
-                    }),
+                    &PlaneSlice::new(lrf_in_plane, lrf_po.x, lrf_po.y),
+                    &mut lrf_ref.planes_mut().nth(pli).unwrap().region_mut(
+                      Area::Rect {
+                        x: lrf_po.x,
+                        y: lrf_po.y,
+                        width: vis_width,
+                        height: vis_height,
+                      },
+                    ),
                   );
                 }
                 let err = rdo_loop_plane_error(

@@ -12,7 +12,7 @@ use thiserror::Error;
 use rayon::{ThreadPool, ThreadPoolBuilder};
 use std::sync::Arc;
 
-use crate::api::{ChromaSampling, Context, ContextInner, PixelRange};
+use crate::api::{ChromaSubsampling, Context, ContextInner, PixelRange};
 use crate::util::{self, Pixel};
 
 mod encoder;
@@ -221,6 +221,7 @@ impl Config {
     <T as util::pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>,
     i32: util::math::CastFromPrimitive<T>,
     u32: util::math::CastFromPrimitive<T>,
+    i16: util::math::CastFromPrimitive<T>,
   {
     assert!(
       8 * std::mem::size_of::<T>() >= self.enc.bit_depth,
@@ -241,7 +242,7 @@ impl Config {
     let chroma_sampling = config.chroma_sampling;
 
     // FIXME: tx partition for intra not supported for chroma 422
-    if chroma_sampling == ChromaSampling::Cs422 {
+    if chroma_sampling == ChromaSubsampling::Yuv422 {
       config.speed_settings.transform.rdo_tx_decision = false;
     }
 
@@ -303,6 +304,7 @@ impl Config {
     <T as util::pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>,
     i32: util::math::CastFromPrimitive<T>,
     u32: util::math::CastFromPrimitive<T>,
+    i16: util::math::CastFromPrimitive<T>,
   {
     let inner = self.new_inner()?;
     let config = (*inner.config).clone();
@@ -405,13 +407,13 @@ impl Config {
 
     // <https://aomediacodec.github.io/av1-spec/#color-config-syntax>
     if let Some(color_description) = config.color_description {
-      if config.chroma_sampling != ChromaSampling::Cs400
+      if config.chroma_sampling != ChromaSubsampling::Monochrome
         && color_description.is_srgb_triple()
       {
         if config.pixel_range != PixelRange::Full {
           return Err(ColorConfigurationMismatch);
         }
-        if config.chroma_sampling != ChromaSampling::Cs444 {
+        if config.chroma_sampling != ChromaSubsampling::Yuv444 {
           return Err(ColorConfigurationMismatch);
         }
       }

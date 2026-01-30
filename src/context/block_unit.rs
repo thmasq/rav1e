@@ -10,9 +10,9 @@
 use std::mem::MaybeUninit;
 
 use super::*;
-
 use crate::predict::PredictionMode;
 use crate::util::{self, CastFromPrimitive};
+use v_frame::chroma::ChromaSubsampling;
 
 pub const MAX_PLANES: usize = 3;
 
@@ -215,7 +215,7 @@ impl Default for Block {
 #[derive(Clone)]
 pub struct BlockContextCheckpoint {
   x: usize,
-  chroma_sampling: ChromaSampling,
+  chroma_sampling: ChromaSubsampling,
   cdef_coded: bool,
   above_partition_context: [u8; MIB_SIZE >> 1],
   // left context is also at 8x8 granularity
@@ -262,7 +262,7 @@ impl<'a> BlockContext<'a> {
   }
 
   pub fn checkpoint(
-    &self, tile_bo: &TileBlockOffset, chroma_sampling: ChromaSampling,
+    &self, tile_bo: &TileBlockOffset, chroma_sampling: ChromaSubsampling,
   ) -> BlockContextCheckpoint {
     let x = tile_bo.0.x & (COEFF_CONTEXT_MAX_WIDTH - MIB_SIZE);
     let mut checkpoint = BlockContextCheckpoint {
@@ -283,7 +283,7 @@ impl<'a> BlockContext<'a> {
       .above_tx_context
       .copy_from_slice(&self.above_tx_context[x..][..MIB_SIZE]);
     let num_planes =
-      if chroma_sampling == ChromaSampling::Cs400 { 1 } else { 3 };
+      if chroma_sampling == ChromaSubsampling::Monochrome { 1 } else { 3 };
     for (p, (dst, src)) in checkpoint
       .above_coeff_context
       .iter_mut()
@@ -291,7 +291,8 @@ impl<'a> BlockContext<'a> {
       .enumerate()
       .take(num_planes)
     {
-      let xdec = (p > 0 && chroma_sampling != ChromaSampling::Cs444) as usize;
+      let xdec =
+        (p > 0 && chroma_sampling != ChromaSubsampling::Yuv444) as usize;
       dst.copy_from_slice(&src[(x >> xdec)..][..MIB_SIZE]);
     }
     checkpoint
@@ -307,7 +308,11 @@ impl<'a> BlockContext<'a> {
       .copy_from_slice(&checkpoint.above_tx_context);
     self.left_tx_context = checkpoint.left_tx_context;
     let num_planes =
-      if checkpoint.chroma_sampling == ChromaSampling::Cs400 { 1 } else { 3 };
+      if checkpoint.chroma_sampling == ChromaSubsampling::Monochrome {
+        1
+      } else {
+        3
+      };
     for (p, (dst, src)) in self
       .above_coeff_context
       .iter_mut()
@@ -315,7 +320,8 @@ impl<'a> BlockContext<'a> {
       .enumerate()
       .take(num_planes)
     {
-      let xdec = (p > 0 && checkpoint.chroma_sampling != ChromaSampling::Cs444)
+      let xdec = (p > 0
+        && checkpoint.chroma_sampling != ChromaSubsampling::Yuv444)
         as usize;
       dst[(x >> xdec)..][..MIB_SIZE].copy_from_slice(src);
     }
@@ -771,7 +777,7 @@ impl ContextWriter<'_> {
   pub fn write_use_palette_mode<W: Writer>(
     &mut self, w: &mut W, enable: bool, bsize: BlockSize, bo: TileBlockOffset,
     luma_mode: PredictionMode, chroma_mode: PredictionMode, xdec: usize,
-    ydec: usize, cs: ChromaSampling,
+    ydec: usize, cs: ChromaSubsampling,
   ) {
     if enable {
       unimplemented!(); // TODO

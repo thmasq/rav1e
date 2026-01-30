@@ -13,7 +13,6 @@ use crate::context::{
   TileSuperBlockOffset, MAX_SB_SIZE_LOG2, MIB_SIZE_LOG2, MI_SIZE,
   MI_SIZE_LOG2, SB_SIZE,
 };
-use crate::dist::*;
 use crate::frame::*;
 use crate::mc::MotionVector;
 use crate::partition::*;
@@ -22,6 +21,7 @@ use crate::tiling::*;
 use crate::util::ILog;
 use crate::util::{clamp, Pixel};
 use crate::FrameInvariants;
+use crate::{dist::*, util};
 
 use arrayvec::*;
 use std::ops::{Index, IndexMut};
@@ -153,7 +153,9 @@ pub enum MVSamplingMode {
 pub fn estimate_tile_motion<T: Pixel>(
   fi: &FrameInvariants<T>, ts: &mut TileStateMut<'_, T>,
   inter_cfg: &InterConfig,
-) {
+) where
+  i32: util::math::CastFromPrimitive<T>,
+{
   let init_size = MIB_SIZE_LOG2;
 
   let mut prev_ssdec: Option<u8> = None;
@@ -221,7 +223,9 @@ fn estimate_sb_motion<T: Pixel>(
   fi: &FrameInvariants<T>, ts: &mut TileStateMut<'_, T>, ref_frame: RefType,
   mv_size_in_b_log2: usize, tile_bo: TileBlockOffset, init: bool, ssdec: u8,
   lambda: u32,
-) {
+) where
+  i32: util::math::CastFromPrimitive<T>,
+{
   let pix_offset = tile_bo.to_luma_plane_offset();
   let sb_h: usize = SB_SIZE.min(ts.height - pix_offset.y as usize);
   let sb_w: usize = SB_SIZE.min(ts.width - pix_offset.x as usize);
@@ -284,7 +288,9 @@ fn estimate_sb_motion<T: Pixel>(
 fn refine_subsampled_sb_motion<T: Pixel>(
   fi: &FrameInvariants<T>, ts: &mut TileStateMut<'_, T>, ref_frame: RefType,
   mv_size_in_b_log2: usize, tile_bo: TileBlockOffset, ssdec: u8, lambda: u32,
-) {
+) where
+  i32: util::math::CastFromPrimitive<T>,
+{
   let pix_offset = tile_bo.to_luma_plane_offset();
   let sb_h: usize = SB_SIZE.min(ts.height - pix_offset.y as usize);
   let sb_w: usize = SB_SIZE.min(ts.width - pix_offset.x as usize);
@@ -538,7 +544,10 @@ pub fn estimate_motion<T: Pixel>(
   tile_bo: TileBlockOffset, ref_frame: RefType,
   pmv: Option<[MotionVector; 2]>, corner: MVSamplingMode,
   extensive_search: bool, ssdec: u8, lambda: Option<u32>,
-) -> Option<MotionSearchResult> {
+) -> Option<MotionSearchResult>
+where
+  i32: util::math::CastFromPrimitive<T>,
+{
   if let Some(ref rec) =
     fi.rec_buffer.frames[fi.ref_frames[ref_frame.to_index()] as usize]
   {
@@ -634,7 +643,10 @@ pub fn estimate_motion<T: Pixel>(
 fn refine_subsampled_motion_estimate<T: Pixel>(
   fi: &FrameInvariants<T>, ts: &TileStateMut<'_, T>, w: usize, h: usize,
   tile_bo: TileBlockOffset, ref_frame: RefType, ssdec: u8, lambda: u32,
-) -> Option<MotionSearchResult> {
+) -> Option<MotionSearchResult>
+where
+  i32: util::math::CastFromPrimitive<T>,
+{
   if let Some(ref rec) =
     fi.rec_buffer.frames[fi.ref_frames[ref_frame.to_index()] as usize]
   {
@@ -697,7 +709,10 @@ fn full_pixel_me<T: Pixel>(
   mvx_min: isize, mvx_max: isize, mvy_min: isize, mvy_max: isize,
   ref_frame: RefType, corner: MVSamplingMode, extensive_search: bool,
   ssdec: u8,
-) -> MotionSearchResult {
+) -> MotionSearchResult
+where
+  i32: util::math::CastFromPrimitive<T>,
+{
   let ref_frame_id = ref_frame.to_index();
   let tile_me_stats = &ts.me_stats[ref_frame_id].as_const();
   let frame_ref = fi.rec_buffer.frames[fi.ref_frames[0] as usize]
@@ -859,7 +874,9 @@ fn sub_pixel_me<T: Pixel>(
   p_ref: &Plane<T>, lambda: u32, pmv: [MotionVector; 2], mvx_min: isize,
   mvx_max: isize, mvy_min: isize, mvy_max: isize, w: usize, h: usize,
   use_satd: bool, best: &mut MotionSearchResult, ref_frame: RefType,
-) {
+) where
+  i32: util::math::CastFromPrimitive<T>,
+{
   subpel_diamond_search(
     fi,
     po,
@@ -886,7 +903,10 @@ fn get_best_predictor<T: Pixel>(
   p_ref: &Plane<T>, predictors: &[MotionVector], bit_depth: usize,
   pmv: [MotionVector; 2], lambda: u32, mvx_min: isize, mvx_max: isize,
   mvy_min: isize, mvy_max: isize, w: usize, h: usize,
-) -> MotionSearchResult {
+) -> MotionSearchResult
+where
+  i32: util::math::CastFromPrimitive<T>,
+{
   let mut best: MotionSearchResult = MotionSearchResult::empty();
 
   for &init_mv in predictors.iter() {
@@ -957,7 +977,9 @@ fn fullpel_diamond_search<T: Pixel>(
   p_ref: &Plane<T>, current: &mut MotionSearchResult, bit_depth: usize,
   pmv: [MotionVector; 2], lambda: u32, mvx_min: isize, mvx_max: isize,
   mvy_min: isize, mvy_max: isize, w: usize, h: usize,
-) {
+) where
+  i32: util::math::CastFromPrimitive<T>,
+{
   // Define the initial and the final scale (log2) of the diamond.
   let (mut diamond_radius_log2, diamond_radius_end_log2) = (1u8, 0u8);
 
@@ -1057,7 +1079,9 @@ fn hexagon_search<T: Pixel>(
   p_ref: &Plane<T>, current: &mut MotionSearchResult, bit_depth: usize,
   pmv: [MotionVector; 2], lambda: u32, mvx_min: isize, mvx_max: isize,
   mvy_min: isize, mvy_max: isize, w: usize, h: usize,
-) {
+) where
+  i32: util::math::CastFromPrimitive<T>,
+{
   // The first iteration of hexagon search is implemented separate from
   // subsequent iterations, which overlap with previous iterations.
 
@@ -1172,7 +1196,9 @@ fn uneven_multi_hex_search<T: Pixel>(
   p_ref: &Plane<T>, current: &mut MotionSearchResult, bit_depth: usize,
   pmv: [MotionVector; 2], lambda: u32, mvx_min: isize, mvx_max: isize,
   mvy_min: isize, mvy_max: isize, w: usize, h: usize, me_range: i16,
-) {
+) where
+  i32: util::math::CastFromPrimitive<T>,
+{
   assert!(!current.is_empty());
 
   // Search in a cross pattern to obtain a rough approximate of motion.
@@ -1314,7 +1340,9 @@ fn subpel_diamond_search<T: Pixel>(
   mvx_min: isize, mvx_max: isize, mvy_min: isize, mvy_max: isize, w: usize,
   h: usize, use_satd: bool, current: &mut MotionSearchResult,
   ref_frame: RefType,
-) {
+) where
+  i32: util::math::CastFromPrimitive<T>,
+{
   use crate::util::Aligned;
 
   // Motion compensation assembly has special requirements for edges
@@ -1398,7 +1426,10 @@ fn get_fullpel_mv_rd<T: Pixel>(
   p_ref: &Plane<T>, bit_depth: usize, pmv: [MotionVector; 2], lambda: u32,
   use_satd: bool, mvx_min: isize, mvx_max: isize, mvy_min: isize,
   mvy_max: isize, w: usize, h: usize, cand_mv: MotionVector,
-) -> MVCandidateRD {
+) -> MVCandidateRD
+where
+  i32: util::math::CastFromPrimitive<T>,
+{
   if (cand_mv.col as isize) < mvx_min
     || (cand_mv.col as isize) > mvx_max
     || (cand_mv.row as isize) < mvy_min
@@ -1424,7 +1455,10 @@ fn get_subpel_mv_rd<T: Pixel>(
   mvx_min: isize, mvx_max: isize, mvy_min: isize, mvy_max: isize, w: usize,
   h: usize, cand_mv: MotionVector, tmp_region: &mut PlaneRegionMut<T>,
   ref_frame: RefType,
-) -> MVCandidateRD {
+) -> MVCandidateRD
+where
+  i32: util::math::CastFromPrimitive<T>,
+{
   if (cand_mv.col as isize) < mvx_min
     || (cand_mv.col as isize) > mvx_max
     || (cand_mv.row as isize) < mvy_min
@@ -1456,7 +1490,10 @@ fn compute_mv_rd<T: Pixel>(
   fi: &FrameInvariants<T>, pmv: [MotionVector; 2], lambda: u32,
   use_satd: bool, bit_depth: usize, w: usize, h: usize, cand_mv: MotionVector,
   plane_org: &PlaneRegion<'_, T>, plane_ref: &PlaneRegion<'_, T>,
-) -> MVCandidateRD {
+) -> MVCandidateRD
+where
+  i32: util::math::CastFromPrimitive<T>,
+{
   let sad = if use_satd {
     get_satd(plane_org, plane_ref, w, h, bit_depth, fi.cpu_feature_level)
   } else {
@@ -1475,7 +1512,10 @@ fn full_search<T: Pixel>(
   fi: &FrameInvariants<T>, x_lo: isize, x_hi: isize, y_lo: isize, y_hi: isize,
   w: usize, h: usize, org_region: &PlaneRegion<T>, p_ref: &Plane<T>,
   po: PlaneOffset, step: usize, lambda: u32, pmv: [MotionVector; 2],
-) -> MotionSearchResult {
+) -> MotionSearchResult
+where
+  i32: util::math::CastFromPrimitive<T>,
+{
   let search_region = p_ref.region(Area::Rect {
     x: x_lo,
     y: y_lo,

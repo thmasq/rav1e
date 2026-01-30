@@ -8,12 +8,12 @@
 // PATENTS file, you can obtain it at www.aomedia.org/license/patent.
 
 use crate::cpu_features::CpuFeatureLevel;
-use crate::dist::*;
 use crate::encoder::IMPORTANCE_BLOCK_SIZE;
 use crate::partition::BlockSize;
 use crate::rdo::DistortionScale;
 use crate::tiling::PlaneRegion;
 use crate::util::*;
+use crate::{dist::*, util};
 
 type WeightedSseFn = unsafe extern fn(
   src: *const u8,
@@ -94,7 +94,10 @@ pub fn get_weighted_sse<T: Pixel>(
   src: &PlaneRegion<'_, T>, dst: &PlaneRegion<'_, T>, scale: &[u32],
   scale_stride: usize, w: usize, h: usize, bit_depth: usize,
   cpu: CpuFeatureLevel,
-) -> u64 {
+) -> u64
+where
+  i32: util::math::CastFromPrimitive<T>,
+{
   // Assembly breaks if imp block size changes.
   assert_eq!(IMPORTANCE_BLOCK_SIZE >> 1, 4);
 

@@ -24,6 +24,7 @@ pub use tables::*;
 
 use crate::scan_order::av1_scan_orders;
 use crate::transform::{TxSize, TxType};
+use crate::util;
 use crate::util::math::CastFromPrimitive;
 use crate::util::math::Fixed;
 use std::mem;
@@ -270,7 +271,10 @@ impl QuantizationContext {
   #[inline]
   pub fn quantize<T: Coefficient>(
     &self, coeffs: &[T], qcoeffs: &mut [T], tx_size: TxSize, tx_type: TxType,
-  ) -> u16 {
+  ) -> u16
+  where
+    i32: util::math::CastFromPrimitive<T>,
+  {
     let scan = av1_scan_orders[tx_size as usize][tx_type as usize].scan;
     let iscan = av1_scan_orders[tx_size as usize][tx_type as usize].iscan;
 
@@ -359,14 +363,16 @@ impl QuantizationContext {
 
 pub mod rust {
   use super::*;
-  use crate::cpu_features::CpuFeatureLevel;
+  use crate::{cpu_features::CpuFeatureLevel, util};
   use std::mem::MaybeUninit;
 
   pub fn dequantize<T: Coefficient>(
     qindex: u8, coeffs: &[T], _eob: u16, rcoeffs: &mut [MaybeUninit<T>],
     tx_size: TxSize, bit_depth: usize, dc_delta_q: i8, ac_delta_q: i8,
     _cpu: CpuFeatureLevel,
-  ) {
+  ) where
+    i32: util::math::CastFromPrimitive<T>,
+  {
     let log_tx_scale = get_log_tx_scale(tx_size) as i32;
     let offset = (1 << log_tx_scale) - 1;
 

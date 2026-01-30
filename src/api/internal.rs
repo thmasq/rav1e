@@ -16,7 +16,6 @@ use crate::api::lookahead::{
 use crate::api::{
   EncoderConfig, EncoderStatus, FrameType, Opaque, Packet, T35,
 };
-use crate::color::ChromaSampling::Cs400;
 use crate::dist::get_satd;
 use crate::encoder::*;
 use crate::frame::PlanePad;
@@ -38,6 +37,7 @@ use std::env;
 use std::fs;
 use std::path::PathBuf;
 use std::sync::Arc;
+use v_frame::chroma::ChromaSubsampling;
 
 /// The set of options that controls frame re-ordering and reference picture
 ///  selection.
@@ -272,6 +272,7 @@ where
   <T as util::pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>,
   i32: util::math::CastFromPrimitive<T>,
   u32: util::math::CastFromPrimitive<T>,
+  i16: util::math::CastFromPrimitive<T>,
 {
   pub fn new(enc: &EncoderConfig) -> Self {
     // initialize with temporal delimiter
@@ -1446,8 +1447,13 @@ where
     );
     self.packet_data.extend(data);
 
-    let planes =
-      if frame_data.fi.sequence.chroma_sampling == Cs400 { 1 } else { 3 };
+    let planes = if frame_data.fi.sequence.chroma_sampling
+      == ChromaSubsampling::Monochrome
+    {
+      1
+    } else {
+      3
+    };
 
     Arc::get_mut(&mut frame_data.fs.rec).unwrap().pad(
       frame_data.fi.width,

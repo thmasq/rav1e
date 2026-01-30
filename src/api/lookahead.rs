@@ -12,7 +12,7 @@ use crate::partition::{get_intra_edges, BlockSize};
 use crate::predict::{IntraParam, PredictionMode};
 use crate::tiling::{Area, PlaneRegion, TileRect};
 use crate::transform::TxSize;
-use crate::util::Aligned;
+use crate::util::{self, Aligned};
 use crate::Pixel;
 use rayon::iter::*;
 use std::num::{NonZeroU8, NonZeroUsize};
@@ -31,7 +31,10 @@ pub(crate) const IMP_BLOCK_AREA_IN_MV_UNITS: i64 =
 pub(crate) fn estimate_intra_costs<T: Pixel>(
   temp_plane: &mut Plane<T>, frame: &Frame<T>, bit_depth: usize,
   cpu_feature_level: CpuFeatureLevel,
-) -> Box<[u32]> {
+) -> Box<[u32]>
+where
+  i32: util::math::CastFromPrimitive<T>,
+{
   let plane = &frame.y_plane;
   let plane_after_prediction = temp_plane;
 
@@ -183,7 +186,10 @@ pub(crate) fn estimate_importance_block_difference<T: Pixel>(
 pub(crate) fn estimate_inter_costs<T: Pixel>(
   frame: Arc<Frame<T>>, ref_frame: Arc<Frame<T>>, bit_depth: usize,
   mut config: EncoderConfig, sequence: Arc<Sequence>, buffer: RefMEStats,
-) -> f64 {
+) -> f64
+where
+  i32: util::math::CastFromPrimitive<T>,
+{
   config.low_latency = true;
   config.speed_settings.multiref = false;
   let inter_cfg = InterConfig::new(&config);
@@ -274,7 +280,9 @@ pub(crate) fn estimate_inter_costs<T: Pixel>(
 #[profiling::function]
 pub(crate) fn compute_motion_vectors<T: Pixel>(
   fi: &mut FrameInvariants<T>, fs: &mut FrameState<T>, inter_cfg: &InterConfig,
-) {
+) where
+  i32: util::math::CastFromPrimitive<T>,
+{
   let mut blocks = FrameBlocks::new(fi.w_in_b, fi.h_in_b);
   fi.sequence
     .tiling

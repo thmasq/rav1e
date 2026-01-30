@@ -9,6 +9,7 @@
 
 use super::*;
 use std::marker::PhantomData;
+use v_frame::chroma::ChromaSubsampling;
 
 pub const CDF_LEN_MAX: usize = 16;
 
@@ -724,7 +725,7 @@ impl<'a> ContextWriter<'a> {
   }
 
   pub fn checkpoint(
-    &self, tile_bo: &TileBlockOffset, chroma_sampling: ChromaSampling,
+    &self, tile_bo: &TileBlockOffset, chroma_sampling: ChromaSubsampling,
   ) -> ContextWriterCheckpoint {
     ContextWriterCheckpoint {
       fc: self.fc_log.checkpoint(),

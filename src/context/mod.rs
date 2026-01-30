@@ -11,7 +11,6 @@
 #![allow(dead_code)]
 #![allow(non_camel_case_types)]
 
-use crate::color::ChromaSampling;
 use crate::ec::{Writer, OD_BITRES};
 use crate::encoder::FrameInvariants;
 use crate::entropymode::*;

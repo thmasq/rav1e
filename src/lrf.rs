@@ -11,8 +11,9 @@ use std::cmp;
 use std::iter::FusedIterator;
 use std::ops::{Index, IndexMut};
 
+use v_frame::chroma::ChromaSubsampling;
+
 use crate::api::SGRComplexityLevel;
-use crate::color::ChromaSampling::Cs400;
 use crate::context::{MAX_PLANES, SB_SIZE};
 use crate::encoder::FrameInvariants;
 use crate::frame::{AsRegion, Frame, Plane, PlaneSlice};
@@ -1498,7 +1499,11 @@ impl RestorationState {
   ) {
     let cdeffed = out.clone();
     let planes =
-      if fi.sequence.chroma_sampling == Cs400 { 1 } else { MAX_PLANES };
+      if fi.sequence.chroma_sampling == ChromaSubsampling::Monochrome {
+        1
+      } else {
+        MAX_PLANES
+      };
 
     // unlike the other loop filters that operate over the padded
     // frame dimensions, restoration filtering and source pixel

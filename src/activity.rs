@@ -22,7 +22,8 @@ pub struct ActivityMask {
 impl ActivityMask {
   #[profiling::function]
   pub fn from_plane<T: Pixel>(luma_plane: &Plane<T>) -> ActivityMask {
-    let PlaneConfig { width, height, .. } = luma_plane.cfg;
+    let PlaneConfig { width, height, .. } =
+      PlaneConfig::new(&luma_plane.geometry());
 
     // Width and height are padded to 8×8 block size.
     let w_in_imp_b = width.align_power_of_two_and_shift(3);
@@ -82,7 +83,7 @@ fn variance_8x8<T: Pixel>(src: &PlaneRegion<'_, T>) -> u32 {
     let row = &src[j][0..8];
     for (sum_s, sum_s2, s) in izip!(&mut sum_s_cols, &mut sum_s2_cols, row) {
       // Don't convert directly to u32 to allow better vectorization
-      let s: u16 = u16::cast_from(*s);
+      let s: u16 = (*s).to_u16();
       *sum_s += s;
 
       // Convert to u32 to avoid overflows when multiplying

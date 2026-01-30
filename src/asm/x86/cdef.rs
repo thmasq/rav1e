@@ -44,7 +44,9 @@ pub(crate) unsafe fn cdef_filter_block<T: Pixel>(
   dst: &mut PlaneRegionMut<'_, T>, src: *const T, src_stride: isize,
   pri_strength: i32, sec_strength: i32, dir: usize, damping: i32,
   bit_depth: usize, xdec: usize, ydec: usize, edges: u8, cpu: CpuFeatureLevel,
-) {
+) where
+  i32: util::math::CastFromPrimitive<T>,
+{
   let call_rust = |dst: &mut PlaneRegionMut<T>| {
     rust::cdef_filter_block(
       dst,
@@ -295,6 +297,7 @@ cpu_function_lookup_table!(
 mod test {
   pub const CDEF_HAVE_NONE: u8 = 0;
   use super::*;
+  use crate::prelude::Plane;
   use interpolate_name::interpolate_test;
   use rand::random;
   use std::str::FromStr;

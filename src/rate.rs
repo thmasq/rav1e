@@ -9,13 +9,13 @@
 
 use std::cmp;
 
-use crate::api::color::ChromaSampling;
 use crate::api::ContextInner;
 use crate::encoder::TEMPORAL_DELIMITER;
 use crate::quantize::{ac_q, dc_q, select_ac_qi, select_dc_qi};
 use crate::util::{
   self, bexp64, bexp_q24, blog64, clamp, q24_to_q57, q57, q57_to_q24, Pixel,
 };
+use v_frame::chroma::ChromaSubsampling;
 
 // The number of frame sub-types for which we track distinct parameters.
 // This does not include FRAME_SUBTYPE_SEF, because we don't need to do any
@@ -508,15 +508,15 @@ const Q57_SQUARE_EXP_SCALE: f64 =
 // Daala style log-offset for chroma quantizers
 // TODO: Optimal offsets for more configurations than just BT.709
 fn chroma_offset(
-  log_target_q: i64, chroma_sampling: ChromaSampling,
+  log_target_q: i64, chroma_sampling: ChromaSubsampling,
 ) -> (i64, i64) {
   let x = log_target_q.max(0);
   // Gradient optimized for CIEDE2000+PSNR on subset3
   let y = match chroma_sampling {
-    ChromaSampling::Cs400 => 0,
-    ChromaSampling::Cs420 => (x >> 2) + (x >> 6), // 0.266
-    ChromaSampling::Cs422 => (x >> 3) + (x >> 4) - (x >> 7), // 0.180
-    ChromaSampling::Cs444 => (x >> 4) + (x >> 5) + (x >> 8), // 0.098
+    ChromaSubsampling::Monochrome => 0,
+    ChromaSubsampling::Yuv420 => (x >> 2) + (x >> 6), // 0.266
+    ChromaSubsampling::Yuv422 => (x >> 3) + (x >> 4) - (x >> 7), // 0.180
+    ChromaSubsampling::Yuv444 => (x >> 4) + (x >> 5) + (x >> 8), // 0.098
   };
   (const { blog64(7) - blog64(4) } - y, const { blog64(5) - blog64(4) } - y)
 }
@@ -524,7 +524,7 @@ fn chroma_offset(
 impl QuantizerParameters {
   fn new_from_log_q(
     log_base_q: i64, log_target_q: i64, bit_depth: usize,
-    chroma_sampling: ChromaSampling, is_intra: bool,
+    chroma_sampling: ChromaSubsampling, is_intra: bool,
     log_isqrt_mean_scale: i64,
   ) -> QuantizerParameters {
     let scale = log_isqrt_mean_scale + q57(QSCALE + bit_depth as i32 - 8);
@@ -539,7 +539,7 @@ impl QuantizerParameters {
     let quantizer = bexp64(log_q_y + scale);
     let (offset_u, offset_v) =
       chroma_offset(log_q_y + log_isqrt_mean_scale, chroma_sampling);
-    let mono = chroma_sampling == ChromaSampling::Cs400;
+    let mono = chroma_sampling == ChromaSubsampling::Monochrome;
     let log_q_u = log_q_y + offset_u;
     let log_q_v = log_q_y + offset_v;
     let quantizer_u = bexp64(log_q_u + scale);
@@ -702,7 +702,7 @@ impl RCState {
   }
 
   pub(crate) fn select_first_pass_qi(
-    &self, bit_depth: usize, fti: usize, chroma_sampling: ChromaSampling,
+    &self, bit_depth: usize, fti: usize, chroma_sampling: ChromaSubsampling,
   ) -> QuantizerParameters {
     // Adjust the quantizer for the frame type, result is Q57:
     let log_q = ((self.pass1_log_base_q + (1i64 << 11)) >> 12)

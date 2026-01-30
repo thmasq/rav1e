@@ -14,8 +14,8 @@ use crate::predict::{
 };
 use crate::tiling::{PlaneRegion, PlaneRegionMut};
 use crate::transform::TxSize;
-use crate::Pixel;
 use crate::PixelType;
+use crate::{util, Pixel};
 use std::mem::MaybeUninit;
 
 macro_rules! decl_angular_ipred_fn {
@@ -873,7 +873,9 @@ pub fn dispatch_predict_intra<T: Pixel>(
 pub(crate) fn pred_cfl_ac<T: Pixel, const XDEC: usize, const YDEC: usize>(
   ac: &mut [MaybeUninit<i16>], luma: &PlaneRegion<'_, T>, bsize: BlockSize,
   w_pad: usize, h_pad: usize, cpu: CpuFeatureLevel,
-) {
+) where
+  i16: util::math::CastFromPrimitive<T>,
+{
   debug_assert_eq!(ac.len(), bsize.area());
 
   let call_rust = |ac: &mut [MaybeUninit<i16>]| {

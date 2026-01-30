@@ -143,7 +143,7 @@ pub struct Sequence {
   pub num_bits_width: u32,
   pub num_bits_height: u32,
   pub bit_depth: usize,
-  pub chroma_sampling: ChromaSampling,
+  pub chroma_sampling: ChromaSubsampling,
   pub chroma_sample_position: ChromaSamplePosition,
   pub pixel_range: PixelRange,
   pub color_description: Option<ColorDescription>,
@@ -231,11 +231,11 @@ impl Sequence {
     assert!(height_bits <= 16);
 
     let profile = if config.bit_depth == 12
-      || config.chroma_sampling == ChromaSampling::Cs422
+      || config.chroma_sampling == ChromaSubsampling::Yuv422
     {
       2
     } else {
-      u8::from(config.chroma_sampling == ChromaSampling::Cs444)
+      u8::from(config.chroma_sampling == ChromaSubsampling::Yuv444)
     };
 
     let operating_point_idc: [u16; MAX_NUM_OPERATING_POINTS] =
@@ -264,7 +264,7 @@ impl Sequence {
       frame_rate,
       TilingInfo::tile_log2(1, config.tile_cols).unwrap(),
       TilingInfo::tile_log2(1, config.tile_rows).unwrap(),
-      config.chroma_sampling == ChromaSampling::Cs422,
+      config.chroma_sampling == ChromaSubsampling::Yuv422,
     );
 
     if config.tiles > 0 {
@@ -280,7 +280,7 @@ impl Sequence {
           frame_rate,
           tile_cols_log2,
           tile_rows_log2,
-          config.chroma_sampling == ChromaSampling::Cs422,
+          config.chroma_sampling == ChromaSubsampling::Yuv422,
         );
 
         if tiling.rows * tiling.cols >= config.tiles {
@@ -2059,9 +2059,14 @@ where
   <T as util::pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>,
   i32: util::math::CastFromPrimitive<T>,
   u32: util::math::CastFromPrimitive<T>,
+  i16: util::math::CastFromPrimitive<T>,
 {
-  let planes =
-    if fi.sequence.chroma_sampling == ChromaSampling::Cs400 { 1 } else { 3 };
+  let planes = if fi.sequence.chroma_sampling == ChromaSubsampling::Monochrome
+  {
+    1
+  } else {
+    3
+  };
   let is_inter = !luma_mode.is_intra();
   if is_inter {
     assert!(luma_mode == chroma_mode);
@@ -2371,6 +2376,7 @@ where
   <T as util::pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>,
   i32: util::math::CastFromPrimitive<T>,
   u32: util::math::CastFromPrimitive<T>,
+  i16: util::math::CastFromPrimitive<T>,
 {
   let bw = bsize.width_mi() / tx_size.width_mi();
   let bh = bsize.height_mi() / tx_size.height_mi();
@@ -2439,7 +2445,7 @@ where
 
   if !do_chroma
     || luma_only
-    || fi.sequence.chroma_sampling == ChromaSampling::Cs400
+    || fi.sequence.chroma_sampling == ChromaSubsampling::Monochrome
   {
     return (partition_has_coeff, tx_dist);
   };
@@ -2616,7 +2622,7 @@ where
 
   if !has_chroma(tile_bo, bsize, xdec, ydec, fi.sequence.chroma_sampling)
     || luma_only
-    || fi.sequence.chroma_sampling == ChromaSampling::Cs400
+    || fi.sequence.chroma_sampling == ChromaSubsampling::Monochrome
   {
     return (partition_has_coeff, tx_dist);
   };
@@ -2717,6 +2723,7 @@ pub fn encode_block_with_modes<T: Pixel, W: Writer>(
   <T as util::pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>,
   i32: util::math::CastFromPrimitive<T>,
   u32: util::math::CastFromPrimitive<T>,
+  i16: util::math::CastFromPrimitive<T>,
 {
   let (mode_luma, mode_chroma) =
     (mode_decision.pred_mode_luma, mode_decision.pred_mode_chroma);
@@ -2790,6 +2797,7 @@ where
   <T as util::pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>,
   i32: util::math::CastFromPrimitive<T>,
   u32: util::math::CastFromPrimitive<T>,
+  i16: util::math::CastFromPrimitive<T>,
 {
   let rdo_type = RDOType::PixelDistRealRate;
   let mut rd_cost = f64::MAX;
@@ -2819,7 +2827,7 @@ where
 
   let can_split = // FIXME: sub-8x8 inter blocks not supported for non-4:2:0 sampling
     if fi.frame_type.has_inter() &&
-      fi.sequence.chroma_sampling != ChromaSampling::Cs420 &&
+      fi.sequence.chroma_sampling != ChromaSubsampling::Yuv420 &&
       bsize <= BlockSize::BLOCK_8X8 {
       false
     } else {
@@ -2896,7 +2904,9 @@ where
       if has_cols {
         partition_types.push(PartitionType::PARTITION_HORZ);
       }
-      if !(fi.sequence.chroma_sampling == ChromaSampling::Cs422) && has_rows {
+      if !(fi.sequence.chroma_sampling == ChromaSubsampling::Yuv422)
+        && has_rows
+      {
         partition_types.push(PartitionType::PARTITION_VERT);
       }
     }
@@ -3080,6 +3090,7 @@ fn encode_partition_topdown<T: Pixel, W: Writer>(
   <T as util::pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>,
   i32: util::math::CastFromPrimitive<T>,
   u32: util::math::CastFromPrimitive<T>,
+  i16: util::math::CastFromPrimitive<T>,
 {
   if tile_bo.0.x >= ts.mi_width || tile_bo.0.y >= ts.mi_height {
     return;
@@ -3098,7 +3109,7 @@ fn encode_partition_topdown<T: Pixel, W: Writer>(
 
   let can_split = // FIXME: sub-8x8 inter blocks not supported for non-4:2:0 sampling
     if fi.frame_type.has_inter() &&
-      fi.sequence.chroma_sampling != ChromaSampling::Cs420 &&
+      fi.sequence.chroma_sampling != ChromaSubsampling::Yuv420 &&
       bsize <= BlockSize::BLOCK_8X8 {
       false
     } else {
@@ -3403,9 +3414,14 @@ where
   <T as util::pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>,
   i32: util::math::CastFromPrimitive<T>,
   u32: util::math::CastFromPrimitive<T>,
+  i16: util::math::CastFromPrimitive<T>,
 {
-  let planes =
-    if fi.sequence.chroma_sampling == ChromaSampling::Cs400 { 1 } else { 3 };
+  let planes = if fi.sequence.chroma_sampling == ChromaSubsampling::Monochrome
+  {
+    1
+  } else {
+    3
+  };
   let mut blocks = FrameBlocks::new(fi.w_in_b, fi.h_in_b);
   let ti = &fi.sequence.tiling;
 
@@ -3548,9 +3564,11 @@ fn check_lf_queue<T: Pixel>(
   deblock_p: bool,
 ) where
   i32: util::math::CastFromPrimitive<T>,
+  u32: util::math::CastFromPrimitive<T>,
 {
   let mut check_queue = true;
-  let planes = if fi.sequence.chroma_sampling == ChromaSampling::Cs400 {
+  let planes = if fi.sequence.chroma_sampling == ChromaSubsampling::Monochrome
+  {
     1
   } else {
     MAX_PLANES
@@ -3646,11 +3664,16 @@ where
   i32: util::math::CastFromPrimitive<T>,
   i32: util::math::CastFromPrimitive<T>,
   u32: util::math::CastFromPrimitive<T>,
+  i16: util::math::CastFromPrimitive<T>,
 {
   let mut enc_stats = EncoderStats::default();
   let mut w = WriterEncoder::new();
-  let planes =
-    if fi.sequence.chroma_sampling == ChromaSampling::Cs400 { 1 } else { 3 };
+  let planes = if fi.sequence.chroma_sampling == ChromaSubsampling::Monochrome
+  {
+    1
+  } else {
+    3
+  };
 
   let bc = BlockContext::new(blocks);
   let mut cw = ContextWriter::new(fc, bc);
@@ -3917,7 +3940,11 @@ pub fn encode_show_existing_frame<T: Pixel>(
   if let Some(ref rec) = fi.rec_buffer.frames[map_idx] {
     let fs_rec = Arc::get_mut(&mut fs.rec).unwrap();
     let planes =
-      if fi.sequence.chroma_sampling == ChromaSampling::Cs400 { 1 } else { 3 };
+      if fi.sequence.chroma_sampling == ChromaSubsampling::Monochrome {
+        1
+      } else {
+        3
+      };
     for p in 0..planes {
       fs_rec
         .planes_mut()
@@ -3958,6 +3985,7 @@ where
   <T as util::pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>,
   i32: util::math::CastFromPrimitive<T>,
   u32: util::math::CastFromPrimitive<T>,
+  i16: util::math::CastFromPrimitive<T>,
 {
   debug_assert!(!fi.is_show_existing_frame());
   let obu_extension = 0;
