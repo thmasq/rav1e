@@ -727,7 +727,18 @@ pub fn rdo_tx_size_type<T: Pixel>(
   cw: &mut ContextWriter, bsize: BlockSize, tile_bo: TileBlockOffset,
   luma_mode: PredictionMode, ref_frames: [RefType; 2], mvs: [MotionVector; 2],
   skip: bool,
-) -> (TxSize, TxType) {
+) -> (TxSize, TxType)
+where
+  u32: crate::util::math::CastFromPrimitive<
+    <T as crate::util::pixel::Pixel>::Coeff,
+  >,
+  i32: crate::util::math::CastFromPrimitive<
+    <T as crate::util::pixel::Pixel>::Coeff,
+  >,
+  <T as crate::util::pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>,
+  i32: crate::util::math::CastFromPrimitive<T>,
+  u32: crate::util::math::CastFromPrimitive<T>,
+{
   let is_inter = !luma_mode.is_intra();
   let mut tx_size = max_txsize_rect_lookup[bsize as usize];
 
@@ -822,7 +833,17 @@ fn luma_chroma_mode_rdo<T: Pixel>(
   mode_set_chroma: &[PredictionMode], luma_mode_is_intra: bool,
   mode_context: usize, mv_stack: &ArrayVec<CandidateMV, 9>,
   angle_delta: AngleDelta,
-) {
+) where
+  u32: crate::util::math::CastFromPrimitive<
+    <T as crate::util::pixel::Pixel>::Coeff,
+  >,
+  i32: crate::util::math::CastFromPrimitive<
+    <T as crate::util::pixel::Pixel>::Coeff,
+  >,
+  <T as crate::util::pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>,
+  i32: crate::util::math::CastFromPrimitive<T>,
+  u32: crate::util::math::CastFromPrimitive<T>,
+{
   let PlaneConfig { xdec, ydec, .. } = ts.input.planes[1].cfg;
 
   let is_chroma_block =
@@ -964,7 +985,18 @@ pub fn rdo_mode_decision<T: Pixel>(
   fi: &FrameInvariants<T>, ts: &mut TileStateMut<'_, T>,
   cw: &mut ContextWriter, bsize: BlockSize, tile_bo: TileBlockOffset,
   inter_cfg: &InterConfig,
-) -> PartitionParameters {
+) -> PartitionParameters
+where
+  u32: crate::util::math::CastFromPrimitive<
+    <T as crate::util::pixel::Pixel>::Coeff,
+  >,
+  i32: crate::util::math::CastFromPrimitive<
+    <T as crate::util::pixel::Pixel>::Coeff,
+  >,
+  <T as crate::util::pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>,
+  i32: crate::util::math::CastFromPrimitive<T>,
+  u32: crate::util::math::CastFromPrimitive<T>,
+{
   let PlaneConfig { xdec, ydec, .. } = ts.input.planes[1].cfg;
   let cw_checkpoint = cw.checkpoint(&tile_bo, fi.sequence.chroma_sampling);
 
@@ -1123,7 +1155,18 @@ fn inter_frame_rdo_mode_decision<T: Pixel>(
   cw: &mut ContextWriter, bsize: BlockSize, tile_bo: TileBlockOffset,
   inter_cfg: &InterConfig, cw_checkpoint: &ContextWriterCheckpoint,
   rdo_type: RDOType,
-) -> PartitionParameters {
+) -> PartitionParameters
+where
+  u32: crate::util::math::CastFromPrimitive<
+    <T as crate::util::pixel::Pixel>::Coeff,
+  >,
+  i32: crate::util::math::CastFromPrimitive<
+    <T as crate::util::pixel::Pixel>::Coeff,
+  >,
+  <T as crate::util::pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>,
+  i32: crate::util::math::CastFromPrimitive<T>,
+  u32: crate::util::math::CastFromPrimitive<T>,
+{
   let mut best = PartitionParameters::default();
 
   // we can never have more than 7 reference frame sets
@@ -1321,7 +1364,7 @@ fn inter_frame_rdo_mode_decision<T: Pixel>(
     if num_modes_rdo != inter_mode_set.len() {
       let tile_rect = ts.tile_rect();
       let rec = &mut ts.rec.planes[0];
-      let po = tile_bo.plane_offset(rec.plane_cfg);
+      let po = tile_bo.plane_offset(&rec.plane_cfg);
       let mut rec_region =
         rec.subregion_mut(Area::BlockStartingAt { bo: tile_bo.0 });
 
@@ -1396,7 +1439,18 @@ fn intra_frame_rdo_mode_decision<T: Pixel>(
   cw: &mut ContextWriter, bsize: BlockSize, tile_bo: TileBlockOffset,
   cw_checkpoint: &ContextWriterCheckpoint, rdo_type: RDOType,
   mut best: PartitionParameters, is_chroma_block: bool,
-) -> PartitionParameters {
+) -> PartitionParameters
+where
+  u32: crate::util::math::CastFromPrimitive<
+    <T as crate::util::pixel::Pixel>::Coeff,
+  >,
+  i32: crate::util::math::CastFromPrimitive<
+    <T as crate::util::pixel::Pixel>::Coeff,
+  >,
+  <T as crate::util::pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>,
+  i32: crate::util::math::CastFromPrimitive<T>,
+  u32: crate::util::math::CastFromPrimitive<T>,
+{
   let mut modes = ArrayVec::<_, INTRA_MODES>::new();
 
   // Reduce number of prediction modes at higher speed levels
@@ -1437,7 +1491,7 @@ fn intra_frame_rdo_mode_decision<T: Pixel>(
       let mut edge_buf = Aligned::uninit_array();
       let edge_buf = {
         let rec = &ts.rec.planes[0].as_const();
-        let po = tile_bo.plane_offset(rec.plane_cfg);
+        let po = tile_bo.plane_offset(&rec.plane_cfg);
         // FIXME: If tx partition is used, get_intra_edges() should be called for each tx block
         get_intra_edges(
           &mut edge_buf,
@@ -1616,11 +1670,11 @@ pub fn rdo_cfl_alpha<T: Pixel>(
   let ac = luma_ac(&mut ac.data, ts, tile_bo, bsize, luma_tx_size, fi);
   let best_alpha: ArrayVec<i16, 2> = (1..3)
     .map(|p| {
-      let &PlaneConfig { xdec, ydec, .. } = ts.rec.planes[p].plane_cfg;
+      let PlaneConfig { xdec, ydec, .. } = ts.rec.planes[p].plane_cfg;
       let tile_rect = ts.tile_rect().decimated(xdec, ydec);
       let rec = &mut ts.rec.planes[p];
       let input = &ts.input_tile.planes[p];
-      let po = tile_bo.plane_offset(rec.plane_cfg);
+      let po = tile_bo.plane_offset(&rec.plane_cfg);
       let mut edge_buf = Aligned::uninit_array();
       let edge_buf = get_intra_edges(
         &mut edge_buf,
@@ -1704,7 +1758,18 @@ pub fn rdo_tx_type_decision<T: Pixel>(
   mode: PredictionMode, ref_frames: [RefType; 2], mvs: [MotionVector; 2],
   bsize: BlockSize, tile_bo: TileBlockOffset, tx_size: TxSize, tx_set: TxSet,
   tx_types: &[TxType], cur_best_rd: f64,
-) -> (TxType, f64) {
+) -> (TxType, f64)
+where
+  u32: crate::util::math::CastFromPrimitive<
+    <T as crate::util::pixel::Pixel>::Coeff,
+  >,
+  i32: crate::util::math::CastFromPrimitive<
+    <T as crate::util::pixel::Pixel>::Coeff,
+  >,
+  <T as crate::util::pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>,
+  i32: crate::util::math::CastFromPrimitive<T>,
+  u32: crate::util::math::CastFromPrimitive<T>,
+{
   let mut best_type = TxType::DCT_DCT;
   let mut best_rd = f64::MAX;
 
@@ -1850,7 +1915,18 @@ fn rdo_partition_none<T: Pixel>(
   fi: &FrameInvariants<T>, ts: &mut TileStateMut<'_, T>,
   cw: &mut ContextWriter, bsize: BlockSize, tile_bo: TileBlockOffset,
   inter_cfg: &InterConfig, child_modes: &mut ArrayVec<PartitionParameters, 4>,
-) -> f64 {
+) -> f64
+where
+  u32: crate::util::math::CastFromPrimitive<
+    <T as crate::util::pixel::Pixel>::Coeff,
+  >,
+  i32: crate::util::math::CastFromPrimitive<
+    <T as crate::util::pixel::Pixel>::Coeff,
+  >,
+  <T as crate::util::pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>,
+  i32: crate::util::math::CastFromPrimitive<T>,
+  u32: crate::util::math::CastFromPrimitive<T>,
+{
   debug_assert!(tile_bo.0.x < ts.mi_width && tile_bo.0.y < ts.mi_height);
 
   let mode = rdo_mode_decision(fi, ts, cw, bsize, tile_bo, inter_cfg);
@@ -1869,7 +1945,18 @@ fn rdo_partition_simple<T: Pixel, W: Writer>(
   bsize: BlockSize, tile_bo: TileBlockOffset, inter_cfg: &InterConfig,
   partition: PartitionType, rdo_type: RDOType, best_rd: f64,
   child_modes: &mut ArrayVec<PartitionParameters, 4>,
-) -> Option<f64> {
+) -> Option<f64>
+where
+  u32: crate::util::math::CastFromPrimitive<
+    <T as crate::util::pixel::Pixel>::Coeff,
+  >,
+  i32: crate::util::math::CastFromPrimitive<
+    <T as crate::util::pixel::Pixel>::Coeff,
+  >,
+  <T as crate::util::pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>,
+  i32: crate::util::math::CastFromPrimitive<T>,
+  u32: crate::util::math::CastFromPrimitive<T>,
+{
   debug_assert!(tile_bo.0.x < ts.mi_width && tile_bo.0.y < ts.mi_height);
   let subsize = bsize.subsize(partition).unwrap();
 
@@ -1952,7 +2039,18 @@ pub fn rdo_partition_decision<T: Pixel, W: Writer>(
   bsize: BlockSize, tile_bo: TileBlockOffset,
   cached_block: &PartitionGroupParameters, partition_types: &[PartitionType],
   rdo_type: RDOType, inter_cfg: &InterConfig,
-) -> PartitionGroupParameters {
+) -> PartitionGroupParameters
+where
+  u32: crate::util::math::CastFromPrimitive<
+    <T as crate::util::pixel::Pixel>::Coeff,
+  >,
+  i32: crate::util::math::CastFromPrimitive<
+    <T as crate::util::pixel::Pixel>::Coeff,
+  >,
+  <T as crate::util::pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>,
+  i32: crate::util::math::CastFromPrimitive<T>,
+  u32: crate::util::math::CastFromPrimitive<T>,
+{
   let mut best_partition = cached_block.part_type;
   let mut best_rd = cached_block.rd_cost;
   let mut best_pred_modes = cached_block.part_modes.clone();
@@ -2105,7 +2203,9 @@ pub fn rdo_loop_decision<T: Pixel, W: Writer>(
   base_sbo: TileSuperBlockOffset, fi: &FrameInvariants<T>,
   ts: &mut TileStateMut<'_, T>, cw: &mut ContextWriter, w: &mut W,
   deblock_p: bool,
-) {
+) where
+  i32: crate::util::math::CastFromPrimitive<T>,
+{
   let planes = if fi.sequence.chroma_sampling == ChromaSampling::Cs400 {
     1
   } else {
@@ -2329,16 +2429,11 @@ pub fn rdo_loop_decision<T: Pixel, W: Writer>(
   let mut cdef_work =
     if !cdef_skip_all { Some(rec_subset.clone()) } else { None };
   let mut lrf_work = if !lru_skip_all {
-    Some(Frame {
-      planes: {
-        let new_plane = |pli: usize| {
-          let PlaneConfig { xdec, ydec, width, height, .. } =
-            rec_subset.planes[pli].cfg;
-          Plane::new(width, height, xdec, ydec, 0, 0)
-        };
-        [new_plane(0), new_plane(1), new_plane(2)]
-      },
-    })
+    Some(Frame::new(
+      rec_subset.y_plane.width().get(),
+      rec_subset.y_plane.height().get(),
+      fi.sequence.chroma_sampling,
+    ))
   } else {
     None
   };
@@ -2611,7 +2706,7 @@ pub fn rdo_loop_decision<T: Pixel, W: Writer>(
             ) {
               let src_plane = &src_subset.planes[pli]; // uncompressed input for reference
               let lrf_in_plane = &lrf_input.planes[pli];
-              let lrf_po = loop_sbo.plane_offset(src_plane.plane_cfg);
+              let lrf_po = loop_sbo.plane_offset(&src_plane.plane_cfg);
               let mut best_new_lrf = best_lrf[lru_y * lru_w[pli] + lru_x][pli];
               let mut best_cost =
                 best_lrf_cost[lru_y * lru_w[pli] + lru_x][pli];

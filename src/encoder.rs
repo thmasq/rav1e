@@ -2057,6 +2057,8 @@ where
   u32: util::math::CastFromPrimitive<<T as util::pixel::Pixel>::Coeff>,
   i32: util::math::CastFromPrimitive<<T as util::pixel::Pixel>::Coeff>,
   <T as util::pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>,
+  i32: util::math::CastFromPrimitive<T>,
+  u32: util::math::CastFromPrimitive<T>,
 {
   let planes =
     if fi.sequence.chroma_sampling == ChromaSampling::Cs400 { 1 } else { 3 };
@@ -2367,6 +2369,8 @@ where
   u32: util::math::CastFromPrimitive<<T as util::pixel::Pixel>::Coeff>,
   i32: util::math::CastFromPrimitive<<T as util::pixel::Pixel>::Coeff>,
   <T as util::pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>,
+  i32: util::math::CastFromPrimitive<T>,
+  u32: util::math::CastFromPrimitive<T>,
 {
   let bw = bsize.width_mi() / tx_size.width_mi();
   let bh = bsize.height_mi() / tx_size.height_mi();
@@ -2542,6 +2546,8 @@ where
   u32: util::math::CastFromPrimitive<<T as util::pixel::Pixel>::Coeff>,
   i32: util::math::CastFromPrimitive<<T as util::pixel::Pixel>::Coeff>,
   <T as util::pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>,
+  i32: util::math::CastFromPrimitive<T>,
+  u32: util::math::CastFromPrimitive<T>,
 {
   if skip {
     return (false, ScaledDistortion::zero());
@@ -2709,6 +2715,8 @@ pub fn encode_block_with_modes<T: Pixel, W: Writer>(
   u32: util::math::CastFromPrimitive<<T as util::pixel::Pixel>::Coeff>,
   i32: util::math::CastFromPrimitive<<T as util::pixel::Pixel>::Coeff>,
   <T as util::pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>,
+  i32: util::math::CastFromPrimitive<T>,
+  u32: util::math::CastFromPrimitive<T>,
 {
   let (mode_luma, mode_chroma) =
     (mode_decision.pred_mode_luma, mode_decision.pred_mode_chroma);
@@ -2780,6 +2788,8 @@ where
   u32: util::math::CastFromPrimitive<<T as util::pixel::Pixel>::Coeff>,
   i32: util::math::CastFromPrimitive<<T as util::pixel::Pixel>::Coeff>,
   <T as util::pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>,
+  i32: util::math::CastFromPrimitive<T>,
+  u32: util::math::CastFromPrimitive<T>,
 {
   let rdo_type = RDOType::PixelDistRealRate;
   let mut rd_cost = f64::MAX;
@@ -3068,6 +3078,8 @@ fn encode_partition_topdown<T: Pixel, W: Writer>(
   u32: util::math::CastFromPrimitive<<T as util::pixel::Pixel>::Coeff>,
   i32: util::math::CastFromPrimitive<<T as util::pixel::Pixel>::Coeff>,
   <T as util::pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>,
+  i32: util::math::CastFromPrimitive<T>,
+  u32: util::math::CastFromPrimitive<T>,
 {
   if tile_bo.0.x >= ts.mi_width || tile_bo.0.y >= ts.mi_height {
     return;
@@ -3382,14 +3394,15 @@ fn get_initial_cdfcontext<T: Pixel>(fi: &FrameInvariants<T>) -> CDFContext {
 }
 
 #[profiling::function]
-fn encode_tile_group<T: Pixel<Coeff = T>>(
+fn encode_tile_group<T: Pixel>(
   fi: &FrameInvariants<T>, fs: &mut FrameState<T>, inter_cfg: &InterConfig,
 ) -> Vec<u8>
 where
   u32: util::math::CastFromPrimitive<<T as util::pixel::Pixel>::Coeff>,
   i32: util::math::CastFromPrimitive<<T as util::pixel::Pixel>::Coeff>,
   <T as util::pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>,
-  <T as util::pixel::Pixel>::Coeff: util::pixel::Pixel,
+  i32: util::math::CastFromPrimitive<T>,
+  u32: util::math::CastFromPrimitive<T>,
 {
   let planes =
     if fi.sequence.chroma_sampling == ChromaSampling::Cs400 { 1 } else { 3 };
@@ -3533,7 +3546,9 @@ fn check_lf_queue<T: Pixel>(
   sbs_q: &mut VecDeque<SBSQueueEntry>, last_lru_ready: &mut [i32; 3],
   last_lru_rdoed: &mut [i32; 3], last_lru_coded: &mut [i32; 3],
   deblock_p: bool,
-) {
+) where
+  i32: util::math::CastFromPrimitive<T>,
+{
   let mut check_queue = true;
   let planes = if fi.sequence.chroma_sampling == ChromaSampling::Cs400 {
     1
@@ -3628,6 +3643,9 @@ where
   u32: util::math::CastFromPrimitive<<T as util::pixel::Pixel>::Coeff>,
   i32: util::math::CastFromPrimitive<<T as util::pixel::Pixel>::Coeff>,
   <T as util::pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>,
+  i32: util::math::CastFromPrimitive<T>,
+  i32: util::math::CastFromPrimitive<T>,
+  u32: util::math::CastFromPrimitive<T>,
 {
   let mut enc_stats = EncoderStats::default();
   let mut w = WriterEncoder::new();
@@ -3931,14 +3949,15 @@ fn get_initial_segmentation<T: Pixel>(
 ///
 /// - If the frame packets cannot be written
 #[profiling::function]
-pub fn encode_frame<T: Pixel<Coeff = T>>(
+pub fn encode_frame<T: Pixel>(
   fi: &FrameInvariants<T>, fs: &mut FrameState<T>, inter_cfg: &InterConfig,
 ) -> Vec<u8>
 where
   u32: util::math::CastFromPrimitive<<T as util::pixel::Pixel>::Coeff>,
   i32: util::math::CastFromPrimitive<<T as util::pixel::Pixel>::Coeff>,
   <T as util::pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>,
-  <T as util::pixel::Pixel>::Coeff: util::pixel::Pixel,
+  i32: util::math::CastFromPrimitive<T>,
+  u32: util::math::CastFromPrimitive<T>,
 {
   debug_assert!(!fi.is_show_existing_frame());
   let obu_extension = 0;

@@ -218,6 +218,9 @@ impl Config {
   where
     u32: util::math::CastFromPrimitive<<T as util::pixel::Pixel>::Coeff>,
     i32: util::math::CastFromPrimitive<<T as util::pixel::Pixel>::Coeff>,
+    <T as util::pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>,
+    i32: util::math::CastFromPrimitive<T>,
+    u32: util::math::CastFromPrimitive<T>,
   {
     assert!(
       8 * std::mem::size_of::<T>() >= self.enc.bit_depth,
@@ -297,6 +300,9 @@ impl Config {
   where
     u32: util::math::CastFromPrimitive<<T as util::pixel::Pixel>::Coeff>,
     i32: util::math::CastFromPrimitive<<T as util::pixel::Pixel>::Coeff>,
+    <T as util::pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>,
+    i32: util::math::CastFromPrimitive<T>,
+    u32: util::math::CastFromPrimitive<T>,
   {
     let inner = self.new_inner()?;
     let config = (*inner.config).clone();

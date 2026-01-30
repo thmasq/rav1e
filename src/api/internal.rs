@@ -265,10 +265,13 @@ pub(crate) struct ContextInner<T: Pixel> {
   t35_q: BTreeMap<u64, Box<[T35]>>,
 }
 
-impl<T: Pixel<Coeff = T>> ContextInner<T>
+impl<T: Pixel> ContextInner<T>
 where
   u32: util::math::CastFromPrimitive<<T as util::pixel::Pixel>::Coeff>,
   i32: util::math::CastFromPrimitive<<T as util::pixel::Pixel>::Coeff>,
+  <T as util::pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>,
+  i32: util::math::CastFromPrimitive<T>,
+  u32: util::math::CastFromPrimitive<T>,
 {
   pub fn new(enc: &EncoderConfig) -> Self {
     // initialize with temporal delimiter
@@ -1273,11 +1276,7 @@ where
 
   pub(crate) fn encode_packet(
     &mut self, cur_output_frameno: u64,
-  ) -> Result<Packet<T>, EncoderStatus>
-  where
-    <T as util::pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>,
-    <T as util::pixel::Pixel>::Coeff: util::pixel::Pixel,
-  {
+  ) -> Result<Packet<T>, EncoderStatus> {
     if self
       .frame_data
       .get(&cur_output_frameno)
@@ -1351,11 +1350,7 @@ where
   #[profiling::function]
   pub fn encode_normal_packet(
     &mut self, cur_output_frameno: u64,
-  ) -> Result<Packet<T>, EncoderStatus>
-  where
-    <T as util::pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>,
-    <T as util::pixel::Pixel>::Coeff: util::pixel::Pixel,
-  {
+  ) -> Result<Packet<T>, EncoderStatus> {
     let mut frame_data =
       self.frame_data.remove(&cur_output_frameno).unwrap().unwrap();
 
@@ -1516,11 +1511,7 @@ where
   }
 
   #[profiling::function]
-  pub fn receive_packet(&mut self) -> Result<Packet<T>, EncoderStatus>
-  where
-    <T as util::pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>,
-    <T as util::pixel::Pixel>::Coeff: util::pixel::Pixel,
-  {
+  pub fn receive_packet(&mut self) -> Result<Packet<T>, EncoderStatus> {
     if self.done_processing() {
       return Err(EncoderStatus::LimitReached);
     }

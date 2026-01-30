@@ -37,6 +37,9 @@ impl<T: Pixel> Context<T>
 where
   u32: crate::util::math::CastFromPrimitive<T::Coeff>,
   i32: crate::util::math::CastFromPrimitive<T::Coeff>,
+  <T as util::pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>,
+  i32: crate::util::math::CastFromPrimitive<T>,
+  u32: crate::util::math::CastFromPrimitive<T>,
 {
   /// Allocates and returns a new frame.
   ///
@@ -304,11 +307,7 @@ where
   /// # }
   /// ```
   #[inline]
-  pub fn receive_packet(&mut self) -> Result<Packet<T>, EncoderStatus>
-  where
-    <T as util::pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>,
-    <T as util::pixel::Pixel>::Coeff: util::pixel::Pixel,
-  {
+  pub fn receive_packet(&mut self) -> Result<Packet<T>, EncoderStatus> {
     let inner = &mut self.inner;
     let mut run = move || inner.receive_packet();
 
@@ -401,6 +400,9 @@ impl<T: Pixel> Context<T>
 where
   u32: crate::util::math::CastFromPrimitive<T::Coeff>,
   i32: crate::util::math::CastFromPrimitive<T::Coeff>,
+  <T as util::pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>,
+  i32: crate::util::math::CastFromPrimitive<T>,
+  u32: crate::util::math::CastFromPrimitive<T>,
 {
   /// Return the Rate Control Summary Packet size
   ///
