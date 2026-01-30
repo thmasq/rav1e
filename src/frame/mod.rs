@@ -250,6 +250,7 @@ impl<'a, T: Pixel> fmt::Debug for PlaneSlice<'a, T> {
   }
 }
 
+#[allow(dead_code)]
 impl<'a, T: Pixel> PlaneSlice<'a, T> {
   pub fn new(plane: &'a Plane<T>, x: isize, y: isize) -> Self {
     Self { plane, x, y }

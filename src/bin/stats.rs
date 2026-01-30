@@ -7,9 +7,13 @@
 // Media Patent License 1.0 was not distributed with this source code in the
 // PATENTS file, you can obtain it at www.aomedia.org/license/patent.
 
-use av_metrics::video::*;
+use av_metrics::video::{
+  ciede, psnr, psnr_hvs, ssim, ChromaSubsampling, Frame, PlanarMetrics,
+};
 use rav1e::data::EncoderStats;
-use rav1e::prelude::*;
+use rav1e::prelude::{
+  BlockSize, FrameType, Packet, Pixel, PredictionMode, Rational, TxType,
+};
 use std::fmt;
 use std::time::Instant;
 
@@ -29,7 +33,7 @@ pub struct FrameSummary {
 
 #[profiling::function]
 pub fn build_frame_summary<T: Pixel>(
-  packets: Packet<T>, bit_depth: usize, chroma_sampling: ChromaSampling,
+  packets: Packet<T>, bit_depth: usize, chroma_sampling: ChromaSubsampling,
   metrics_cli: MetricsEnabled,
 ) -> FrameSummary {
   let metrics_input_frame: &Frame<T> = packets.source.as_ref().unwrap();
@@ -740,8 +744,8 @@ pub enum MetricsEnabled {
 }
 
 pub fn calculate_frame_metrics<T: Pixel>(
-  frame1: &Frame<T>, frame2: &Frame<T>, bit_depth: usize, cs: ChromaSampling,
-  metrics: MetricsEnabled,
+  frame1: &Frame<T>, frame2: &Frame<T>, bit_depth: usize,
+  cs: ChromaSubsampling, metrics: MetricsEnabled,
 ) -> QualityMetrics {
   match metrics {
     MetricsEnabled::None => QualityMetrics::default(),

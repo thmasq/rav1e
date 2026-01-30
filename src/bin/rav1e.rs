@@ -512,7 +512,7 @@ fn run() -> Result<(), error::CliError> {
     info!("CPU Feature Level: {}", CpuFeatureLevel::default());
 
     info!(
-      "Using y4m decoder: {}x{}p @ {}/{} fps, {}, {}-bit",
+      "Using y4m decoder: {}x{}p @ {}/{} fps, {:?}, {}-bit",
       video_info.width,
       video_info.height,
       video_info.time_base.den,

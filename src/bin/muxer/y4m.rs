@@ -17,12 +17,17 @@ pub fn write_y4m_frame<T: Pixel>(
   y4m_enc: &mut y4m::Encoder<Box<dyn Write + Send>>, rec: &Frame<T>,
   y4m_details: VideoDetails,
 ) {
-  let planes =
-    if y4m_details.chroma_sampling == ChromaSampling::Cs400 { 1 } else { 3 };
+  let planes = if y4m_details.chroma_sampling == ChromaSubsampling::Monochrome
+  {
+    1
+  } else {
+    3
+  };
   let bytes_per_sample = if y4m_details.bit_depth > 8 { 2 } else { 1 };
   let (chroma_width, chroma_height) = y4m_details
     .chroma_sampling
-    .get_chroma_dimensions(y4m_details.width, y4m_details.height);
+    .chroma_dimensions(y4m_details.width, y4m_details.height)
+    .unwrap();
   let pitch_y = y4m_details.width * bytes_per_sample;
   let pitch_uv = chroma_width * bytes_per_sample;
 
@@ -33,9 +38,9 @@ pub fn write_y4m_frame<T: Pixel>(
   );
 
   let (stride_y, stride_u, stride_v) = (
-    rec.planes[0].cfg.stride,
-    rec.planes[1].cfg.stride,
-    rec.planes[2].cfg.stride,
+    rec.y_plane.geometry().stride.get(),
+    rec.u_plane.unwrap().geometry().stride.get(),
+    rec.v_plane.unwrap().geometry().stride.get(),
   );
 
   for (line, line_out) in

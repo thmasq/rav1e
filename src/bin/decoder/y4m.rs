@@ -10,7 +10,6 @@
 
 use std::io::Read;
 
-use crate::color::ChromaSampling::Cs400;
 use crate::decoder::{DecodeError, Decoder, FrameBuilder, VideoDetails};
 use rav1e::prelude::*;
 
@@ -50,21 +49,23 @@ impl Decoder for y4m::Decoder<Box<dyn Read + Send>> {
       .map(|frame| {
         let mut f = ctx.new_frame();
 
-        let (chroma_width, _) =
-          cfg.chroma_sampling.get_chroma_dimensions(cfg.width, cfg.height);
+        let (chroma_width, _) = cfg
+          .chroma_sampling
+          .chroma_dimensions(cfg.width, cfg.height)
+          .unwrap();
 
-        f.planes[0].copy_from_raw_u8(
+        f.y_plane.copy_from_raw_u8(
           frame.get_y_plane(),
           cfg.width * bytes,
           bytes,
         );
-        if cfg.chroma_sampling != Cs400 {
-          f.planes[1].copy_from_raw_u8(
+        if cfg.chroma_sampling != ChromaSubsampling::Monochrome {
+          f.u_plane.copy_from_raw_u8(
             frame.get_u_plane(),
             chroma_width * bytes,
             bytes,
           );
-          f.planes[2].copy_from_raw_u8(
+          f.v_plane.copy_from_raw_u8(
             frame.get_v_plane(),
             chroma_width * bytes,
             bytes,
@@ -93,17 +94,17 @@ impl From<y4m::Error> for DecodeError {
 
 pub const fn map_y4m_color_space(
   color_space: y4m::Colorspace,
-) -> (ChromaSampling, ChromaSamplePosition) {
+) -> (ChromaSubsampling, ChromaSamplePosition) {
   use crate::ChromaSamplePosition::*;
-  use crate::ChromaSampling::*;
+  use crate::ChromaSubsampling::*;
   use y4m::Colorspace::*;
   match color_space {
-    Cmono | Cmono12 => (Cs400, Unknown),
-    C420jpeg | C420paldv => (Cs420, Unknown),
-    C420mpeg2 => (Cs420, Vertical),
-    C420 | C420p10 | C420p12 => (Cs420, Colocated),
-    C422 | C422p10 | C422p12 => (Cs422, Colocated),
-    C444 | C444p10 | C444p12 => (Cs444, Colocated),
+    Cmono | Cmono12 => (Monochrome, Unknown),
+    C420jpeg | C420paldv => (Yuv420, Unknown),
+    C420mpeg2 => (Yuv420, Vertical),
+    C420 | C420p10 | C420p12 => (Yuv420, Colocated),
+    C422 | C422p10 | C422p12 => (Yuv422, Colocated),
+    C444 | C444p10 | C444p12 => (Yuv444, Colocated),
     _ => unimplemented!(),
   }
 }
