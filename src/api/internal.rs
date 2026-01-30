@@ -1297,17 +1297,10 @@ where
   pub(crate) fn encode_packet(
     &mut self, cur_output_frameno: u64,
   ) -> Result<Packet<T>, EncoderStatus>
-    where
+  where
     <T as pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>,
     u32: math::CastFromPrimitive<<T as pixel::Pixel>::Coeff>,
-    <T as pixel::Pixel>::Coeff: pixel::Pixel,
-    <<T as pixel::Pixel>::Coeff as pixel::Pixel>::Coeff:
-      num_traits::AsPrimitive<u8>,
     i16: math::CastFromPrimitive<<T as pixel::Pixel>::Coeff>,
-    i32: math::CastFromPrimitive<
-      <<T as pixel::Pixel>::Coeff as pixel::Pixel>::Coeff,
-    >,
-    <<T as pixel::Pixel>::Coeff as pixel::Pixel>::Coeff: pixel::Pixel, <<<T as pixel::Pixel>::Coeff as pixel::Pixel>::Coeff as pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>, u32: math::CastFromPrimitive<<<T as pixel::Pixel>::Coeff as pixel::Pixel>::Coeff>, i16: math::CastFromPrimitive<<<T as pixel::Pixel>::Coeff as pixel::Pixel>::Coeff>, u32: math::CastFromPrimitive<<<<T as pixel::Pixel>::Coeff as pixel::Pixel>::Coeff as pixel::Pixel>::Coeff>
   {
     if self
       .frame_data
@@ -1386,14 +1379,7 @@ where
   where
     <T as pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>,
     u32: math::CastFromPrimitive<<T as pixel::Pixel>::Coeff>,
-    <T as pixel::Pixel>::Coeff: pixel::Pixel,
-    <<T as pixel::Pixel>::Coeff as pixel::Pixel>::Coeff:
-      num_traits::AsPrimitive<u8>,
     i16: math::CastFromPrimitive<<T as pixel::Pixel>::Coeff>,
-    i32: math::CastFromPrimitive<
-      <<T as pixel::Pixel>::Coeff as pixel::Pixel>::Coeff,
-    >,
-    <<T as pixel::Pixel>::Coeff as pixel::Pixel>::Coeff: pixel::Pixel, <<<T as pixel::Pixel>::Coeff as pixel::Pixel>::Coeff as pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>, u32: math::CastFromPrimitive<<<T as pixel::Pixel>::Coeff as pixel::Pixel>::Coeff>, i16: math::CastFromPrimitive<<<T as pixel::Pixel>::Coeff as pixel::Pixel>::Coeff>, u32: math::CastFromPrimitive<<<<T as pixel::Pixel>::Coeff as pixel::Pixel>::Coeff as pixel::Pixel>::Coeff>
   {
     let mut frame_data =
       self.frame_data.remove(&cur_output_frameno).unwrap().unwrap();
@@ -1568,11 +1554,7 @@ where
     i32: math::CastFromPrimitive<<T as pixel::Pixel>::Coeff>,
     u32: math::CastFromPrimitive<<T as pixel::Pixel>::Coeff>,
     i16: math::CastFromPrimitive<<T as pixel::Pixel>::Coeff>,
-    <T as pixel::Pixel>::Coeff: pixel::Pixel,
-    <<T as pixel::Pixel>::Coeff as pixel::Pixel>::Coeff: pixel::Pixel,
     <T as pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>,
-    <<T as pixel::Pixel>::Coeff as pixel::Pixel>::Coeff:
-      num_traits::AsPrimitive<u8>, <<<T as pixel::Pixel>::Coeff as pixel::Pixel>::Coeff as pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>, i32: math::CastFromPrimitive<<<T as pixel::Pixel>::Coeff as pixel::Pixel>::Coeff>, u32: math::CastFromPrimitive<<<T as pixel::Pixel>::Coeff as pixel::Pixel>::Coeff>, i16: math::CastFromPrimitive<<<T as pixel::Pixel>::Coeff as pixel::Pixel>::Coeff>, u32: math::CastFromPrimitive<<<<T as pixel::Pixel>::Coeff as pixel::Pixel>::Coeff as pixel::Pixel>::Coeff>
   {
     if self.done_processing() {
       return Err(EncoderStatus::LimitReached);
