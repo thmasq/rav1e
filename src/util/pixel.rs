@@ -29,6 +29,7 @@ pub trait Pixel:
   fn to_i32(self) -> i32;
   fn to_i16(self) -> i16;
   fn to_u16(self) -> u16;
+  fn to_u32(self) -> u32; // Added this
 }
 
 /// Trait for transform coefficients (i16, i32)
@@ -43,6 +44,11 @@ pub trait Coefficient:
   + CastFromPrimitive<usize>
 {
   type Pixel: Pixel<Coeff = Self>;
+
+  fn to_u32(self) -> u32;
+  fn to_i32(self) -> i32;
+  fn to_i16(self) -> i16;
+  fn as_u8(self) -> u8;
 }
 
 impl Pixel for u8 {
@@ -66,6 +72,11 @@ impl Pixel for u8 {
   #[inline(always)]
   fn to_u16(self) -> u16 {
     self as u16
+  }
+
+  #[inline(always)]
+  fn to_u32(self) -> u32 {
+    self as u32
   }
 }
 
@@ -91,12 +102,51 @@ impl Pixel for u16 {
   fn to_u16(self) -> u16 {
     self
   }
+
+  #[inline(always)]
+  fn to_u32(self) -> u32 {
+    self as u32
+  }
 }
 
 impl Coefficient for i16 {
   type Pixel = u8;
+
+  #[inline(always)]
+  fn to_u32(self) -> u32 {
+    self as u32
+  }
+  #[inline(always)]
+  fn to_i32(self) -> i32 {
+    self as i32
+  }
+  #[inline(always)]
+  fn to_i16(self) -> i16 {
+    self
+  }
+  #[inline(always)]
+  fn as_u8(self) -> u8 {
+    self as u8
+  }
 }
 
 impl Coefficient for i32 {
   type Pixel = u16;
+
+  #[inline(always)]
+  fn to_u32(self) -> u32 {
+    self as u32
+  }
+  #[inline(always)]
+  fn to_i32(self) -> i32 {
+    self
+  }
+  #[inline(always)]
+  fn to_i16(self) -> i16 {
+    self as i16
+  }
+  #[inline(always)]
+  fn as_u8(self) -> u8 {
+    self as u8
+  }
 }

@@ -723,14 +723,7 @@ impl RCState {
   pub(crate) fn select_qi<T: Pixel>(
     &self, ctx: &ContextInner<T>, output_frameno: u64, fti: usize,
     maybe_prev_log_base_q: Option<i64>, log_isqrt_mean_scale: i64,
-  ) -> QuantizerParameters
-  where
-    u32: crate::util::math::CastFromPrimitive<T::Coeff>,
-    i32: crate::util::math::CastFromPrimitive<T::Coeff>,
-    <T as util::pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>,
-    i32: crate::util::math::CastFromPrimitive<T>,
-    u32: crate::util::math::CastFromPrimitive<T>,
-  {
+  ) -> QuantizerParameters {
     // Is rate control active?
     if self.target_bitrate <= 0 {
       // Rate control is not active.

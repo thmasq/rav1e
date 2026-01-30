@@ -142,6 +142,27 @@ impl CastFromPrimitive<i32> for u32 {
   }
 }
 
+impl CastFromPrimitive<u8> for u32 {
+  #[inline(always)]
+  fn cast_from(v: u8) -> Self {
+    v as u32
+  }
+}
+
+impl CastFromPrimitive<u16> for u32 {
+  #[inline(always)]
+  fn cast_from(v: u16) -> Self {
+    v as u32
+  }
+}
+
+impl CastFromPrimitive<u16> for i16 {
+  #[inline(always)]
+  fn cast_from(v: u16) -> Self {
+    v as i16
+  }
+}
+
 #[inline(always)]
 pub const fn round_shift(value: i32, bit: usize) -> i32 {
   (value + (1 << bit >> 1)) >> bit

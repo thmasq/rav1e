@@ -27,8 +27,7 @@ use crate::rate::{
 };
 use crate::stats::EncoderStats;
 use crate::tiling::Area;
-use crate::util;
-use crate::util::Pixel;
+use crate::util::{math, pixel, Pixel};
 use arrayvec::ArrayVec;
 use av_scenechange::SceneChangeDetector;
 use std::cmp;
@@ -267,12 +266,12 @@ pub(crate) struct ContextInner<T: Pixel> {
 
 impl<T: Pixel> ContextInner<T>
 where
-  u32: util::math::CastFromPrimitive<<T as util::pixel::Pixel>::Coeff>,
-  i32: util::math::CastFromPrimitive<<T as util::pixel::Pixel>::Coeff>,
-  <T as util::pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>,
-  i32: util::math::CastFromPrimitive<T>,
-  u32: util::math::CastFromPrimitive<T>,
-  i16: util::math::CastFromPrimitive<T>,
+  i32: math::CastFromPrimitive<T>,
+  u32: math::CastFromPrimitive<T>,
+  i16: math::CastFromPrimitive<T>,
+  i32: math::CastFromPrimitive<<T as pixel::Pixel>::Coeff>,
+  u32: math::CastFromPrimitive<<T as pixel::Pixel>::Coeff>,
+  i16: math::CastFromPrimitive<<T as pixel::Pixel>::Coeff>,
 {
   pub fn new(enc: &EncoderConfig) -> Self {
     // initialize with temporal delimiter
@@ -350,7 +349,10 @@ where
   pub fn send_frame(
     &mut self, mut frame: Option<Arc<Frame<T>>>,
     params: Option<FrameParameters>,
-  ) -> Result<(), EncoderStatus> {
+  ) -> Result<(), EncoderStatus>
+  where
+    i32: math::CastFromPrimitive<T>,
+  {
     if let Some(ref mut frame) = frame {
       let EncoderConfig { width, height, .. } = *self.config;
 
@@ -684,7 +686,10 @@ where
   /// function must be called after every new `FrameInvariants` is initially
   /// computed.
   #[profiling::function]
-  fn compute_lookahead_motion_vectors(&mut self, output_frameno: u64) {
+  fn compute_lookahead_motion_vectors(&mut self, output_frameno: u64)
+  where
+    i32: math::CastFromPrimitive<T>,
+  {
     let frame_data = self.frame_data.get(&output_frameno).unwrap();
 
     // We're only interested in valid frames which are not show-existing-frame.
@@ -852,7 +857,10 @@ where
 
   /// Computes lookahead intra cost approximations and fills in
   /// `lookahead_intra_costs` on the `FrameInvariants`.
-  fn compute_lookahead_intra_costs(&mut self, output_frameno: u64) {
+  fn compute_lookahead_intra_costs(&mut self, output_frameno: u64)
+  where
+    i32: math::CastFromPrimitive<T>,
+  {
     let frame_data = self.frame_data.get(&output_frameno).unwrap();
     let fd = &frame_data.as_ref();
 
@@ -913,7 +921,10 @@ where
   }
 
   #[profiling::function]
-  pub fn compute_frame_invariants(&mut self) {
+  pub fn compute_frame_invariants(&mut self)
+  where
+    i32: math::CastFromPrimitive<T>,
+  {
     while self.set_frame_properties(self.next_lookahead_output_frameno).is_ok()
     {
       self
@@ -931,7 +942,9 @@ where
     frame: &Frame<T>, reference_frame: &Frame<T>, bit_depth: usize,
     bsize: BlockSize, len: usize,
     reference_frame_block_importances: &mut [f32],
-  ) {
+  ) where
+    i32: math::CastFromPrimitive<T>,
+  {
     let coded_data = fi.coded_frame_data.as_ref().unwrap();
     let plane_org = &frame.y_plane;
     let plane_ref = &reference_frame.y_plane;
@@ -1089,7 +1102,10 @@ where
 
   /// Computes the block importances for the current output frame.
   #[profiling::function]
-  fn compute_block_importances(&mut self) {
+  fn compute_block_importances(&mut self)
+  where
+    i32: math::CastFromPrimitive<T>,
+  {
     // SEF don't need block importances.
     if self.frame_data[&self.output_frameno]
       .as_ref()
@@ -1277,7 +1293,19 @@ where
 
   pub(crate) fn encode_packet(
     &mut self, cur_output_frameno: u64,
-  ) -> Result<Packet<T>, EncoderStatus> {
+  ) -> Result<Packet<T>, EncoderStatus>
+    where
+    <T as pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>,
+    u32: math::CastFromPrimitive<<T as pixel::Pixel>::Coeff>,
+    <T as pixel::Pixel>::Coeff: pixel::Pixel,
+    <<T as pixel::Pixel>::Coeff as pixel::Pixel>::Coeff:
+      num_traits::AsPrimitive<u8>,
+    i16: math::CastFromPrimitive<<T as pixel::Pixel>::Coeff>,
+    i32: math::CastFromPrimitive<
+      <<T as pixel::Pixel>::Coeff as pixel::Pixel>::Coeff,
+    >,
+    <<T as pixel::Pixel>::Coeff as pixel::Pixel>::Coeff: pixel::Pixel, <<<T as pixel::Pixel>::Coeff as pixel::Pixel>::Coeff as pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>, u32: math::CastFromPrimitive<<<T as pixel::Pixel>::Coeff as pixel::Pixel>::Coeff>, i16: math::CastFromPrimitive<<<T as pixel::Pixel>::Coeff as pixel::Pixel>::Coeff>, u32: math::CastFromPrimitive<<<<T as pixel::Pixel>::Coeff as pixel::Pixel>::Coeff as pixel::Pixel>::Coeff>
+  {
     if self
       .frame_data
       .get(&cur_output_frameno)
@@ -1351,7 +1379,19 @@ where
   #[profiling::function]
   pub fn encode_normal_packet(
     &mut self, cur_output_frameno: u64,
-  ) -> Result<Packet<T>, EncoderStatus> {
+  ) -> Result<Packet<T>, EncoderStatus>
+  where
+    <T as pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>,
+    u32: math::CastFromPrimitive<<T as pixel::Pixel>::Coeff>,
+    <T as pixel::Pixel>::Coeff: pixel::Pixel,
+    <<T as pixel::Pixel>::Coeff as pixel::Pixel>::Coeff:
+      num_traits::AsPrimitive<u8>,
+    i16: math::CastFromPrimitive<<T as pixel::Pixel>::Coeff>,
+    i32: math::CastFromPrimitive<
+      <<T as pixel::Pixel>::Coeff as pixel::Pixel>::Coeff,
+    >,
+    <<T as pixel::Pixel>::Coeff as pixel::Pixel>::Coeff: pixel::Pixel, <<<T as pixel::Pixel>::Coeff as pixel::Pixel>::Coeff as pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>, u32: math::CastFromPrimitive<<<T as pixel::Pixel>::Coeff as pixel::Pixel>::Coeff>, i16: math::CastFromPrimitive<<<T as pixel::Pixel>::Coeff as pixel::Pixel>::Coeff>, u32: math::CastFromPrimitive<<<<T as pixel::Pixel>::Coeff as pixel::Pixel>::Coeff as pixel::Pixel>::Coeff>
+  {
     let mut frame_data =
       self.frame_data.remove(&cur_output_frameno).unwrap().unwrap();
 
@@ -1517,7 +1557,20 @@ where
   }
 
   #[profiling::function]
-  pub fn receive_packet(&mut self) -> Result<Packet<T>, EncoderStatus> {
+  pub fn receive_packet(&mut self) -> Result<Packet<T>, EncoderStatus>
+  where
+    i32: math::CastFromPrimitive<T>,
+    u32: math::CastFromPrimitive<T>,
+    i16: math::CastFromPrimitive<T>,
+    i32: math::CastFromPrimitive<<T as pixel::Pixel>::Coeff>,
+    u32: math::CastFromPrimitive<<T as pixel::Pixel>::Coeff>,
+    i16: math::CastFromPrimitive<<T as pixel::Pixel>::Coeff>,
+    <T as pixel::Pixel>::Coeff: pixel::Pixel,
+    <<T as pixel::Pixel>::Coeff as pixel::Pixel>::Coeff: pixel::Pixel,
+    <T as pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>,
+    <<T as pixel::Pixel>::Coeff as pixel::Pixel>::Coeff:
+      num_traits::AsPrimitive<u8>, <<<T as pixel::Pixel>::Coeff as pixel::Pixel>::Coeff as pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>, i32: math::CastFromPrimitive<<<T as pixel::Pixel>::Coeff as pixel::Pixel>::Coeff>, u32: math::CastFromPrimitive<<<T as pixel::Pixel>::Coeff as pixel::Pixel>::Coeff>, i16: math::CastFromPrimitive<<<T as pixel::Pixel>::Coeff as pixel::Pixel>::Coeff>, u32: math::CastFromPrimitive<<<<T as pixel::Pixel>::Coeff as pixel::Pixel>::Coeff as pixel::Pixel>::Coeff>
+  {
     if self.done_processing() {
       return Err(EncoderStatus::LimitReached);
     }
