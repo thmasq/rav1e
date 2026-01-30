@@ -13,6 +13,47 @@ use std::io::Read;
 use crate::decoder::{DecodeError, Decoder, FrameBuilder, VideoDetails};
 use rav1e::prelude::*;
 
+trait PlaneMutExt {
+  fn copy_from_raw_u8(
+    &mut self, source: &[u8], source_stride: usize, bytes_per_sample: usize,
+  );
+}
+
+impl<T: Pixel> PlaneMutExt for Plane<T> {
+  fn copy_from_raw_u8(
+    &mut self, source: &[u8], source_stride: usize, bytes_per_sample: usize,
+  ) {
+    let width = self.width().get();
+    for (i, row) in self.rows_mut().enumerate() {
+      let src_start = i * source_stride;
+      let src_end = src_start + width * bytes_per_sample;
+
+      if src_end > source.len() {
+        break;
+      }
+
+      let src = &source[src_start..src_end];
+
+      // SAFETY: We cast the destination slice (T) to bytes (u8) and copy.
+      // This assumes T (u8 or u16) matches the input byte layout (e.g. Little Endian).
+      unsafe {
+        let dst_ptr = row.as_mut_ptr() as *mut u8;
+        std::ptr::copy_nonoverlapping(src.as_ptr(), dst_ptr, src.len());
+      }
+    }
+  }
+}
+
+impl<T: Pixel> PlaneMutExt for Option<Plane<T>> {
+  fn copy_from_raw_u8(
+    &mut self, source: &[u8], source_stride: usize, bytes_per_sample: usize,
+  ) {
+    if let Some(plane) = self {
+      plane.copy_from_raw_u8(source, source_stride, bytes_per_sample);
+    }
+  }
+}
+
 impl Decoder for y4m::Decoder<Box<dyn Read + Send>> {
   fn get_video_details(&self) -> VideoDetails {
     let width = self.get_width();
