@@ -40,6 +40,8 @@ where
   <T as util::pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>,
   i32: crate::util::math::CastFromPrimitive<T>,
   u32: crate::util::math::CastFromPrimitive<T>,
+  i16: crate::util::math::CastFromPrimitive<T>,
+  i16: crate::util::math::CastFromPrimitive<T::Coeff>,
 {
   /// Allocates and returns a new frame.
   ///
@@ -307,7 +309,14 @@ where
   /// # }
   /// ```
   #[inline]
-  pub fn receive_packet(&mut self) -> Result<Packet<T>, EncoderStatus> {
+  pub fn receive_packet(&mut self) -> Result<Packet<T>, EncoderStatus>
+  where
+    <T as util::pixel::Pixel>::Coeff: util::pixel::Pixel,
+    <<T as util::pixel::Pixel>::Coeff as util::pixel::Pixel>::Coeff:
+      util::pixel::Pixel,
+    <<T as util::pixel::Pixel>::Coeff as util::pixel::Pixel>::Coeff:
+      num_traits::AsPrimitive<u8>, <<<T as util::pixel::Pixel>::Coeff as util::pixel::Pixel>::Coeff as util::pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>, i32: util::math::CastFromPrimitive<<<T as util::pixel::Pixel>::Coeff as util::pixel::Pixel>::Coeff>, u32: util::math::CastFromPrimitive<<<T as util::pixel::Pixel>::Coeff as util::pixel::Pixel>::Coeff>, i16: util::math::CastFromPrimitive<<<T as util::pixel::Pixel>::Coeff as util::pixel::Pixel>::Coeff>, u32: util::math::CastFromPrimitive<<<<T as util::pixel::Pixel>::Coeff as util::pixel::Pixel>::Coeff as util::pixel::Pixel>::Coeff>
+  {
     let inner = &mut self.inner;
     let mut run = move || inner.receive_packet();
 
@@ -403,6 +412,8 @@ where
   <T as util::pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>,
   i32: crate::util::math::CastFromPrimitive<T>,
   u32: crate::util::math::CastFromPrimitive<T>,
+  i16: crate::util::math::CastFromPrimitive<T>,
+  i16: crate::util::math::CastFromPrimitive<T::Coeff>,
 {
   /// Return the Rate Control Summary Packet size
   ///

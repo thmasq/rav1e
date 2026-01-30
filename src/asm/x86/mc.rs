@@ -129,7 +129,7 @@ pub fn put_8tap<T: Pixel>(
             dst.data_ptr_mut() as *mut _,
             T::to_asm_stride(dst.plane_cfg.stride),
             src.as_ptr() as *const _,
-            T::to_asm_stride(src.plane.cfg.stride),
+            T::to_asm_stride(src.plane.geometry().stride.get()),
             width as i32,
             height as i32,
             col_frac,
@@ -144,7 +144,7 @@ pub fn put_8tap<T: Pixel>(
             dst.data_ptr_mut() as *mut _,
             T::to_asm_stride(dst.plane_cfg.stride),
             src.as_ptr() as *const _,
-            T::to_asm_stride(src.plane.cfg.stride),
+            T::to_asm_stride(src.plane.geometry().stride.get()),
             width as i32,
             height as i32,
             col_frac,
@@ -214,7 +214,7 @@ pub fn prep_8tap<T: Pixel>(
           Some(func) => (func)(
             tmp.as_mut_ptr(),
             src.as_ptr() as *const _,
-            T::to_asm_stride(src.plane.cfg.stride),
+            T::to_asm_stride(src.plane.geometry().stride.get()),
             width as i32,
             height as i32,
             col_frac,
@@ -228,7 +228,7 @@ pub fn prep_8tap<T: Pixel>(
           Some(func) => (func)(
             tmp.as_mut_ptr() as *mut _,
             src.as_ptr() as *const _,
-            T::to_asm_stride(src.plane.cfg.stride),
+            T::to_asm_stride(src.plane.geometry().stride.get()),
             width as i32,
             height as i32,
             col_frac,
@@ -624,6 +624,8 @@ cpu_function_lookup_table!(
 #[cfg(test)]
 mod test {
   use super::*;
+  use crate::frame::PlaneOffset;
+  use crate::prelude::Plane;
   use rand::random;
   use std::str::FromStr;
 

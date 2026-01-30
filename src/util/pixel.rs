@@ -29,7 +29,8 @@ pub trait Pixel:
   fn to_i32(self) -> i32;
   fn to_i16(self) -> i16;
   fn to_u16(self) -> u16;
-  fn to_u32(self) -> u32; // Added this
+  fn to_u32(self) -> u32;
+  fn to_asm_stride(stride: usize) -> isize;
 }
 
 /// Trait for transform coefficients (i16, i32)
@@ -78,6 +79,11 @@ impl Pixel for u8 {
   fn to_u32(self) -> u32 {
     self as u32
   }
+
+  #[inline(always)]
+  fn to_asm_stride(stride: usize) -> isize {
+    stride as isize
+  }
 }
 
 impl Pixel for u16 {
@@ -106,6 +112,11 @@ impl Pixel for u16 {
   #[inline(always)]
   fn to_u32(self) -> u32 {
     self as u32
+  }
+
+  #[inline(always)]
+  fn to_asm_stride(stride: usize) -> isize {
+    stride as isize
   }
 }
 

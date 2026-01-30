@@ -352,6 +352,7 @@ where
   ) -> Result<(), EncoderStatus>
   where
     i32: math::CastFromPrimitive<T>,
+    <T as pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>,
   {
     if let Some(ref mut frame) = frame {
       let EncoderConfig { width, height, .. } = *self.config;
@@ -689,6 +690,7 @@ where
   fn compute_lookahead_motion_vectors(&mut self, output_frameno: u64)
   where
     i32: math::CastFromPrimitive<T>,
+    <T as pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>,
   {
     let frame_data = self.frame_data.get(&output_frameno).unwrap();
 
@@ -924,6 +926,7 @@ where
   pub fn compute_frame_invariants(&mut self)
   where
     i32: math::CastFromPrimitive<T>,
+    <T as pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>,
   {
     while self.set_frame_properties(self.next_lookahead_output_frameno).is_ok()
     {

@@ -1240,8 +1240,7 @@ pub(crate) mod rust {
 
       for j in 0..INTRA_EDGE_KERNEL[0].len() {
         let k = (i + j).saturating_sub(2).min(size - 1);
-        s += INTRA_EDGE_KERNEL[(strength - 1) as usize][j]
-          * edge[k].to_u32().unwrap();
+        s += INTRA_EDGE_KERNEL[(strength - 1) as usize][j] * edge[k].to_u32();
       }
 
       edge_filtered[i] = T::cast_from(((s + 8) >> 4) as i32);
