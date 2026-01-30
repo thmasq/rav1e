@@ -31,7 +31,16 @@ use std::io::{Read, Seek, Write};
 use std::process::exit;
 use std::sync::Arc;
 
-impl<T: Pixel> FrameBuilder<T> for Context<T> {
+impl<T: Pixel> FrameBuilder<T> for Context<T>
+where
+  u32: CastFromPrimitive<T::Coeff>,
+  i32: CastFromPrimitive<T::Coeff>,
+  T::Coeff: num_traits::AsPrimitive<u8>,
+  i32: CastFromPrimitive<T>,
+  u32: CastFromPrimitive<T>,
+  i16: CastFromPrimitive<T>,
+  i16: CastFromPrimitive<T::Coeff>,
+{
   fn new_frame(&self) -> Frame<T> {
     Context::new_frame(self)
   }
@@ -76,7 +85,16 @@ impl<D: Decoder> Source<D> {
   #[profiling::function]
   fn read_frame<T: Pixel>(
     &mut self, ctx: &mut Context<T>, video_info: VideoDetails,
-  ) -> Result<(), CliError> {
+  ) -> Result<(), CliError>
+  where
+    u32: CastFromPrimitive<T::Coeff>,
+    i32: CastFromPrimitive<T::Coeff>,
+    T::Coeff: num_traits::AsPrimitive<u8>,
+    i32: CastFromPrimitive<T>,
+    u32: CastFromPrimitive<T>,
+    i16: CastFromPrimitive<T>,
+    i16: CastFromPrimitive<T::Coeff>,
+  {
     if self.limit != 0 && self.count == self.limit {
       ctx.flush();
       return Ok(());
@@ -115,7 +133,16 @@ fn process_frame<T: Pixel, D: Decoder>(
   pass1file: Option<&mut File>, pass2file: Option<&mut File>,
   mut y4m_enc: Option<&mut y4m::Encoder<Box<dyn Write + Send>>>,
   metrics_cli: MetricsEnabled,
-) -> Result<Option<Vec<FrameSummary>>, CliError> {
+) -> Result<Option<Vec<FrameSummary>>, CliError>
+where
+  u32: CastFromPrimitive<T::Coeff>,
+  i32: CastFromPrimitive<T::Coeff>,
+  T::Coeff: num_traits::AsPrimitive<u8>,
+  i32: CastFromPrimitive<T>,
+  u32: CastFromPrimitive<T>,
+  i16: CastFromPrimitive<T>,
+  i16: CastFromPrimitive<T::Coeff>,
+{
   let y4m_details = source.input.get_video_details();
   let mut frame_summaries = Vec::new();
   let mut pass1file = pass1file;
@@ -222,7 +249,16 @@ fn do_encode<T: Pixel, D: Decoder>(
   mut pass2file: Option<File>,
   mut y4m_enc: Option<y4m::Encoder<Box<dyn Write + Send>>>,
   metrics_enabled: MetricsEnabled,
-) -> Result<(), CliError> {
+) -> Result<(), CliError>
+where
+  u32: CastFromPrimitive<T::Coeff>,
+  i32: CastFromPrimitive<T::Coeff>,
+  T::Coeff: num_traits::AsPrimitive<u8>,
+  i32: CastFromPrimitive<T>,
+  u32: CastFromPrimitive<T>,
+  i16: CastFromPrimitive<T>,
+  i16: CastFromPrimitive<T::Coeff>,
+{
   let mut ctx: Context<T> =
     cfg.new_context().map_err(|e| e.context("Invalid encoder settings"))?;
 
