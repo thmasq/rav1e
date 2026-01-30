@@ -1,6 +1,6 @@
 [package]
 name = "rav1e"
-version = "0.8.2"
+version = "0.8.3"
 authors = ["Thomas Daede <tdaede@xiph.org>"]
 edition = "2021"
 rust-version = "1.83.0"
@@ -76,7 +76,7 @@ dump_lookahead_data = ["byteorder", "image"]
 
 [dependencies]
 arg_enum_proc_macro = "0.3.4"
-av-scenechange = { git = "https://github.com/thmasq/av-scenechange", tag = "0.22.2", default-features = false, features = [
+av-scenechange = { git = "https://github.com/thmasq/av-scenechange", tag = "0.22.3", default-features = false, features = [
   "asm",
 ] }
 bitstream-io = "4.9.0"
