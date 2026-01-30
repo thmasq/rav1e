@@ -3950,7 +3950,7 @@ pub fn encode_show_existing_frame<T: Pixel>(
         .planes_mut()
         .nth(p)
         .unwrap()
-        .data()
+        .data_mut()
         .copy_from_slice(&rec.frame.planes().nth(p).unwrap().data());
     }
   }
