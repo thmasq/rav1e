@@ -455,11 +455,13 @@ impl<'a, T: Pixel> Iterator for VertPaddedIter<'a, T> {
       } else {
         self.deblocked
       };
-
+      let cfg = src_plane.geometry();
       let stride = src_plane.geometry().stride.get();
       // Calculate offset based on stride. self.x and ly should be valid for the plane data.
       // Plane data is linear.
-      let offset = (ly as usize) * stride + (self.x as usize);
+      let offset = (ly as usize + cfg.pad_top) * stride
+        + (self.x as usize + cfg.pad_left);
+
       self.y += 1;
       Some(&src_plane.data()[offset..])
     } else {
