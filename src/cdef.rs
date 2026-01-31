@@ -559,26 +559,24 @@ pub fn cdef_filter_superblock<T: Pixel>(
             // SAFETY: `cdef_filter_block` may call Assembly code.
             // The asserts here verify that we are not calling it
             // with invalid parameters.
-            unsafe {
-              assert!(
-                in_plane.geometry().width.get() as isize
-                  >= in_po.x
-                    + xsize as isize
-                    + if edges & CDEF_HAVE_RIGHT > 0 { 2 } else { 0 }
-              );
-              assert!(
-                0 <= in_po.x - if edges & CDEF_HAVE_LEFT > 0 { 2 } else { 0 }
-              );
-              assert!(
-                in_plane.geometry().height.get() as isize
-                  >= in_po.y
-                    + ysize as isize
-                    + if edges & CDEF_HAVE_BOTTOM > 0 { 2 } else { 0 }
-              );
-              assert!(
-                0 <= in_po.y - if edges & CDEF_HAVE_TOP > 0 { 2 } else { 0 }
-              );
+            let mut plane_edges = edges;
 
+            if (in_plane.geometry().width.get() as isize)
+              < (in_po.x + xsize as isize)
+                + (if edges & CDEF_HAVE_RIGHT > 0 { 2 } else { 0 })
+            {
+              plane_edges &= !CDEF_HAVE_RIGHT;
+            }
+
+            if (in_plane.geometry().height.get() as isize)
+              < (in_po.y + ysize as isize)
+                + (if edges & CDEF_HAVE_BOTTOM > 0 { 2 } else { 0 })
+            {
+              plane_edges &= !CDEF_HAVE_BOTTOM;
+            }
+
+            // SAFETY: `cdef_filter_block` may call Assembly code.
+            unsafe {
               cdef_filter_block(
                 out_block,
                 &in_slice[0][0] as *const T,
@@ -590,7 +588,7 @@ pub fn cdef_filter_superblock<T: Pixel>(
                 bit_depth,
                 xdec,
                 ydec,
-                edges,
+                plane_edges,
                 fi.cpu_feature_level,
               );
             }
