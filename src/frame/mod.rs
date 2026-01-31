@@ -91,49 +91,90 @@ impl<T: Pixel> PlanePad for Plane<T> {
     let stride = geo.stride.get();
     let data_origin = self.data_origin();
     let data = self.data_mut();
+    let len = data.len();
+
+    if w == 0 || h == 0 {
+      return;
+    }
 
     // 1. Pad Left/Right for visible rows
     for y in 0..h {
       let row_start = data_origin + y * stride;
+
+      // Safety check: ensure row_start is within bounds
+      if row_start >= len {
+        break;
+      }
+
       // Pad left
       let val_left = data[row_start];
       for x in 1..=pad_l {
-        data[row_start - x] = val_left;
+        if row_start >= x {
+          // Prevent underflow
+          data[row_start - x] = val_left;
+        }
       }
+
       // Pad right
-      let val_right = data[row_start + w - 1];
-      for x in 0..pad_r {
-        data[row_start + w + x] = val_right;
+      // Ensure we don't read or write past the end of the buffer
+      if row_start + w > 0 {
+        let val_right_idx = row_start + w - 1;
+        if val_right_idx < len {
+          let val_right = data[val_right_idx];
+          for x in 0..pad_r {
+            let idx = row_start + w + x;
+            if idx < len {
+              data[idx] = val_right;
+            }
+          }
+        }
       }
     }
 
     // 2. Pad Top (copying the first padded row)
-    let first_row_start = data_origin - pad_l;
-    let row_len = w + pad_l + pad_r;
-    for y in 1..=pad_t {
-      let dest = first_row_start - y * stride;
-      let (src_part, dest_part) = if dest < first_row_start {
-        let (d, s) = data.split_at_mut(first_row_start);
-        (&s[0..row_len], &mut d[dest..dest + row_len])
-      } else {
-        // Should not happen with top padding
-        continue;
-      };
-      dest_part.copy_from_slice(src_part);
+    // Ensure we don't underflow data_origin
+    if data_origin >= pad_l {
+      let first_row_start = data_origin - pad_l;
+      let row_len = w + pad_l + pad_r;
+      for y in 1..=pad_t {
+        if y * stride > first_row_start {
+          break;
+        } // Prevent underflow
+        let dest = first_row_start - y * stride;
+
+        // Bounds-safe copy
+        for x in 0..row_len {
+          let src_idx = first_row_start + x;
+          let dst_idx = dest + x;
+          if src_idx < len && dst_idx < len {
+            data[dst_idx] = data[src_idx];
+          }
+        }
+      }
     }
 
     // 3. Pad Bottom (copying the last padded row)
-    let last_row_start = data_origin + (h - 1) * stride - pad_l;
-    for y in 1..=pad_b {
-      let dest = last_row_start + y * stride;
-      // We must copy carefully; simpler to iterate loop for safety
-      // or clone the source row first if overlap issues arise.
-      // For simplicity here, element-wise copy:
-      for x in 0..row_len {
-        data[dest + x] = data[last_row_start + x];
+    // Safety check for last_row calculation
+    let last_row_idx = h.saturating_sub(1);
+    let last_row_start_base = data_origin + last_row_idx * stride;
+
+    if last_row_start_base >= pad_l {
+      let last_row_start = last_row_start_base - pad_l;
+      let row_len = w + pad_l + pad_r;
+
+      for y in 1..=pad_b {
+        let dest = last_row_start + y * stride;
+        for x in 0..row_len {
+          let src_idx = last_row_start + x;
+          let dst_idx = dest + x;
+          if src_idx < len && dst_idx < len {
+            data[dst_idx] = data[src_idx];
+          }
+        }
       }
     }
   }
+
   fn probe_padding(&self, w: usize, h: usize) -> bool {
     let geo = self.geometry();
 
