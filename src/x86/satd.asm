@@ -637,7 +637,7 @@ cglobal satd_4x16, 4, 8, 7, src, src_stride, dst, dst_stride, \
 cglobal satd_8x8, 4, 6, 10, src, src_stride, dst, dst_stride, \
                            src_stride3, dst_stride3
     %define           hsub  m0
-    mova              hsub, [maddubsw_hsub]
+    movu              hsub, [maddubsw_hsub]
     ; Load rows into m1-m8
     lea       src_stride3q, [src_strideq*3]
     lea       dst_stride3q, [dst_strideq*3]
@@ -735,7 +735,7 @@ INIT_YMM avx2
 cglobal satd_8x16, 4, 8, 11, src, src_stride, dst, dst_stride, \
                              src8, dst8, src_stride3, dst_stride3
     %define           hsub  m0
-    mova              hsub, [maddubsw_hsub]
+    movu              hsub, [maddubsw_hsub]
     ; Load rows into m1-m8
     lea              src8q, [srcq+src_strideq*8]
     lea              dst8q, [dstq+dst_strideq*8]
@@ -810,7 +810,7 @@ cglobal satd_8x32, 4, 9, 13, src, src_stride, dst, dst_stride, \
     lea              dst8q, [dstq+dst_strideq*8]
 .loop:
     %define           hsub  m0
-    mova              hsub, [maddubsw_hsub]
+    movu              hsub, [maddubsw_hsub]
     ; Load rows into m1-m8
     LOAD_DIFF_Qx2 1, [srcq], [dstq], \
                      [src8q], [dst8q], \

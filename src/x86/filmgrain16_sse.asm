@@ -145,7 +145,7 @@ cglobal generate_grain_y_16bpc, 3, 6, 8, buf, fg_data, bdmax
     shr             r5d, 11             ; 0 for 10bpc, 2 for 12bpc
     sub              r3, r5
     SPLATW           m6, [base+round+r3*2-2]
-    mova             m5, [base+pb_mask]
+    movu             m5, [base+pb_mask]
     SPLATW           m0, [fg_dataq+FGData.seed]
     mov              r3, -73*82*2
     sub            bufq, r3
@@ -306,11 +306,11 @@ cglobal generate_grain_y_16bpc, 3, 6, 8, buf, fg_data, bdmax
 %define m9 [rsp+2*16]
 %define m10 [rsp+3*16]
 %define m11 [rsp+4*16]
-    mova            m12, m0
-    mova             m8, m1
-    mova             m9, m2
-    mova            m10, m3
-    mova            m11, m4
+    movu            m12, m0
+    movu             m8, m1
+    movu             m9, m2
+    movu            m10, m3
+    movu            m11, m4
     mov          bdmaxd, bdmaxm
 %endif
     sar          bdmaxd, 1
@@ -330,11 +330,11 @@ cglobal generate_grain_y_16bpc, 3, 6, 8, buf, fg_data, bdmax
 %else
 %define m13 [rsp+5*16]
 %define m14 [rsp+6*16]
-    mova            m13, m0
-    mova            m14, m1
+    movu            m13, m0
+    movu            m14, m1
 %if !cpuflag(sse4)
 %define m15 [rsp+7*16]
-    mova            m15, m2
+    movu            m15, m2
 %endif
 %endif
     sub            bufq, 2*(82*73-(82*3+79))
@@ -451,8 +451,8 @@ cglobal generate_grain_y_16bpc, 3, 6, 8, buf, fg_data, bdmax
 %else
 %define m14 [rsp+10*16]
 %define m15 [esp+11*16]
-    mova            m14, m6
-    mova            m15, m7
+    movu            m14, m6
+    movu            m15, m7
 %endif
 
     ; build cf0-1 until 18-19 in m5-12 and r0/1
@@ -466,7 +466,7 @@ cglobal generate_grain_y_16bpc, 3, 6, 8, buf, fg_data, bdmax
     pshufd           m4, m2, q3333
 %else
     pshufd           m5, m2, q3333
-    mova       [tmp+48], m5
+    movu       [tmp+48], m5
 %endif
     pshufd           m3, m2, q2222
     pshufd           m1, m2, q0000
@@ -488,11 +488,11 @@ cglobal generate_grain_y_16bpc, 3, 6, 8, buf, fg_data, bdmax
 %define m10 [rsp+6*16]
 %define m11 [esp+7*16]
 %define m12 [rsp+8*16]
-    mova             m8, m0
-    mova             m9, m1
-    mova            m10, m2
-    mova            m11, m3
-    mova            m12, m4
+    movu             m8, m0
+    movu             m9, m1
+    movu            m10, m2
+    movu            m11, m3
+    movu            m12, m4
 %endif
 
     ; build cf20,round in r2
@@ -503,8 +503,8 @@ cglobal generate_grain_y_16bpc, 3, 6, 8, buf, fg_data, bdmax
     punpcklbw        m0, m1
     pshufd           m1, m0, q0000
     pshufd           m2, m0, q1111
-    mova       [tmp+ 0], m1
-    mova       [tmp+16], m2
+    movu       [tmp+ 0], m1
+    movu       [tmp+16], m2
     psrldq           m3, m0, 10
     pinsrw           m3, [base+round_vals+shiftq*2-10], 3
 
@@ -512,12 +512,12 @@ cglobal generate_grain_y_16bpc, 3, 6, 8, buf, fg_data, bdmax
     SWAP              3, 13
 %else
 %define m13 [esp+9*16]
-    mova            m13, m3
+    movu            m13, m3
 %endif
 
     pinsrw           m0, [base+round_vals+shiftq*2-12], 5
     pshufd           m3, m0, q2222
-    mova       [tmp+32], m3
+    movu       [tmp+32], m3
 
     DEFINE_ARGS buf, fg_data, h, x
     sub            bufq, 2*(82*73-(82*3+79))
@@ -652,7 +652,7 @@ cglobal generate_grain_uv_%1_16bpc, 1, 7, 8, buf, x, pic_reg, fg_data, h
     shr             r6d, 11             ; 0 for 10bpc, 2 for 12bpc
     sub              r5, r6
     SPLATW           m6, [base+round+r5*2-2]
-    mova             m5, [base+pb_mask]
+    movu             m5, [base+pb_mask]
     SPLATW           m0, [fg_dataq+FGData.seed]
 %if ARCH_X86_64
     SPLATW           m2, [base+pw_seed_xor+uvq*4]
@@ -738,7 +738,7 @@ cglobal generate_grain_uv_%1_16bpc, 1, 7, 8, buf, x, pic_reg, fg_data, h
     DEFINE_ARGS buf, bufy, h, x
 %else
 %define m14 [rsp+0*16]
-    mova            m14, m1
+    movu            m14, m1
     DEFINE_ARGS buf, bufy, pic_reg, h, x
 %endif
     pxor             m5, m5
@@ -757,7 +757,7 @@ cglobal generate_grain_uv_%1_16bpc, 1, 7, 8, buf, x, pic_reg, fg_data, h
     SWAP              2, 12
 %else
 %define m12 [rsp+1*16]
-    mova            m12, m2
+    movu            m12, m2
 %endif
 %endif
 %endif
@@ -995,9 +995,9 @@ cglobal generate_grain_uv_%1_16bpc, 1, 7, 8, buf, x, pic_reg, fg_data, h
 %define m13 [rsp+5*16]
 %define m14 [rsp+6*16]
 %define m15 [rsp+7*16]
-    mova            m13, m5
-    mova            m14, m6
-    mova            m15, m7
+    movu            m13, m5
+    movu            m14, m6
+    movu            m15, m7
 %endif
 
     ; coef values
@@ -1028,11 +1028,11 @@ cglobal generate_grain_uv_%1_16bpc, 1, 7, 8, buf, x, pic_reg, fg_data, h
 %define m10 [rsp+2*16]
 %define m11 [rsp+3*16]
 %define m12 [rsp+4*16]
-    mova             m8, m0
-    mova             m9, m1
-    mova            m10, m2
-    mova            m11, m3
-    mova            m12, m4
+    movu             m8, m0
+    movu             m9, m1
+    movu            m10, m2
+    movu            m11, m3
+    movu            m12, m4
 %endif
 
 %if ARCH_X86_64
@@ -1200,10 +1200,10 @@ cglobal generate_grain_uv_%1_16bpc, 1, 7, 8, buf, x, pic_reg, fg_data, h
 %define m12 [rsp+10*16]
 %define m14 [rsp+12*16]
 %define m15 [rsp+13*16]
-    mova            m11, m3
-    mova            m12, m4
-    mova            m14, m6
-    mova            m15, m7
+    movu            m11, m3
+    movu            m12, m4
+    movu            m14, m6
+    movu            m15, m7
 %endif
 
     ; cf from y=-3,x=-3 until y=-3,x=-2
@@ -1218,12 +1218,12 @@ cglobal generate_grain_uv_%1_16bpc, 1, 7, 8, buf, x, pic_reg, fg_data, h
     pshufd           m0, m0, q3333
     pshufd           m5, m2, q0000
     pshufd           m6, m2, q1111
-    mova     [tmp+16*0], m1
-    mova     [tmp+16*1], m3
-    mova     [tmp+16*2], m4
-    mova     [tmp+16*3], m0
-    mova     [tmp+16*4], m5
-    mova     [tmp+16*5], m6
+    movu     [tmp+16*0], m1
+    movu     [tmp+16*1], m3
+    movu     [tmp+16*2], m4
+    movu     [tmp+16*3], m0
+    movu     [tmp+16*4], m5
+    movu     [tmp+16*5], m6
     pshufd           m6, m2, q2222
     pshufd           m7, m2, q3333
 
@@ -1255,10 +1255,10 @@ cglobal generate_grain_uv_%1_16bpc, 1, 7, 8, buf, x, pic_reg, fg_data, h
 %define m9  [rsp+ 7*16]
 %define m10 [rsp+ 8*16]
 %define m13 [rsp+11*16]
-    mova             m8, m1
-    mova             m9, m0
-    mova            m10, m3
-    mova            m13, m5
+    movu             m8, m1
+    movu             m9, m0
+    movu            m10, m3
+    movu            m13, m5
     DEFINE_ARGS buf, bufy, pic_reg, fg_data, h, x
 %endif
 %if %2
@@ -1402,7 +1402,7 @@ generate_grain_uv_fn 444, 0, 0
 
 %macro SCRATCH 3
 %if ARCH_X86_32
-    mova [rsp+%3*mmsize], m%1
+    movu [rsp+%3*mmsize], m%1
 %define m%2 [rsp+%3*mmsize]
 %else
     SWAP             %1, %2
@@ -1493,7 +1493,7 @@ cglobal fgy_32x32xn_16bpc, 6, 15, 16, dst, src, stride, fg_data, w, scaling, gra
     SCRATCH           6, 14, 5
     SCRATCH           7, 15, 6
 
-    mova             m6, [base+pw_27_17_17_27]   ; for horizontal filter
+    movu             m6, [base+pw_27_17_17_27]   ; for horizontal filter
 
 %if ARCH_X86_32
     DEFINE_ARGS dst, src, scaling, sby, fg_data, picptr, unused2
@@ -1614,8 +1614,8 @@ cglobal fgy_32x32xn_16bpc, 6, 15, 16, dst, src, stride, fg_data, w, scaling, gra
     pminsw           m0, m12
     pminsw           m1, m12
     movifnidn      dstq, dstmp
-    mova [dstq+srcq+ 0], m0
-    mova [dstq+srcq+16], m1
+    movu [dstq+srcq+ 0], m0
+    movu [dstq+srcq+16], m1
 
     add            srcq, r2mp               ; src += stride
     add      grain_lutq, 82*2
@@ -1748,8 +1748,8 @@ cglobal fgy_32x32xn_16bpc, 6, 15, 16, dst, src, stride, fg_data, w, scaling, gra
     pminsw           m0, m12
     pminsw           m1, m12
     movifnidn      dstq, dstmp
-    mova [dstq+srcq+ 0], m0
-    mova [dstq+srcq+16], m1
+    movu [dstq+srcq+ 0], m0
+    movu [dstq+srcq+16], m1
 
     add            srcq, r2mp
     add      grain_lutq, 82*2
@@ -1962,8 +1962,8 @@ cglobal fgy_32x32xn_16bpc, 6, 15, 16, dst, src, stride, fg_data, w, scaling, gra
     pminsw           m0, m12
     pminsw           m1, m12
     movifnidn      dstq, dstmp
-    mova [dstq+srcq+ 0], m0
-    mova [dstq+srcq+16], m1
+    movu [dstq+srcq+ 0], m0
+    movu [dstq+srcq+16], m1
 
     add            srcq, r2mp
     add      grain_lutq, 82*2
@@ -2159,8 +2159,8 @@ cglobal fgy_32x32xn_16bpc, 6, 15, 16, dst, src, stride, fg_data, w, scaling, gra
     pminsw           m0, m12
     pminsw           m1, m12
     movifnidn      dstq, dstmp
-    mova [dstq+srcq+ 0], m0
-    mova [dstq+srcq+16], m1
+    movu [dstq+srcq+ 0], m0
+    movu [dstq+srcq+16], m1
 
     add            srcq, r2mp
     add      grain_lutq, 82*2
@@ -2344,9 +2344,9 @@ cglobal fguv_32x32xn_i%1_16bpc, 6, 15, 16, dst, src, stride, fg_data, w, scaling
 %else
     SPLATD           m6, [base+pd_16]
 %if %2
-    mova             m5, [base+pw_23_22]
+    movu             m5, [base+pw_23_22]
 %else
-    mova             m5, [base+pw_27_17_17_27]
+    movu             m5, [base+pw_27_17_17_27]
 %endif
 %endif
 
@@ -2461,8 +2461,8 @@ cglobal fguv_32x32xn_i%1_16bpc, 6, 15, 16, dst, src, stride, fg_data, w, scaling
     mov      grain_lutq, grain_lutmp
 %%loop_y:
     ; src
-    mova             m0, [srcq]
-    mova             m1, [srcq+16]          ; m0-1: src as word
+    movu             m0, [srcq]
+    movu             m1, [srcq+16]          ; m0-1: src as word
 
     ; luma_src
     pxor          mzero, mzero
@@ -2471,8 +2471,8 @@ cglobal fguv_32x32xn_i%1_16bpc, 6, 15, 16, dst, src, stride, fg_data, w, scaling
 
     mov           lumaq, r9m
 %endif
-    mova             m4, [lumaq+ 0]
-    mova             m6, [lumaq+(16<<%2)]
+    movu             m4, [lumaq+ 0]
+    movu             m6, [lumaq+(16<<%2)]
 %if %2
     phaddw           m4, [lumaq+16]
     phaddw           m6, [lumaq+48]
@@ -2529,8 +2529,8 @@ cglobal fguv_32x32xn_i%1_16bpc, 6, 15, 16, dst, src, stride, fg_data, w, scaling
     pminsw           m0, m12
     pminsw           m1, m12
     movifnidn      dstq, dstmp
-    mova      [dstq+ 0], m0
-    mova      [dstq+16], m1
+    movu      [dstq+ 0], m0
+    movu      [dstq+16], m1
 
 %if ARCH_X86_32
     add            srcq, r2mp
@@ -2635,8 +2635,8 @@ cglobal fguv_32x32xn_i%1_16bpc, 6, 15, 16, dst, src, stride, fg_data, w, scaling
     mov              hd, r7m
     mov      grain_lutq, grain_lutmp
 %%loop_y_h_overlap:
-    mova             m0, [srcq]
-    mova             m1, [srcq+16]
+    movu             m0, [srcq]
+    movu             m1, [srcq+16]
 
     ; luma_src
     pxor          mzero, mzero
@@ -2644,8 +2644,8 @@ cglobal fguv_32x32xn_i%1_16bpc, 6, 15, 16, dst, src, stride, fg_data, w, scaling
     DEFINE_ARGS dst, src, scaling, offxy, h, luma, grain_lut
     mov           lumaq, r9m
 %endif
-    mova             m4, [lumaq+ 0]
-    mova             m6, [lumaq+(16<<%2)]
+    movu             m4, [lumaq+ 0]
+    movu             m6, [lumaq+(16<<%2)]
 %if %2
     phaddw           m4, [lumaq+16]
     phaddw           m6, [lumaq+48]
@@ -2728,8 +2728,8 @@ cglobal fguv_32x32xn_i%1_16bpc, 6, 15, 16, dst, src, stride, fg_data, w, scaling
     pminsw           m0, m12
     pminsw           m1, m12
     movifnidn      dstq, dstmp
-    mova      [dstq+ 0], m0
-    mova      [dstq+16], m1
+    movu      [dstq+ 0], m0
+    movu      [dstq+16], m1
 
 %if ARCH_X86_32
     add            srcq, r2mp
@@ -2967,8 +2967,8 @@ cglobal fguv_32x32xn_i%1_16bpc, 6, 15, 16, dst, src, stride, fg_data, w, scaling
     pminsw           m4, m9
 
     ; src
-    mova             m0, [srcq]
-    mova             m1, [srcq+16]
+    movu             m0, [srcq]
+    movu             m1, [srcq+16]
 
     ; luma_src
     pxor          mzero, mzero
@@ -2977,8 +2977,8 @@ cglobal fguv_32x32xn_i%1_16bpc, 6, 15, 16, dst, src, stride, fg_data, w, scaling
 
     mov           lumaq, r9mp
 %endif
-    mova             m5, [lumaq+ 0]
-    mova             m6, [lumaq+(16<<%2)]
+    movu             m5, [lumaq+ 0]
+    movu             m6, [lumaq+(16<<%2)]
 %if %2
     phaddw           m5, [lumaq+16]
     phaddw           m6, [lumaq+48]
@@ -3034,8 +3034,8 @@ cglobal fguv_32x32xn_i%1_16bpc, 6, 15, 16, dst, src, stride, fg_data, w, scaling
     pminsw           m0, m12
     pminsw           m1, m12
     movifnidn      dstq, dstmp
-    mova      [dstq+ 0], m0
-    mova      [dstq+16], m1
+    movu      [dstq+ 0], m0
+    movu      [dstq+16], m1
 
     dec              hw
     jle %%end_y_v_overlap
@@ -3267,8 +3267,8 @@ cglobal fguv_32x32xn_i%1_16bpc, 6, 15, 16, dst, src, stride, fg_data, w, scaling
     pminsw           m4, m9
 
     ; src
-    mova             m0, [srcq]
-    mova             m1, [srcq+16]
+    movu             m0, [srcq]
+    movu             m1, [srcq+16]
 
     ; luma_src
     pxor          mzero, mzero
@@ -3277,8 +3277,8 @@ cglobal fguv_32x32xn_i%1_16bpc, 6, 15, 16, dst, src, stride, fg_data, w, scaling
 
     mov           lumaq, r9mp
 %endif
-    mova             m6, [lumaq+ 0]
-    mova             m5, [lumaq+(16<<%2)]
+    movu             m6, [lumaq+ 0]
+    movu             m5, [lumaq+(16<<%2)]
 %if %2
     phaddw           m6, [lumaq+16]
     phaddw           m5, [lumaq+48]
@@ -3341,8 +3341,8 @@ cglobal fguv_32x32xn_i%1_16bpc, 6, 15, 16, dst, src, stride, fg_data, w, scaling
     pminsw           m0, m12
     pminsw           m1, m12
     movifnidn      dstq, dstmp
-    mova      [dstq+ 0], m0
-    mova      [dstq+16], m1
+    movu      [dstq+ 0], m0
+    movu      [dstq+16], m1
 
 %if ARCH_X86_32
     add            srcq, r2mp

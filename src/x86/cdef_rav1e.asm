@@ -141,7 +141,7 @@ cglobal cdef_filter_%1x%2, 4, 12, 16, 64
     pmulld          m2, m3
     pmovsxbd        m4, [tableq+dirq*8+16+64]
     paddd           m2, m4
-    mova     [offsets], m2
+    movu     [offsets], m2
 
     ; register to shuffle values into after packing
     vbroadcasti128 m12, [shufb_lohi]
@@ -212,12 +212,12 @@ cglobal cdef_filter_%1x%2, 4, 12, 16, 64
     movhps         xm5, [tmp3q]
     vinserti128     m4, xm5, 1
 %else
-    mova           xm4, [tmp0q]                  ; px
+    movu           xm4, [tmp0q]                  ; px
     vinserti128     m4, [tmp1q], 1
 %endif
     pxor           m15, m15                     ; sum
-    mova            m7, m4                      ; max
-    mova            m8, m4                      ; min
+    movu            m7, m4                      ; max
+    movu            m8, m4                      ; min
 .k_loop:
     vpbroadcastb    m2, [priq+kq]               ; pri_taps
     vpbroadcastb    m3, [secq+kq]               ; sec_taps

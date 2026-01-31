@@ -148,8 +148,8 @@ SECTION .text
     punpckldq       m4, m5
 %endif
 %if %3 == 1
-    mova            m7, m4                      ; min
-    mova            m8, m4                      ; max
+    movu            m7, m4                      ; min
+    movu            m8, m4                      ; max
 %endif
 %endmacro
 
@@ -304,13 +304,13 @@ SECTION .text
     movhps         xm5, [stkq+32*3]
     vinserti128     m4, xm5, 1
 %else
-    mova           xm4, [stkq+32*0]             ; px
+    movu           xm4, [stkq+32*0]             ; px
     vinserti128     m4, [stkq+32*1], 1
 %endif
     pxor           m15, m15                     ; sum
 %if %3 == 1
-    mova            m7, m4                      ; max
-    mova            m8, m4                      ; min
+    movu            m7, m4                      ; max
+    movu            m8, m4                      ; min
 %endif
 %endmacro
 
@@ -420,7 +420,7 @@ cglobal cdef_filter_%1x%2_8bpc, 5, 11, 0, dst, stride, left, top, bot, \
     PUSH           r13
     ALLOC_STACK 8*2+%1*%2*1, 16
     pmovzxwd        m0, [leftq]
-    mova    [rsp+0x10], m0
+    movu    [rsp+0x10], m0
 %else
 %assign regs_used 15
     PUSH           r13
@@ -434,11 +434,11 @@ cglobal cdef_filter_%1x%2_8bpc, 5, 11, 0, dst, stride, left, top, bot, \
     pmovzxbd        m2, [leftq+1]
     pmovzxbd        m3, [leftq+9]
     mov       [rsp+16], botq
-    mova    [rsp+0x20], m0
-    mova    [rsp+0x40], m1
-    mova    [rsp+0x60], m2
-    mova    [rsp+0x80], m3
-    mova    [rsp+0xa0], m4
+    movu    [rsp+0x20], m0
+    movu    [rsp+0x40], m1
+    movu    [rsp+0x60], m2
+    movu    [rsp+0x80], m3
+    movu    [rsp+0xa0], m4
     lea           botq, [dstq+strideq*4]
 %endif
 
@@ -924,7 +924,7 @@ cglobal cdef_filter_%1x%2_8bpc, 5, 11, 0, dst, stride, left, top, bot, \
     pblendw         m6, m11, 0x55
  %endif
 %else
-    mova           m11, [rsp+gprsize+0x20+hq*8+64]
+    movu           m11, [rsp+gprsize+0x20+hq*8+64]
     movu           xm5, [dstq+strideq*0-2]
     movu           xm9, [dstq+strideq*1-2]
     vinserti128     m5, [dstq+strideq*2-2], 1
@@ -1218,19 +1218,19 @@ cglobal cdef_filter_%1x%2_8bpc, 5, 11, 0, dst, stride, left, top, bot, \
     pmovzxbw        m2, [dstq+strideq*1]
     pmovzxbw        m3, [dstq+strideq*2]
     pmovzxbw        m4, [dstq+stride3q]
-    mova     [px+0*32], m1
-    mova     [px+1*32], m2
-    mova     [px+2*32], m3
-    mova     [px+3*32], m4
+    movu     [px+0*32], m1
+    movu     [px+1*32], m2
+    movu     [px+2*32], m3
+    movu     [px+3*32], m4
 %if %2 == 8
     pmovzxbw        m1, [dst4q+strideq*0]
     pmovzxbw        m2, [dst4q+strideq*1]
     pmovzxbw        m3, [dst4q+strideq*2]
     pmovzxbw        m4, [dst4q+stride3q]
-    mova     [px+4*32], m1
-    mova     [px+5*32], m2
-    mova     [px+6*32], m3
-    mova     [px+7*32], m4
+    movu     [px+4*32], m1
+    movu     [px+5*32], m2
+    movu     [px+6*32], m3
+    movu     [px+7*32], m4
 %endif
     jmp .body_done
 .no_right:
@@ -1252,10 +1252,10 @@ cglobal cdef_filter_%1x%2_8bpc, 5, 11, 0, dst, stride, left, top, bot, \
     pmovzxbw       xm2, [dstq+strideq*1]
     pmovzxbw       xm3, [dstq+strideq*2]
     pmovzxbw       xm4, [dstq+stride3q]
-    mova     [px+0*32], xm1
-    mova     [px+1*32], xm2
-    mova     [px+2*32], xm3
-    mova     [px+3*32], xm4
+    movu     [px+0*32], xm1
+    movu     [px+1*32], xm2
+    movu     [px+2*32], xm3
+    movu     [px+3*32], xm4
 %endif
     movd [px+0*32+%1*2], xm14
     movd [px+1*32+%1*2], xm14
@@ -1280,10 +1280,10 @@ cglobal cdef_filter_%1x%2_8bpc, 5, 11, 0, dst, stride, left, top, bot, \
     pmovzxbw       xm2, [dst4q+strideq*1]
     pmovzxbw       xm3, [dst4q+strideq*2]
     pmovzxbw       xm4, [dst4q+stride3q]
-    mova     [px+4*32], xm1
-    mova     [px+5*32], xm2
-    mova     [px+6*32], xm3
-    mova     [px+7*32], xm4
+    movu     [px+4*32], xm1
+    movu     [px+5*32], xm2
+    movu     [px+6*32], xm3
+    movu     [px+7*32], xm4
  %endif
     movd [px+4*32+%1*2], xm14
     movd [px+5*32+%1*2], xm14
@@ -1317,8 +1317,8 @@ cglobal cdef_filter_%1x%2_8bpc, 5, 11, 0, dst, stride, left, top, bot, \
     jz .top_no_left_right
     pmovzxbw        m1, [topq+strideq*0]
     pmovzxbw        m2, [topq+strideq*1]
-    mova   [px-2*32+0], m1
-    mova   [px-1*32+0], m2
+    movu   [px-2*32+0], m1
+    movu   [px-1*32+0], m2
     movd   [px-2*32-4], xm14
     movd   [px-1*32-4], xm14
     jmp .top_done
@@ -1332,8 +1332,8 @@ cglobal cdef_filter_%1x%2_8bpc, 5, 11, 0, dst, stride, left, top, bot, \
 %else
     pmovzxbw       xm1, [topq+strideq*0]
     pmovzxbw       xm2, [topq+strideq*1]
-    mova   [px-2*32+0], xm1
-    mova   [px-1*32+0], xm2
+    movu   [px-2*32+0], xm1
+    movu   [px-1*32+0], xm2
 %endif
     movd   [px-2*32-4], xm14
     movd   [px-1*32-4], xm14
@@ -1405,8 +1405,8 @@ cglobal cdef_filter_%1x%2_8bpc, 5, 11, 0, dst, stride, left, top, bot, \
     jz .bottom_no_left_right
     pmovzxbw        m1, [botq+strideq*0]
     pmovzxbw        m2, [botq+strideq*1]
-    mova   [px+(%2+0)*32+0], m1
-    mova   [px+(%2+1)*32+0], m2
+    movu   [px+(%2+0)*32+0], m1
+    movu   [px+(%2+1)*32+0], m2
     movd   [px+(%2+0)*32-4], xm14
     movd   [px+(%2+1)*32-4], xm14
     jmp .bottom_done
@@ -1420,8 +1420,8 @@ cglobal cdef_filter_%1x%2_8bpc, 5, 11, 0, dst, stride, left, top, bot, \
 %else
     pmovzxbw       xm1, [botq+strideq*0]
     pmovzxbw       xm2, [botq+strideq*1]
-    mova   [px+(%2+0)*32+0], xm1
-    mova   [px+(%2+1)*32+0], xm2
+    movu   [px+(%2+0)*32+0], xm1
+    movu   [px+(%2+1)*32+0], xm2
 %endif
     movd   [px+(%2+0)*32-4], xm14
     movd   [px+(%2+1)*32-4], xm14
@@ -1735,8 +1735,8 @@ cglobal_label .main
     pmulld          m5, m13
     paddd           m5, m1                  ; cost1[a-d] | cost3[a-d]
 
-    mova           xm0, [pd_47130256+ 16]
-    mova            m1, [pd_47130256]
+    movu           xm0, [pd_47130256+ 16]
+    movu            m1, [pd_47130256]
     phaddd          m9, m8
     phaddd          m5, m4
     phaddd          m9, m5

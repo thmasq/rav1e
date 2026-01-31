@@ -93,7 +93,7 @@ SECTION .text
 
 %macro TRANSPOSE_16X16B 2 ; output_transpose, mem
 %if %1 == 0
-    mova          %2, m15 ; m7 in 32-bit
+    movu          %2, m15 ; m7 in 32-bit
 %endif
 
     ; input in m0-7
@@ -107,11 +107,11 @@ SECTION .text
     SWAP           4, 5, 7
 %else
  %if %1 == 0
-    mova          m5, %2
+    movu          m5, %2
  %else
-    mova          m5, [esp+1*16]
+    movu          m5, [esp+1*16]
  %endif
-    mova          %2, m4
+    movu          %2, m4
 %endif
     punpcklbw     m4, m6, m5
     punpckhbw     m6, m5
@@ -126,8 +126,8 @@ SECTION .text
 %if ARCH_X86_64
     SWAP           3, 4, 7
 %else
-    mova          m4, %2
-    mova          %2, m3
+    movu          m4, %2
+    movu          %2, m3
 %endif
     punpcklwd     m3, m4, m6
     punpckhwd     m4, m6
@@ -138,8 +138,8 @@ SECTION .text
 %if ARCH_X86_64
     SWAP           2, 7, 5
 %else
-    mova          m2, %2
-    mova  [esp+1*16], m5
+    movu          m2, %2
+    movu  [esp+1*16], m5
 %endif
     punpckldq     m5, m15, m2
     punpckhdq    m15, m2
@@ -149,26 +149,26 @@ SECTION .text
     punpckhdq     m0, m4
 
 %if ARCH_X86_32
-    mova  [esp+0*16], m6
-    mova  [esp+2*16], m5
-    mova  [esp+3*16], m15
-    mova  [esp+4*16], m2
-    mova  [esp+5*16], m1
-    mova  [esp+6*16], m3
-    mova  [esp+7*16], m0
-    mova          m8, [esp+ 8*16]
-    mova          m9, [esp+ 9*16]
-    mova         m10, [esp+10*16]
+    movu  [esp+0*16], m6
+    movu  [esp+2*16], m5
+    movu  [esp+3*16], m15
+    movu  [esp+4*16], m2
+    movu  [esp+5*16], m1
+    movu  [esp+6*16], m3
+    movu  [esp+7*16], m0
+    movu          m8, [esp+ 8*16]
+    movu          m9, [esp+ 9*16]
+    movu         m10, [esp+10*16]
  %if %1 == 0
-    mova         m11, [esp+11*16]
-    mova         m12, [esp+12*16]
-    mova         m13, [esp+13*16]
-    mova         m14, [esp+14*16]
+    movu         m11, [esp+11*16]
+    movu         m12, [esp+12*16]
+    movu         m13, [esp+13*16]
+    movu         m14, [esp+14*16]
  %else
-    mova         m11, [esp+20*16]
-    mova         m12, [esp+15*16]
-    mova         m13, [esp+16*16]
-    mova         m14, [esp+17*16]
+    movu         m11, [esp+20*16]
+    movu         m12, [esp+15*16]
+    movu         m13, [esp+16*16]
+    movu         m14, [esp+17*16]
  %endif
 %endif
 
@@ -183,15 +183,15 @@ SECTION .text
     punpcklbw    m11, m12, m13
     punpckhbw    m12, m13
 %if ARCH_X86_64
-    mova         m13, %2
+    movu         m13, %2
 %else
  %if %1 == 0
-    mova         m13, [esp+15*16]
+    movu         m13, [esp+15*16]
  %else
-    mova         m13, [esp+18*16]
+    movu         m13, [esp+18*16]
  %endif
 %endif
-    mova          %2, m12
+    movu          %2, m12
     punpcklbw    m12, m14, m13
     punpckhbw    m14, m14, m13
 
@@ -202,8 +202,8 @@ SECTION .text
     punpckhwd     m8, m10
     punpcklwd    m10, m11, m12
     punpckhwd    m11, m12
-    mova         m12, %2
-    mova          %2, m11
+    movu         m12, %2
+    movu          %2, m11
     punpcklwd    m11, m12, m14
     punpckhwd    m12, m14
 
@@ -214,21 +214,21 @@ SECTION .text
     punpckhdq     m9, m11
     punpckldq    m11, m8, m12
     punpckhdq     m8, m12
-    mova         m12, %2
-    mova          %2, m8
+    movu         m12, %2
+    movu          %2, m8
     punpckldq     m8, m7, m12
     punpckhdq     m7, m12
 
 %if ARCH_X86_32
-    mova [esp+ 8*16], m10
-    mova [esp+ 9*16], m9
-    mova [esp+10*16], m11
+    movu [esp+ 8*16], m10
+    movu [esp+ 9*16], m9
+    movu [esp+10*16], m11
     SWAP           6, 1
     SWAP           4, 2
     SWAP           5, 3
-    mova          m6, [esp+0*16]
-    mova          m4, [esp+1*16]
-    mova          m5, [esp+2*16]
+    movu          m6, [esp+0*16]
+    movu          m4, [esp+1*16]
+    movu          m5, [esp+2*16]
 %endif
 
     ; interleaved in m6,7,5,15,2,1,3,0,14,13,10,9,11,rsp%2,8,7
@@ -241,28 +241,28 @@ SECTION .text
 %if ARCH_X86_64
     SWAP           8, 5
 %else
-    mova          m8, [esp+3*16]
-    mova [esp+27*16], m5
+    movu          m8, [esp+3*16]
+    movu [esp+27*16], m5
  %define m15 m8
 %endif
     punpcklqdq    m5, m15, m7
     punpckhqdq   m15, m7
 
 %if ARCH_X86_32
-    mova [esp+11*16], m12
-    mova [esp+12*16], m6
-    mova [esp+13*16], m14
-    mova [esp+14*16], m4
-    mova [esp+26*16], m13
-    mova [esp+ 0*16], m5
-    mova [esp+ 1*16], m15
-    mova          m2, [esp+ 4*16]
-    mova         m10, [esp+ 8*16]
-    mova          m1, [esp+ 5*16]
-    mova          m9, [esp+ 9*16]
-    mova          m3, [esp+ 6*16]
-    mova         m11, [esp+10*16]
-    mova          m0, [esp+ 7*16]
+    movu [esp+11*16], m12
+    movu [esp+12*16], m6
+    movu [esp+13*16], m14
+    movu [esp+14*16], m4
+    movu [esp+26*16], m13
+    movu [esp+ 0*16], m5
+    movu [esp+ 1*16], m15
+    movu          m2, [esp+ 4*16]
+    movu         m10, [esp+ 8*16]
+    movu          m1, [esp+ 5*16]
+    movu          m9, [esp+ 9*16]
+    movu          m3, [esp+ 6*16]
+    movu         m11, [esp+10*16]
+    movu          m0, [esp+ 7*16]
 %endif
 
     punpcklqdq    m7, m2, m10
@@ -271,15 +271,15 @@ SECTION .text
     punpckhqdq    m1, m9
     punpcklqdq    m9, m3, m11
     punpckhqdq    m3, m11
-    mova         m11, %2
+    movu         m11, %2
 %if ARCH_X86_32
  %define m12 m3
 %endif
-    mova          %2, m12
+    movu          %2, m12
     punpcklqdq   m12, m0, m11
     punpckhqdq    m0, m11
 %if %1 == 1
-    mova         m11, %2
+    movu         m11, %2
 %endif
 
 %if ARCH_X86_64
@@ -289,13 +289,13 @@ SECTION .text
     SWAP           3, 4, 13
 %else
  %if %1 == 0
-    mova [esp+15*16], m9
-    mova [esp+17*16], m12
-    mova [esp+18*16], m0
-    mova [esp+28*16], m10
-    mova [esp+29*16], m1
-    mova          m3, [esp+0*16]
-    mova          m4, [esp+1*16]
+    movu [esp+15*16], m9
+    movu [esp+17*16], m12
+    movu [esp+18*16], m0
+    movu [esp+28*16], m10
+    movu [esp+29*16], m1
+    movu          m3, [esp+0*16]
+    movu          m4, [esp+1*16]
     SWAP          m5, m7
     SWAP          m6, m2
  %else
@@ -344,10 +344,10 @@ SECTION .text
 %endif
 %if %1 == 4
     lea         tmpq, [dstq+mstrideq*2]
-    mova          m3, [tmpq+strideq*0]          ; p1
-    mova          m4, [tmpq+strideq*1]          ; p0
-    mova          m5, [tmpq+strideq*2]          ; q0
-    mova          m6, [tmpq+stride3q]           ; q1
+    movu          m3, [tmpq+strideq*0]          ; p1
+    movu          m4, [tmpq+strideq*1]          ; p0
+    movu          m5, [tmpq+strideq*2]          ; q0
+    movu          m6, [tmpq+stride3q]           ; q1
 %else
     ; load 6-8 pixels, remainder (for wd=16) will be read inline
     lea         tmpq, [dstq+mstrideq*4]
@@ -358,22 +358,22 @@ SECTION .text
   %define m14 m1
   %define m15 m2
  %endif
-    mova         m13, [tmpq+strideq*1]
-    mova          m3, [tmpq+strideq*2]
-    mova          m4, [tmpq+stride3q]
-    mova          m5, [dstq+strideq*0]
-    mova          m6, [dstq+strideq*1]
-    mova         m14, [dstq+strideq*2]
+    movu         m13, [tmpq+strideq*1]
+    movu          m3, [tmpq+strideq*2]
+    movu          m4, [tmpq+stride3q]
+    movu          m5, [dstq+strideq*0]
+    movu          m6, [dstq+strideq*1]
+    movu         m14, [dstq+strideq*2]
 %if %1 != 6
-    mova         m15, [dstq+stride3q]
+    movu         m15, [dstq+stride3q]
 %endif
  %if ARCH_X86_32
-    mova     %%p2mem, m13
-    mova     %%q2mem, m14
+    movu     %%p2mem, m13
+    movu     %%q2mem, m14
   %define m13 %%p2mem
   %define m14 %%q2mem
   %if %1 != 6
-    mova     %%q3mem, m15
+    movu     %%q3mem, m15
    %define m15 %%q3mem
   %endif
  %endif
@@ -472,7 +472,7 @@ SECTION .text
     SWAP         m15, m2
 %else
  %define m15 [esp+3*16]
-    mova         m15, m2
+    movu         m15, m2
 %endif
     movq          m0, [tmpq+strideq*0-%1/2]
     movq          m2, [tmpq+strideq*1-%1/2]
@@ -496,7 +496,7 @@ SECTION .text
 %if ARCH_X86_64
     SWAP         m15, m0
 %else
-    mova         m15, m0
+    movu         m15, m0
 %endif
     ; xm2: A0-3,B0-3,C0-3,D0-3
     ; xm7: E0-3,F0-3,G0-3,H0-3
@@ -520,7 +520,7 @@ SECTION .text
  %if ARCH_X86_64
     SWAP         m15, m3
  %else
-    mova         m15, m3
+    movu         m15, m3
  %endif
 %endif
     ; xm0: A0-7,B0-7
@@ -555,19 +555,19 @@ SECTION .text
     SWAP          14, 1
     SWAP          15, 7
     ; 3,0,2,6,4,5,1,7 -> 11,13,3,4,5,6,14,15
-    mova [rsp+21*16], m11
+    movu [rsp+21*16], m11
  %define %%p3mem [rsp+21*16]
 %else
  %define m11 [esp+26*16]
  %define m13 [esp+27*16]
  %define m14 [esp+28*16]
  %define m15 [esp+29*16]
-    mova         m11, m3
-    mova         m13, m0
+    movu         m11, m3
+    movu         m13, m0
     SWAP           3, 2
     SWAP           6, 5, 4
-    mova         m14, m1
-    mova         m15, m7
+    movu         m14, m1
+    movu         m15, m7
  %define %%p3mem [esp+26*16]
 %endif
 %else
@@ -578,8 +578,8 @@ SECTION .text
  %else
   %define m13 %%p2mem
   %define m14 %%q2mem
-    mova         m13, m3
-    mova         m14, m5
+    movu         m13, m3
+    movu         m14, m5
     SWAP           3, 0
     SWAP           5, 6, 4, 2
     ; 0,2,6,4 -> 3,4,5,6
@@ -587,7 +587,7 @@ SECTION .text
 %endif
 %else
 %if ARCH_X86_64
-    mova [rsp+20*16], m12
+    movu [rsp+20*16], m12
 %endif
     ; load and 16x16 transpose. We only use 14 pixels but we'll need the
     ; remainder at the end for the second transpose
@@ -610,14 +610,14 @@ SECTION .text
     movu         m13, [tmpq+strideq*1-8]
     movu         m14, [tmpq+strideq*2-8]
     movu         m15, [tmpq+stride3q -8]
-    mova [esp+ 8*16], m8
-    mova [esp+ 9*16], m9
-    mova [esp+10*16], m10
-    mova [esp+11*16], m11
-    mova [esp+12*16], m12
-    mova [esp+13*16], m13
-    mova [esp+14*16], m14
-    mova [esp+15*16], m15
+    movu [esp+ 8*16], m8
+    movu [esp+ 9*16], m9
+    movu [esp+10*16], m10
+    movu [esp+11*16], m11
+    movu [esp+12*16], m12
+    movu [esp+13*16], m13
+    movu [esp+14*16], m14
+    movu [esp+15*16], m15
 %endif
     movu          m0, [dstq+strideq*0-8]
     movu          m1, [dstq+strideq*1-8]
@@ -643,22 +643,22 @@ SECTION .text
 
 %if ARCH_X86_64
     TRANSPOSE_16X16B 0, [rsp+11*16]
-    mova [rsp+12*16], m1
-    mova [rsp+13*16], m2
-    mova [rsp+14*16], m3
-    mova [rsp+15*16], m12
-    mova [rsp+16*16], m13
-    mova [rsp+17*16], m14
-    mova [rsp+18*16], m15
+    movu [rsp+12*16], m1
+    movu [rsp+13*16], m2
+    movu [rsp+14*16], m3
+    movu [rsp+15*16], m12
+    movu [rsp+16*16], m13
+    movu [rsp+17*16], m14
+    movu [rsp+18*16], m15
     ; 4,5,6,7,8,9,10,11 -> 12,13,3,4,5,6,14,15
     SWAP          12, 4, 7
     SWAP          13, 5, 8
     SWAP           3, 6, 9
     SWAP          10, 14
     SWAP          11, 15
-    mova [rsp+21*16], m12
+    movu [rsp+21*16], m12
  %define %%p3mem [rsp+21*16]
-    mova         m12, [rsp+20*16]
+    movu         m12, [rsp+20*16]
 %else
     TRANSPOSE_16X16B 0, [esp+16*16]
  %define %%p3mem [esp+26*16]
@@ -730,8 +730,8 @@ SECTION .text
     lea         tmpq, [dstq+mstrideq*4]
   %endif
  %endif
-    mova  [esp+3*16], m0
-    mova  [esp+4*16], m2
+    movu  [esp+3*16], m0
+    movu  [esp+4*16], m2
 %endif
 
     ABSSUB        m0, m3, m4, m2                ; abs(p1-p0)
@@ -744,7 +744,7 @@ SECTION .text
  %if ARCH_X86_64
     SWAP           7, 11
  %else
-    mova  [esp+5*16], m7
+    movu  [esp+5*16], m7
  %endif
 %else
     pxor          m7, m0, [PIC_sym(pb_128)]
@@ -752,14 +752,14 @@ SECTION .text
 %if ARCH_X86_64
     SWAP           7, 11
 %else
-    mova  [esp+5*16], m7
+    movu  [esp+5*16], m7
 %endif
 
 %if %1 == 6
     ABSSUB        m1, m13, m4, m7               ; abs(p2-p0)
     pmaxub        m1, m0
 %else
-    mova          m2, %%p3mem
+    movu          m2, %%p3mem
     ABSSUB        m1, m2, m4, m7                ; abs(p3-p0)
     pmaxub        m1, m0
     ABSSUB        m7, m13, m4, m2               ; abs(p2-p0)
@@ -776,13 +776,13 @@ SECTION .text
 %if ARCH_X86_64
     SWAP           1, 9
 %else
-    mova  [esp+6*16], m1
+    movu  [esp+6*16], m1
 %endif
 
 %if %1 == 6
     ABSSUB        m7, m13, m3, m1               ; abs(p2-p1)
 %else
-    mova          m2, %%p3mem
+    movu          m2, %%p3mem
     ABSSUB        m7, m2, m13, m1               ; abs(p3-p2)
     ABSSUB        m2, m13, m3, m1               ; abs(p2-p1)
     pmaxub        m7, m2
@@ -793,7 +793,7 @@ SECTION .text
     pmaxub        m7, m2
 %if ARCH_X86_32
  %define m12 m1
-    mova         m12, maskmem
+    movu         m12, maskmem
 %endif
     pand          m2, m12, mask1
     pcmpeqd       m2, m12
@@ -827,48 +827,48 @@ SECTION .text
 %if ARCH_X86_64
     SWAP           0, 8
 %else
-    mova  [esp+3*16], m0
+    movu  [esp+3*16], m0
 %endif
 %ifidn %2, v
     lea         tmpq, [dstq+mstrideq*8]
-    mova          m0, [tmpq+strideq*1]
+    movu          m0, [tmpq+strideq*1]
 %else
-    mova          m0, [rsp+12*16]
+    movu          m0, [rsp+12*16]
 %endif
     ABSSUB        m1, m0, m4, m2
 %ifidn %2, v
-    mova          m0, [tmpq+strideq*2]
+    movu          m0, [tmpq+strideq*2]
 %else
-    mova          m0, [rsp+13*16]
+    movu          m0, [rsp+13*16]
 %endif
     ABSSUB        m2, m0, m4, m7
     pmaxub        m1, m2
 %ifidn %2, v
-    mova          m0, [tmpq+stride3q]
+    movu          m0, [tmpq+stride3q]
 %else
-    mova          m0, [rsp+14*16]
+    movu          m0, [rsp+14*16]
 %endif
     ABSSUB        m2, m0, m4, m7
     pmaxub        m1, m2
 %ifidn %2, v
     lea         tmpq, [dstq+strideq*4]
-    mova          m0, [tmpq+strideq*0]
+    movu          m0, [tmpq+strideq*0]
 %else
-    mova          m0, [rsp+15*16]
+    movu          m0, [rsp+15*16]
 %endif
     ABSSUB        m2, m0, m5, m7
     pmaxub        m1, m2
 %ifidn %2, v
-    mova          m0, [tmpq+strideq*1]
+    movu          m0, [tmpq+strideq*1]
 %else
-    mova          m0, [rsp+16*16]
+    movu          m0, [rsp+16*16]
 %endif
     ABSSUB        m2, m0, m5, m7
     pmaxub        m1, m2
 %ifidn %2, v
-    mova          m0, [tmpq+strideq*2]
+    movu          m0, [tmpq+strideq*2]
 %else
-    mova          m0, [rsp+17*16]
+    movu          m0, [rsp+17*16]
 %endif
     ABSSUB        m2, m0, m5, m7
     pmaxub        m1, m2
@@ -879,7 +879,7 @@ SECTION .text
 %else
     por           m1, [esp+6*16]
  %define m12 m7
-    mova         m12, maskmem
+    movu         m12, maskmem
 %endif
     pand          m2, m12, mask2
     pcmpeqd       m2, m12
@@ -888,7 +888,7 @@ SECTION .text
     pandn         m2, m8, m1                    ; flat16 & fm
 %else
     pandn         m2, [esp+3*16], m1            ; flat16 & fm
-    mova %%flat16mem, m2
+    movu %%flat16mem, m2
 %endif
     SWAP           1, 2
 
@@ -901,7 +901,7 @@ SECTION .text
 %else
     pandn         m0, [esp+6*16], m2
     pandn         m2, [esp+3*16], m0
-    mova  [esp+6*16], m2
+    movu  [esp+6*16], m2
 %endif
     pand          m2, m12, mask0
     pcmpeqd       m2, m12
@@ -918,15 +918,15 @@ SECTION .text
     pandn         m2, [esp+6*16], m0
     SWAP           2, 0
     pandn         m2, m1, [esp+6*16]
-    mova  %%flat8mem, m2
+    movu  %%flat8mem, m2
 %endif
 %elif %1 != 4
  %if ARCH_X86_64
     SWAP           1, 9
  %else
   %define m12 m7
-    mova         m12, maskmem
-    mova          m1, [esp+6*16]
+    movu         m12, maskmem
+    movu          m1, [esp+6*16]
  %endif
     pand          m2, m12, mask1
     pcmpeqd       m2, m12
@@ -940,12 +940,12 @@ SECTION .text
  %if ARCH_X86_64
     SWAP           1, 9
  %else
-    mova  %%flat8mem, m1
+    movu  %%flat8mem, m1
  %endif
 %else
 %if ARCH_X86_32
  %define m12 m1
-    mova         m12, maskmem
+    movu         m12, maskmem
 %endif
     pand          m2, m12, mask0
     pcmpeqd       m2, m12
@@ -954,11 +954,11 @@ SECTION .text
 
     ; short filter
 
-    mova          m1, [PIC_sym(pb_128)]
+    movu          m1, [PIC_sym(pb_128)]
 %if ARCH_X86_64
     SWAP           7, 11
 %else
-    mova          m7, [esp+5*16]
+    movu          m7, [esp+5*16]
 %endif
     pxor          m3, m1
     pxor          m6, m1
@@ -970,7 +970,7 @@ SECTION .text
     paddsb        m1, m2
     paddsb        m1, m2
     paddsb        m1, m2                        ; f=iclip_diff(3*(q0-p0)+f)
-    mova          m2, [PIC_sym(pb_16)]
+    movu          m2, [PIC_sym(pb_16)]
     pand          m0, m1                        ; f&=fm
     paddsb        m1, m0, [PIC_sym(pb_3)]
     paddsb        m0, [PIC_sym(pb_4)]
@@ -982,7 +982,7 @@ SECTION .text
     pxor          m0, m2
     psubb         m1, m2                        ; f2
     psubb         m0, m2                        ; f1
-    mova          m2, [PIC_sym(pb_128)]
+    movu          m2, [PIC_sym(pb_128)]
     paddsb        m4, m1
     psubsb        m5, m0
     pxor          m4, m2
@@ -1002,29 +1002,29 @@ SECTION .text
     ; flat16 filter
 %ifidn %2, v
     lea         tmpq, [dstq+mstrideq*8]
-    mova          m0, [tmpq+strideq*1]          ; p6
-    mova          m2, [tmpq+strideq*2]          ; p5
-    mova          m7, [tmpq+stride3q]           ; p4
+    movu          m0, [tmpq+strideq*1]          ; p6
+    movu          m2, [tmpq+strideq*2]          ; p5
+    movu          m7, [tmpq+stride3q]           ; p4
 %else
-    mova          m0, [rsp+12*16]
-    mova          m2, [rsp+13*16]
-    mova          m7, [rsp+14*16]
+    movu          m0, [rsp+12*16]
+    movu          m2, [rsp+13*16]
+    movu          m7, [rsp+14*16]
 %endif
 
 %if ARCH_X86_64
     SWAP           1, 10
-    mova  %%flat8mem, m9
-    mova     %%q2mem, m14
-    mova     %%q3mem, m15
+    movu  %%flat8mem, m9
+    movu     %%q2mem, m14
+    movu     %%q3mem, m15
     SWAP           0, 8
     SWAP           1, 9
 %else
  %ifidn %2, v
-    mova [esp+17*16], m0
-    mova [esp+19*16], m3
-    mova [esp+21*16], m4
-    mova [esp+22*16], m5
-    mova [esp+23*16], m6
+    movu [esp+17*16], m0
+    movu [esp+19*16], m3
+    movu [esp+21*16], m4
+    movu [esp+22*16], m5
+    movu [esp+23*16], m6
   %xdefine m11 m3
   %xdefine m14 m4
   %xdefine m15 m5
@@ -1037,11 +1037,11 @@ SECTION .text
   %define m5  [esp+22*16]
   %define m6  [esp+23*16]
  %else
-    mova [esp+31*16], m0
-    mova [esp+32*16], m3
-    mova [esp+33*16], m4
-    mova [esp+34*16], m5
-    mova [esp+35*16], m6
+    movu [esp+31*16], m0
+    movu [esp+32*16], m3
+    movu [esp+33*16], m4
+    movu [esp+34*16], m5
+    movu [esp+35*16], m6
   %xdefine m11 m3
   %xdefine m14 m4
   %xdefine m15 m5
@@ -1058,7 +1058,7 @@ SECTION .text
 
     ; p6*7+p5*2+p4*2+p3+p2+p1+p0+q0 [p5/p4/p2/p1/p0/q0][p6/p3] A
     ; write -6
-    mova         m11, %%p3mem
+    movu         m11, %%p3mem
 %if ARCH_X86_64
     punpcklbw    m14, m8, m11
     punpckhbw    m15, m8, m11
@@ -1067,7 +1067,7 @@ SECTION .text
     punpckhbw    m15, m0, m11
 %endif
 %ifidn %2, v
-    mova  [rsp+5*16], m11
+    movu  [rsp+5*16], m11
 %endif
     pmaddubsw    m10, m14, [PIC_sym(pb_7_1)]
     pmaddubsw    m11, m15, [PIC_sym(pb_7_1)]    ; p6*7+p3
@@ -1096,9 +1096,9 @@ SECTION .text
     pandn         m1, m9, m2
     por           m0, m1
 %ifidn %2, v
-    mova [tmpq+strideq*2], m0                   ; p5
+    movu [tmpq+strideq*2], m0                   ; p5
 %else
-    mova [rsp+13*16], m0
+    movu [rsp+13*16], m0
 %endif
 
     ; sub p6*2, add p3/q1 [reuse p6/p3 from A][-p6,+q1|save] B
@@ -1111,8 +1111,8 @@ SECTION .text
     punpckhbw     m1, m8, m6
     pmaddubsw     m0, [PIC_sym(pb_m1_1)]
     pmaddubsw     m1, [PIC_sym(pb_m1_1)]
-    mova  [rsp+3*16], m0
-    mova  [rsp+4*16], m1
+    movu  [rsp+3*16], m0
+    movu  [rsp+4*16], m1
     paddw        m10, m0
     paddw        m11, m1                        ; p6*5+p5*2+p4*2+p3*2+p2+p1+p0+q0+q1
     pmulhrsw      m0, m10, [PIC_sym(pw_2048)]
@@ -1122,14 +1122,14 @@ SECTION .text
     pandn         m1, m9, m7
     por           m0, m1
 %ifidn %2, v
-    mova [tmpq+stride3q], m0                    ; p4
+    movu [tmpq+stride3q], m0                    ; p4
 %else
-    mova [rsp+14*16], m0
+    movu [rsp+14*16], m0
 %endif
 
     ; sub p6/p5, add p2/q2 [-p6,+p2][-p5,+q2|save] C
     ; write -4
-    mova         m14, %%q2mem
+    movu         m14, %%q2mem
     punpcklbw     m0, m8, m13
     punpckhbw     m1, m8, m13
     pmaddubsw     m0, [PIC_sym(pb_m1_1)]
@@ -1140,7 +1140,7 @@ SECTION .text
     punpckhbw     m2, m14
     pmaddubsw     m0, [PIC_sym(pb_m1_1)]
     pmaddubsw     m2, [PIC_sym(pb_m1_1)]
-    mova  [rsp+1*16], m0
+    movu  [rsp+1*16], m0
     paddw        m10, m0
     paddw        m11, m2                        ; p6*4+p5+p4*2+p3*2+p2*2+p1+p0+q0+q1+q2
     pmulhrsw      m0, m10, [PIC_sym(pw_2048)]
@@ -1150,14 +1150,14 @@ SECTION .text
     pandn         m1, m9, %%p3mem
     por           m0, m1
 %ifidn %2, v
-    mova [tmpq+strideq*4], m0                   ; p3
+    movu [tmpq+strideq*4], m0                   ; p3
 %else
-    mova [rsp+19*16], m0
+    movu [rsp+19*16], m0
 %endif
 
     ; sub p6/p4, add p1/q3 [-p6,+p1][-p4,+q3|save] D
     ; write -3
-    mova         m15, %%q3mem
+    movu         m15, %%q3mem
     punpcklbw     m0, m8, m3
     punpckhbw     m1, m8, m3
     pmaddubsw     m0, [PIC_sym(pb_m1_1)]
@@ -1168,12 +1168,12 @@ SECTION .text
     punpckhbw     m7, m15
     pmaddubsw     m0, [PIC_sym(pb_m1_1)]
     pmaddubsw     m7, [PIC_sym(pb_m1_1)]
-    mova  [rsp+2*16], m0
+    movu  [rsp+2*16], m0
 %if ARCH_X86_32
  %ifidn %2, v
-    mova [esp+24*16], m7
+    movu [esp+24*16], m7
  %else
-    mova [esp+36*16], m7
+    movu [esp+36*16], m7
  %endif
 %endif
     paddw        m10, m0
@@ -1184,7 +1184,7 @@ SECTION .text
     pand          m0, m9
     pandn         m1, m9, m13
     por           m0, m1
-    mova  [rsp+6*16], m0                        ; don't clobber p2/m13 since we need it in F
+    movu  [rsp+6*16], m0                        ; don't clobber p2/m13 since we need it in F
 
     ; sub p6/p3, add p0/q4 [-p6,+p0][-p3,+q4|save] E
     ; write -2
@@ -1198,18 +1198,18 @@ SECTION .text
     SWAP           7, 8
 %endif
 %ifidn %2, v
-    mova          m1, [dstq+strideq*4]          ; q4
-    mova          m7, [rsp+5*16]                ; (pre-filter) p3
+    movu          m1, [dstq+strideq*4]          ; q4
+    movu          m7, [rsp+5*16]                ; (pre-filter) p3
 %else
-    mova          m1, [rsp+15*16]
-    mova          m7, %%p3mem                   ; (pre-filter) p3
+    movu          m1, [rsp+15*16]
+    movu          m7, %%p3mem                   ; (pre-filter) p3
 %endif
     punpcklbw     m0, m1, m7
     punpckhbw     m1, m1, m7
     pmaddubsw     m0, [PIC_sym(pb_m1_1)]
     pmaddubsw     m1, [PIC_sym(pb_m1_1)]
-    mova  [rsp+7*16], m0
-    mova  [rsp+5*16], m1
+    movu  [rsp+7*16], m0
+    movu  [rsp+5*16], m1
     psubw        m10, m0
     psubw        m11, m1                        ; p6*2+p5+p4+p3+p2*2+p1*2+p0*2+q0+q1+q2+q3+q4
     pmulhrsw      m0, m10, [PIC_sym(pw_2048)]
@@ -1218,17 +1218,17 @@ SECTION .text
     pand          m0, m9
     pandn         m1, m9, m3
     por           m0, m1
-    mova  [rsp+8*16], m0                        ; don't clobber p1/m3 since we need it in G
+    movu  [rsp+8*16], m0                        ; don't clobber p1/m3 since we need it in G
 
     ; sub p6/p2, add q0/q5 [-p6,+q0][-p2,+q5|save] F
     ; write -1
 %ifidn %2, v
-    mova          m7, [tmpq+strideq*1]          ; p6
+    movu          m7, [tmpq+strideq*1]          ; p6
     lea         tmpq, [dstq+strideq*4]
-    mova          m1, [tmpq+strideq*1]          ; q5
+    movu          m1, [tmpq+strideq*1]          ; q5
 %else
-    mova          m7, [rsp+12*16]               ; p6
-    mova          m1, [rsp+16*16]
+    movu          m7, [rsp+12*16]               ; p6
+    movu          m1, [rsp+16*16]
 %endif
     punpcklbw     m0, m7, m5
     punpckhbw     m7, m5
@@ -1238,20 +1238,20 @@ SECTION .text
     paddw        m11, m7                        ; p6+p5+p4+p3+p2*2+p1*2+p0*2+q0*2+q1+q2+q3+q4
     punpcklbw     m7, m13, m1
     pmaddubsw     m7, [PIC_sym(pb_m1_1)]
-    mova  [rsp+9*16], m7
+    movu  [rsp+9*16], m7
     paddw        m10, m7
 %if ARCH_X86_64
     punpckhbw    m13, m1
-    mova          m1, [rsp+6*16]
+    movu          m1, [rsp+6*16]
     SWAP           1, 13
 %else
     punpckhbw     m7, m13, m1
-    mova          m1, [esp+6*16]
-    mova         m13, m1
+    movu          m1, [esp+6*16]
+    movu         m13, m1
     SWAP           1, 7
 %endif
     pmaddubsw     m1, [PIC_sym(pb_m1_1)]
-    mova [rsp+10*16], m1
+    movu [rsp+10*16], m1
     paddw        m11, m1                        ; p6+p5+p4+p3+p2+p1*2+p0*2+q0*2+q1+q2+q3+q4+q5
     pmulhrsw      m7, m10, [PIC_sym(pw_2048)]
     pmulhrsw      m0, m11, [PIC_sym(pw_2048)]
@@ -1259,26 +1259,26 @@ SECTION .text
     pand          m7, m9
     pandn         m0, m9, m4
     por           m7, m0
-    mova  [rsp+6*16], m7                        ; don't clobber p0/m4 since we need it in H
+    movu  [rsp+6*16], m7                        ; don't clobber p0/m4 since we need it in H
 
     ; sub p6/p1, add q1/q6 [reuse -p6,+q1 from B][-p1,+q6|save] G
     ; write +0
 %ifidn %2, v
-    mova          m7, [tmpq+strideq*2]          ; q6
+    movu          m7, [tmpq+strideq*2]          ; q6
 %else
-    mova          m7, [rsp+17*16]
+    movu          m7, [rsp+17*16]
 %endif
     paddw        m10, [rsp+3*16]
     paddw        m11, [rsp+4*16]                ; p5+p4+p3+p2+p1*2+p0*2+q0*2+q1*2+q2+q3+q4+q5
     punpcklbw     m0, m3, m7
     punpckhbw     m1, m3, m7
 %if ARCH_X86_64
-    mova          m3, [rsp+8*16]
+    movu          m3, [rsp+8*16]
 %endif
     pmaddubsw     m0, [PIC_sym(pb_m1_1)]
     pmaddubsw     m1, [PIC_sym(pb_m1_1)]
-    mova  [rsp+3*16], m0
-    mova  [rsp+4*16], m1
+    movu  [rsp+3*16], m0
+    movu  [rsp+4*16], m1
     paddw        m10, m0
     paddw        m11, m1                        ; p5+p4+p3+p2+p1+p0*2+q0*2+q1*2+q2+q3+q4+q5+q6
     pmulhrsw      m0, m10, [PIC_sym(pw_2048)]
@@ -1288,10 +1288,10 @@ SECTION .text
     pandn         m1, m9, m5
     por           m0, m1
 %if ARCH_X86_32
-    mova          m1, [esp+8*16]
-    mova          m3, m1
+    movu          m1, [esp+8*16]
+    movu          m3, m1
 %endif
-    mova  [rsp+8*16], m0                        ; don't clobber q0/m5 since we need it in I
+    movu  [rsp+8*16], m0                        ; don't clobber q0/m5 since we need it in I
 
     ; sub p5/p0, add q2/q6 [reuse -p5,+q2 from C][-p0,+q6] H
     ; write +1
@@ -1304,7 +1304,7 @@ SECTION .text
     paddw        m10, m0
     paddw        m11, m2                        ; p4+p3+p2+p1+p0+q0*2+q1*2+q2*2+q3+q4+q5+q6*2
 %if ARCH_X86_64
-    mova          m4, [rsp+6*16]
+    movu          m4, [rsp+6*16]
 %else
  %define m4 [esp+6*16]
 %endif
@@ -1322,7 +1322,7 @@ SECTION .text
     SWAP           7, 8
     paddw        m11, m7
 %else
-    mova          m8, m7
+    movu          m8, m7
  %ifidn %2, v
     paddw        m11, [esp+24*16]               ; p3+p2+p1+p0+q0*2+q1*2+q2*2+q3*2+q4+q5+q6*2
  %else
@@ -1332,7 +1332,7 @@ SECTION .text
     punpcklbw     m0, m5, m8
     punpckhbw     m1, m5, m8
 %if ARCH_X86_64
-    mova          m5, [rsp+8*16]
+    movu          m5, [rsp+8*16]
 %else
  %define m5 [esp+8*16]
 %endif
@@ -1364,9 +1364,9 @@ SECTION .text
     pandn         m1, m9, m15
     por           m0, m1
 %ifidn %2, v
-    mova [tmpq+mstrideq], m0                    ; q3
+    movu [tmpq+mstrideq], m0                    ; q3
 %else
-    mova [rsp+20*16], m0
+    movu [rsp+20*16], m0
 %endif
 
     ; sub p2/q2, add q5/q6 [reuse -p2,+q5 from F][-q2,+q6] K
@@ -1390,9 +1390,9 @@ SECTION .text
 %endif
     por           m0, m1
 %ifidn %2, v
-    mova [tmpq+strideq*0], m0                    ; q4
+    movu [tmpq+strideq*0], m0                    ; q4
 %else
-    mova [rsp+15*16], m0
+    movu [rsp+15*16], m0
 %endif
 
     ; sub p1/q3, add q6*2 [reuse -p1,+q6 from G][-q3,+q6] L
@@ -1416,9 +1416,9 @@ SECTION .text
 %endif
     por          m10, m11
 %ifidn %2, v
-    mova [tmpq+strideq*1], m10                  ; q5
+    movu [tmpq+strideq*1], m10                  ; q5
 %else
-    mova [rsp+16*16], m10
+    movu [rsp+16*16], m10
 %endif
 
 %if ARCH_X86_64
@@ -1430,19 +1430,19 @@ SECTION .text
  %xdefine m4 m14
  %xdefine m5 m15
  %xdefine m6 m10
-    mova     %%q2mem, m7
+    movu     %%q2mem, m7
  %ifidn %2, v
-    mova          m3, [esp+19*16]
+    movu          m3, [esp+19*16]
  %else
-    mova          m3, [esp+32*16]
+    movu          m3, [esp+32*16]
  %endif
-    mova          m4, [esp+ 6*16]
-    mova          m5, [esp+ 8*16]
+    movu          m4, [esp+ 6*16]
+    movu          m5, [esp+ 8*16]
 %endif
     SWAP          m6, m2
 
 %if ARCH_X86_64
-    mova          m9, %%flat8mem
+    movu          m9, %%flat8mem
 %endif
 %ifidn %2, v
     lea         tmpq, [dstq+mstrideq*4]
@@ -1457,7 +1457,7 @@ SECTION .text
  %define m14 %%q2mem
  %define m15 %%q3mem
 %endif
-    mova         m11, %%p3mem
+    movu         m11, %%p3mem
     punpcklbw     m0, m11, m3
     punpcklbw     m7, m13, m4
     pmaddubsw     m2, m0, [PIC_sym(pb_3_1)] ; 3 * p3 + p1
@@ -1481,17 +1481,17 @@ SECTION .text
     pandn         m1, m9, m13
     por           m0, m1                    ; p2
 %ifidn %2, v
-    mova [tmpq+strideq*1], m0
+    movu [tmpq+strideq*1], m0
 %else
  %if ARCH_X86_64
     SWAP           0, 10
  %else
-    mova  [esp+2*16], m0
+    movu  [esp+2*16], m0
  %endif
 %endif
 
 %if ARCH_X86_32
-    mova         m11, %%p3mem
+    movu         m11, %%p3mem
 %endif
     punpcklbw     m0, m11, m3
     punpckhbw     m1, m11, m3
@@ -1512,13 +1512,13 @@ SECTION .text
     pandn         m1, m9, m3
     por           m0, m1            ; p1
 %ifidn %2, v
-    mova [tmpq+strideq*2], m0
+    movu [tmpq+strideq*2], m0
 %else
-    mova  [rsp+0*16], m0
+    movu  [rsp+0*16], m0
 %endif
 
 %if ARCH_X86_32
-    mova         m11, %%p3mem
+    movu         m11, %%p3mem
 %endif
     punpcklbw     m0, m11, m3
     punpckhbw     m1, m11, m3
@@ -1539,9 +1539,9 @@ SECTION .text
     pandn         m1, m9, m4
     por           m0, m1            ; p0
 %ifidn %2, v
-    mova [tmpq+stride3q], m0
+    movu [tmpq+stride3q], m0
 %else
-    mova  [rsp+1*16], m0
+    movu  [rsp+1*16], m0
 %endif
 
     punpcklbw     m0, m5, m15
@@ -1551,7 +1551,7 @@ SECTION .text
     paddw         m2, m0
     paddw         m7, m1
 %if ARCH_X86_32
-    mova         m11, %%p3mem
+    movu         m11, %%p3mem
 %endif
     punpcklbw     m0, m11, m4
     punpckhbw    m11, m11, m4
@@ -1566,9 +1566,9 @@ SECTION .text
     pandn        m11, m9, m5
     por          m11, m0            ; q0
 %ifidn %2, v
-    mova [dstq+strideq*0], m11
+    movu [dstq+strideq*0], m11
 %elif ARCH_X86_32
-    mova  [esp+8*16], m11
+    movu  [esp+8*16], m11
 %endif
 
     punpcklbw     m0, m5, m15
@@ -1590,12 +1590,12 @@ SECTION .text
     pandn         m1, m9, m6
     por           m0, m1            ; q1
 %ifidn %2, v
-    mova [dstq+strideq*1], m0
+    movu [dstq+strideq*1], m0
 %else
  %if ARCH_X86_64
     SWAP           0, 13
  %else
-    mova  [esp+9*16], m0
+    movu  [esp+9*16], m0
  %endif
 %endif
 
@@ -1618,12 +1618,12 @@ SECTION .text
     pandn         m7, m9, m14
     por           m2, m7            ; q2
 %ifidn %2, v
-    mova [dstq+strideq*2], m2
+    movu [dstq+strideq*2], m2
 %else
-    mova          m0, [rsp+0*16]
+    movu          m0, [rsp+0*16]
 %if %1 == 8
-    mova          m1, [rsp+1*16]
-    mova          m4, %%p3mem
+    movu          m1, [rsp+1*16]
+    movu          m4, %%p3mem
 
 %if ARCH_X86_32
  %define m10 [esp+2*16]
@@ -1643,7 +1643,7 @@ SECTION .text
 %if ARCH_X86_64
     SWAP           2, 15
 %else
-    mova         m15, m2
+    movu         m15, m2
 %endif
 
     punpcklwd     m2, m3, m5
@@ -1657,7 +1657,7 @@ SECTION .text
 %if ARCH_X86_64
     SWAP           6, 15
 %else
-    mova         m15, m6
+    movu         m15, m6
 %endif
 
     punpckldq     m6, m2, m0
@@ -1698,9 +1698,9 @@ SECTION .text
     SWAP           5, 10, 2
     SWAP           8, 11
     SWAP           9, 13
-    mova [rsp+21*16], m12
+    movu [rsp+21*16], m12
  %else
-    mova [esp+10*16], m2
+    movu [esp+10*16], m2
   %xdefine m8  m0
   %xdefine m9  m1
   %xdefine m10 m2
@@ -1710,20 +1710,20 @@ SECTION .text
   %xdefine m14 m6
   %xdefine m15 m7
  %endif
-    mova          m0, [rsp+11*16]
-    mova          m1, [rsp+12*16]
-    mova          m2, [rsp+13*16]
-    mova          m3, [rsp+14*16]
-    mova          m4, [rsp+19*16]
+    movu          m0, [rsp+11*16]
+    movu          m1, [rsp+12*16]
+    movu          m2, [rsp+13*16]
+    movu          m3, [rsp+14*16]
+    movu          m4, [rsp+19*16]
 %if ARCH_X86_64
-    mova          m7, [rsp+ 1*16]
-    mova         m11, [rsp+20*16]
-    mova         m12, [rsp+15*16]
-    mova         m13, [rsp+16*16]
-    mova         m14, [rsp+17*16]
+    movu          m7, [rsp+ 1*16]
+    movu         m11, [rsp+20*16]
+    movu         m12, [rsp+15*16]
+    movu         m13, [rsp+16*16]
+    movu         m14, [rsp+17*16]
     TRANSPOSE_16X16B 1, [rsp+18*16]
 %else
-    mova          m5, [esp+ 2*16]
+    movu          m5, [esp+ 2*16]
     TRANSPOSE_16X16B 1, [esp+32*16]
     mov         tmpq, dstq
     lea         dstq, [dstq+strideq*8]
@@ -1748,14 +1748,14 @@ SECTION .text
   %xdefine m13 m5
   %xdefine m14 m6
   %xdefine m15 m7
-    mova          m8, [esp+11*16]
-    mova          m9, [esp+12*16]
-    mova         m10, [esp+13*16]
-    mova         m11, [esp+14*16]
-    mova         m12, [esp+26*16]
-    mova         m13, [esp+27*16]
-    mova         m14, [esp+ 0*16]
-    mova         m15, [esp+ 1*16]
+    movu          m8, [esp+11*16]
+    movu          m9, [esp+12*16]
+    movu         m10, [esp+13*16]
+    movu         m11, [esp+14*16]
+    movu         m12, [esp+26*16]
+    movu         m13, [esp+27*16]
+    movu         m14, [esp+ 0*16]
+    movu         m15, [esp+ 1*16]
     mov         dstq, tmpq
 %endif
     movu [dstq+strideq*0-8], xm8
@@ -1771,7 +1771,7 @@ SECTION .text
 %if ARCH_X86_32
     lea         dstq, [dstq+strideq*8]
 %else
-    mova         m12, [rsp+21*16]
+    movu         m12, [rsp+21*16]
 %endif
 
 %endif ; if %1 == 8
@@ -1779,10 +1779,10 @@ SECTION .text
 %elif %1 == 6
     ; flat6 filter
 %if ARCH_X86_32
-    mova  [esp+3*16], m3
-    mova  [esp+4*16], m4
-    mova  [esp+5*16], m5
-    mova  [esp+6*16], m6
+    movu  [esp+3*16], m3
+    movu  [esp+4*16], m4
+    movu  [esp+5*16], m5
+    movu  [esp+6*16], m6
  %xdefine m8  m3
  %xdefine m10 m4
  %xdefine m11 m5
@@ -1813,9 +1813,9 @@ SECTION .text
     pandn        m15, m9, m3
     por           m2, m15
 %ifidn %2, v
-    mova [tmpq+strideq*2], m2                   ; p1
+    movu [tmpq+strideq*2], m2                   ; p1
 %elif ARCH_X86_32
-    mova [esp+11*16], m2
+    movu [esp+11*16], m2
 %endif
 
     pmaddubsw     m8, [PIC_sym(pb_m1_1)]
@@ -1838,9 +1838,9 @@ SECTION .text
     pandn        m15, m9, m4
     por           m2, m15
 %ifidn %2, v
-    mova [tmpq+stride3q], m2                    ; p0
+    movu [tmpq+stride3q], m2                    ; p0
 %elif ARCH_X86_32
-    mova  [esp+8*16], m2
+    movu  [esp+8*16], m2
 %endif
 
     paddw         m0, m8
@@ -1861,7 +1861,7 @@ SECTION .text
     pandn        m15, m9, m5
     por           m2, m15
 %ifidn %2, v
-    mova [dstq+strideq*0], m2                   ; q0
+    movu [dstq+strideq*0], m2                   ; q0
 %endif
 
     pmaddubsw     m8, [PIC_sym(pb_m1_2)]
@@ -1885,14 +1885,14 @@ SECTION .text
  %xdefine m6 m15
 %endif
 %ifidn %2, v
-    mova [dstq+strideq*1], m0                   ; q1
+    movu [dstq+strideq*1], m0                   ; q1
 %else
  %if ARCH_X86_64
     SWAP           3, 13
     SWAP           4, 14
  %else
-    mova          m3, [esp+11*16]
-    mova          m4, [esp+ 8*16]
+    movu          m3, [esp+11*16]
+    movu          m4, [esp+ 8*16]
  %endif
     SWAP           5, 2
     SWAP           6, 0
@@ -1900,10 +1900,10 @@ SECTION .text
 %endif
 %else ; if %1 == 4
 %ifidn %2, v
-    mova [tmpq+strideq*0], m3                   ; p1
-    mova [tmpq+strideq*1], m4                   ; p0
-    mova [tmpq+strideq*2], m5                   ; q0
-    mova [tmpq+stride3q ], m6                   ; q1
+    movu [tmpq+strideq*0], m3                   ; p1
+    movu [tmpq+strideq*1], m4                   ; p0
+    movu [tmpq+strideq*2], m5                   ; q0
+    movu [tmpq+stride3q ], m6                   ; q1
 %else
     TRANSPOSE_16x4_AND_WRITE_4x16 3, 4, 5, 6, 7
 %endif
@@ -1997,7 +1997,7 @@ cglobal lpf_v_sb_y_8bpc, 6, 7, 8, -16 * (26 + copy_args), \
     mov    l_stridem, l_strided
 %endif
     mov   mask_bitsd, 0xf
-    mova         m12, [PIC_sym(pd_mask)]
+    movu         m12, [PIC_sym(pd_mask)]
     XCHG_PIC_REG   0
     movu          m0, [maskq]
     pxor          m4, m4
@@ -2008,10 +2008,10 @@ cglobal lpf_v_sb_y_8bpc, 6, 7, 8, -16 * (26 + copy_args), \
     pshufd        m0, m0, q0000
     por           m1, m2
     por           m0, m1
-    mova [rsp+11*16], m0
-    mova [rsp+12*16], m1
-    mova [rsp+13*16], m2
-    mova [rsp+14*16], m3
+    movu [rsp+11*16], m0
+    movu [rsp+12*16], m1
+    movu [rsp+13*16], m2
+    movu [rsp+14*16], m3
 
 %define maskmem [esp+15*16]
 %define mask0   [rsp+11*16]
@@ -2026,7 +2026,7 @@ cglobal lpf_v_sb_y_8bpc, 6, 7, 8, -16 * (26 + copy_args), \
 %if ARCH_X86_32
     XCHG_PIC_REG   1
     mov  [esp+25*16], mask_bitsd
-    mova     maskmem, m12
+    movu     maskmem, m12
 %endif
     FILTER        16, v
     jmp .end
@@ -2038,7 +2038,7 @@ cglobal lpf_v_sb_y_8bpc, 6, 7, 8, -16 * (26 + copy_args), \
 %if ARCH_X86_32
     XCHG_PIC_REG   1
     mov  [esp+25*16], mask_bitsd
-    mova     maskmem, m12
+    movu     maskmem, m12
 %endif
     FILTER         8, v
     jmp .end
@@ -2050,13 +2050,13 @@ cglobal lpf_v_sb_y_8bpc, 6, 7, 8, -16 * (26 + copy_args), \
 
 %if ARCH_X86_32
     mov  [esp+25*16], mask_bitsd
-    mova     maskmem, m12
+    movu     maskmem, m12
 %endif
     FILTER         4, v
 
 .end:
 %if ARCH_X86_32
-    mova         m12, maskmem
+    movu         m12, maskmem
     mov   mask_bitsd, [esp+25*16]
 %endif
 .no_filter:
@@ -2094,7 +2094,7 @@ cglobal lpf_h_sb_y_8bpc, 6, 7, 8, -16 * (39 + copy_args), \
     mov    l_stridem, l_strided
 %endif
     mov   mask_bitsd, 0xf
-    mova         m12, [PIC_sym(pd_mask)]
+    movu         m12, [PIC_sym(pd_mask)]
     XCHG_PIC_REG   0
     movu          m0, [maskq]
     pxor          m4, m4
@@ -2105,10 +2105,10 @@ cglobal lpf_h_sb_y_8bpc, 6, 7, 8, -16 * (39 + copy_args), \
     pshufd        m0, m0, q0000
     por           m1, m2
     por           m0, m1
-    mova [rsp+22*16], m0
-    mova [rsp+23*16], m1
-    mova [rsp+24*16], m2
-    mova [rsp+25*16], m3
+    movu [rsp+22*16], m0
+    movu [rsp+23*16], m1
+    movu [rsp+24*16], m2
+    movu [rsp+25*16], m3
 
 %define maskmem [esp+37*16]
 %define mask0   [rsp+22*16]
@@ -2123,7 +2123,7 @@ cglobal lpf_h_sb_y_8bpc, 6, 7, 8, -16 * (39 + copy_args), \
 %if ARCH_X86_32
     XCHG_PIC_REG   1
     mov  [esp+38*16], mask_bitsd
-    mova     maskmem, m12
+    movu     maskmem, m12
 %endif
     FILTER        16, h
     jmp .end
@@ -2135,7 +2135,7 @@ cglobal lpf_h_sb_y_8bpc, 6, 7, 8, -16 * (39 + copy_args), \
 %if ARCH_X86_32
     XCHG_PIC_REG   1
     mov  [esp+38*16], mask_bitsd
-    mova     maskmem, m12
+    movu     maskmem, m12
 %endif
     FILTER         8, h
     jmp .end
@@ -2147,7 +2147,7 @@ cglobal lpf_h_sb_y_8bpc, 6, 7, 8, -16 * (39 + copy_args), \
 
 %if ARCH_X86_32
     mov  [esp+38*16], mask_bitsd
-    mova     maskmem, m12
+    movu     maskmem, m12
 %endif
     FILTER         4, h
     jmp .end
@@ -2158,7 +2158,7 @@ cglobal lpf_h_sb_y_8bpc, 6, 7, 8, -16 * (39 + copy_args), \
 %if ARCH_X86_32
     jmp .end_noload
 .end:
-    mova         m12, maskmem
+    movu         m12, maskmem
     mov    l_strideq, l_stridem
     mov   mask_bitsd, [esp+38*16]
 .end_noload:
@@ -2199,7 +2199,7 @@ cglobal lpf_v_sb_uv_8bpc, 6, 7, 8, -16 * (12 + copy_args), \
     mov    l_stridem, l_strided
 %endif
     mov   mask_bitsd, 0xf
-    mova         m12, [PIC_sym(pd_mask)]
+    movu         m12, [PIC_sym(pd_mask)]
     XCHG_PIC_REG   0
     movq          m0, [maskq]
     pxor          m3, m3
@@ -2208,9 +2208,9 @@ cglobal lpf_v_sb_uv_8bpc, 6, 7, 8, -16 * (12 + copy_args), \
     pshufd        m1, m0, q1111
     pshufd        m0, m0, q0000
     por           m0, m1
-    mova  [rsp+0*16], m0
-    mova  [rsp+1*16], m1
-    mova  [rsp+2*16], m2
+    movu  [rsp+0*16], m0
+    movu  [rsp+1*16], m1
+    movu  [rsp+2*16], m2
 
 %define maskmem [esp+7*16]
 %define mask0   [rsp+0*16]
@@ -2224,7 +2224,7 @@ cglobal lpf_v_sb_uv_8bpc, 6, 7, 8, -16 * (12 + copy_args), \
 %if ARCH_X86_32
     XCHG_PIC_REG   1
     mov  [esp+11*16], mask_bitsd
-    mova     maskmem, m12
+    movu     maskmem, m12
 %endif
     FILTER         6, v
     jmp .end
@@ -2236,13 +2236,13 @@ cglobal lpf_v_sb_uv_8bpc, 6, 7, 8, -16 * (12 + copy_args), \
 
 %if ARCH_X86_32
     mov  [esp+11*16], mask_bitsd
-    mova     maskmem, m12
+    movu     maskmem, m12
 %endif
     FILTER         4, v
 
 .end:
 %if ARCH_X86_32
-    mova         m12, maskmem
+    movu         m12, maskmem
     mov   mask_bitsd, [esp+11*16]
 %endif
 .no_filter:
@@ -2280,7 +2280,7 @@ cglobal lpf_h_sb_uv_8bpc, 6, 7, 8, -16 * (13 + copy_args), \
     mov    l_stridem, l_strided
 %endif
     mov   mask_bitsd, 0xf
-    mova         m12, [PIC_sym(pd_mask)]
+    movu         m12, [PIC_sym(pd_mask)]
     XCHG_PIC_REG   0
     movq          m0, [maskq]
     pxor          m3, m3
@@ -2289,9 +2289,9 @@ cglobal lpf_h_sb_uv_8bpc, 6, 7, 8, -16 * (13 + copy_args), \
     pshufd        m1, m0, q1111
     pshufd        m0, m0, q0000
     por           m0, m1
-    mova  [rsp+0*16], m0
-    mova  [rsp+1*16], m1
-    mova  [rsp+2*16], m2
+    movu  [rsp+0*16], m0
+    movu  [rsp+1*16], m1
+    movu  [rsp+2*16], m2
 
 %define maskmem [esp+7*16]
 %define mask0   [rsp+0*16]
@@ -2305,7 +2305,7 @@ cglobal lpf_h_sb_uv_8bpc, 6, 7, 8, -16 * (13 + copy_args), \
 %if ARCH_X86_32
     XCHG_PIC_REG   1
     mov  [esp+12*16], mask_bitsd
-    mova     maskmem, m12
+    movu     maskmem, m12
 %endif
     FILTER         6, h
     jmp .end
@@ -2317,7 +2317,7 @@ cglobal lpf_h_sb_uv_8bpc, 6, 7, 8, -16 * (13 + copy_args), \
 
 %if ARCH_X86_32
     mov  [esp+12*16], mask_bitsd
-    mova     maskmem, m12
+    movu     maskmem, m12
 %endif
     FILTER         4, h
     jmp .end
@@ -2328,7 +2328,7 @@ cglobal lpf_h_sb_uv_8bpc, 6, 7, 8, -16 * (13 + copy_args), \
 %if ARCH_X86_32
     jmp .end_noload
 .end:
-    mova         m12, maskmem
+    movu         m12, maskmem
     mov    l_strided, l_stridem
     mov   mask_bitsd, [esp+12*16]
 .end_noload:

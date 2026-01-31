@@ -118,7 +118,7 @@ cglobal cdef_filter_4x4_8bpc, 5, 8, 13, dst, stride, left, top, bot, \
     vinserti32x4  ym0, ymm0, [leftq], 1
     lea            r2, [strideq*3]
     vinserti32x4  ym1, ymm1, [dstq+strideq*2], 1
-    mova           m5, [base+lut_perm_4x4]
+    movu           m5, [base+lut_perm_4x4]
     vinserti32x4   m0, [dstq+r2], 2
     test          r6b, 0x08      ; avoid buffer overread
     jz .main
@@ -127,7 +127,7 @@ cglobal cdef_filter_4x4_8bpc, 5, 8, 13, dst, stride, left, top, bot, \
 .main:
     movifnidn    prid, prim
     mov           t0d, dirm
-    mova           m3, [base+px_idx]
+    movu           m3, [base+px_idx]
     mov           r3d, dampingm
     vpermi2b       m5, m0, m1    ; lut
     vpbroadcastd   m0, [base+pd_268435568] ; (1 << 28) + (7 << 4)
@@ -189,7 +189,7 @@ cglobal cdef_filter_4x4_8bpc, 5, 8, 13, dst, stride, left, top, bot, \
     vpshldd        m6, m0, 8  ; (px << 8) + ((sum > -8) << 4)
     paddw          m0, m6     ; (px << 8) + ((sum + (sum > -8) + 7) << 4)
 .end:
-    mova          xm1, [base+end_perm]
+    movu          xm1, [base+end_perm]
     vpermb         m0, m1, m0 ; output in bits 8-15 of each dword
     movd   [dstq+strideq*0], xm0
     pextrd [dstq+strideq*1], xm0, 1
@@ -207,7 +207,7 @@ ALIGN function_align
     jz .mask_edges_sec_only
     vpaddd         m2, m3, [base+cdef_dirs+(t0+2)*4] {1to16}
     vpshufbitqmb   k1, m8, m2 ; index in-range
-    mova           m1, m6
+    movu           m1, m6
     vpermb     m1{k1}, m2, m5
     CDEF_FILTER_4x4_PRI
     test         secd, secd
@@ -218,10 +218,10 @@ ALIGN function_align
     vpaddd         m4, m3, [base+cdef_dirs+(t0+4)*4] {1to16}
     vpaddd         m9, m3, [base+cdef_dirs+(t0+0)*4] {1to16}
     vpshufbitqmb   k1, m8, m4
-    mova           m2, m6
+    movu           m2, m6
     vpermb     m2{k1}, m4, m5
     vpshufbitqmb   k1, m8, m9
-    mova           m3, m6
+    movu           m3, m6
     vpermb     m3{k1}, m9, m5
     jmp .sec_main
 ALIGN function_align
@@ -241,7 +241,7 @@ ALIGN function_align
     vpbroadcastq  m11, [r3+secq*8]
     gf2p8affineqb m10, m4, m11, 0
     psubb          m5, m3, m6
-    mova           m9, m8
+    movu           m9, m8
     vpsubb     m8{k1}, m7, m8
     psubusb       m10, m12, m10
     vpsubb     m5{k2}, m6, m3
@@ -277,7 +277,7 @@ cglobal cdef_filter_4x8_8bpc, 5, 9, 22, dst, stride, left, top, bot, \
     kxnorb         k1, k1, k1
     movq          xm2, [topq+strideq*1-2]
     vpgatherdq m0{k1}, [dstq+ym21]  ; +0+1 +2+3 +4+5 +6+7
-    mova          m14, [base+lut_perm_4x8a]
+    movu          m14, [base+lut_perm_4x8a]
     movu          m15, [base+lut_perm_4x8b]
     test          r6b, 0x08         ; avoid buffer overread
     jz .main
@@ -288,7 +288,7 @@ cglobal cdef_filter_4x8_8bpc, 5, 9, 22, dst, stride, left, top, bot, \
     vinserti32x4   m1, [leftq], 2   ; -2-1 +8+9 left ____
     movifnidn    prid, prim
     mov           t0d, dirm
-    mova          m16, [base+px_idx]
+    movu          m16, [base+px_idx]
     mov           r3d, dampingm
     vpermi2b      m14, m0, m1    ; lut top
     vpermi2b      m15, m0, m1    ; lut bottom
@@ -297,7 +297,7 @@ cglobal cdef_filter_4x8_8bpc, 5, 9, 22, dst, stride, left, top, bot, \
     lea            r3, [r8+r3*8] ; gf_shr + (damping - 30) * 8
     vpermb         m2, m16, m14  ; pxt
     vpermb         m3, m16, m15  ; pxb
-    mova           m1, m0
+    movu           m1, m0
     cmp           r6b, 0x0f
     jne .mask_edges              ; mask edges only if required
     test         prid, prid
@@ -319,7 +319,7 @@ cglobal cdef_filter_4x8_8bpc, 5, 9, 22, dst, stride, left, top, bot, \
     vpbroadcastd  m11, [base+pri_tap+priq*4]
     vgf2p8affineqb m8, m6, m9, 0 ; abs(dt) >> shift
     vgf2p8affineqb m9, m7, m9, 0 ; abs(db) >> shift
-    mova          m10, m11
+    movu          m10, m11
     movifnidn     t1d, secm
     vpsubb    m10{k1}, m20, m11  ; apply_sign(pri_tap_top)
     vpsubb    m11{k2}, m20, m11  ; apply_sign(pri_tap_bottom)
@@ -360,7 +360,7 @@ cglobal cdef_filter_4x8_8bpc, 5, 9, 22, dst, stride, left, top, bot, \
     vpshrdd        m2, m3, 16
     pminub         m6, m7
     pmaxub         m8, m9
-    mova         ym14, [base+end_perm]
+    movu         ym14, [base+end_perm]
     vpcmpw         k1, m4, m20, 1
     vpshldw        m2, m5, 8
     pslldq         m7, m6, 1
@@ -379,7 +379,7 @@ cglobal cdef_filter_4x8_8bpc, 5, 9, 22, dst, stride, left, top, bot, \
     movifnidn     t1d, secm
     call .sec
 .end_no_clip:
-    mova          ym4, [base+end_perm]
+    movu          ym4, [base+end_perm]
     kxnorb         k1, k1, k1
     vpshldd        m2, m0, 8  ; (px << 8) + ((sum > -8) << 4)
     vpshldd        m3, m1, 8
@@ -406,8 +406,8 @@ ALIGN function_align
     vpaddd         m6, m16, [base+cdef_dirs+(t0+2)*4] {1to16}
     vpshufbitqmb   k1, m17, m6 ; index in-range
     vpshufbitqmb   k2, m18, m6
-    mova           m4, m2
-    mova           m5, m3
+    movu           m4, m2
+    movu           m5, m3
     vpermb     m4{k1}, m6, m14
     vpermb     m5{k2}, m6, m15
     CDEF_FILTER_4x8_PRI
@@ -422,10 +422,10 @@ ALIGN function_align
     vpshufbitqmb   k2, m18, m10
     vpshufbitqmb   k3, m17, m11
     vpshufbitqmb   k4, m18, m11
-    mova           m6, m2
-    mova           m7, m3
-    mova           m8, m2
-    mova           m9, m3
+    movu           m6, m2
+    movu           m7, m3
+    movu           m8, m2
+    movu           m9, m3
     vpermb     m6{k1}, m10, m14
     vpermb     m7{k2}, m10, m15
     vpermb     m8{k3}, m11, m14
@@ -468,9 +468,9 @@ ALIGN function_align
     pminub        m11, m15
     pminub        m12, m16
     pminub        m13, m17
-    mova          m14, m19
-    mova          m15, m19
-    mova          m16, m19
+    movu          m14, m19
+    movu          m15, m19
+    movu          m16, m19
     vpsubb    m14{k1}, m20, m19    ; apply_sign(sec_tap_top_0)
     vpsubb    m15{k2}, m20, m19    ; apply_sign(sec_tap_bottom_0)
     vpsubb    m16{k3}, m20, m19    ; apply_sign(sec_tap_top_1)
@@ -527,9 +527,9 @@ cglobal cdef_filter_8x8_8bpc, 5, 11, 32, 4*64, dst, stride, left, top, bot, \
     vinserti32x4  m18, [botq+strideq*0-2], 2
     vinserti32x4  m18, [botq+strideq*1-2], 3 ; 6 7 b B
 .main:
-    mova           m0, [base+lut_perm_8x8a]
+    movu           m0, [base+lut_perm_8x8a]
     movu           m1, [base+lut_perm_8x8b]
-    mova          m30, [base+px_idx]
+    movu          m30, [base+px_idx]
     vpermb        m16, m0, m16
     movifnidn    prid, prim
     vpermb        m17, m1, m17
@@ -544,11 +544,11 @@ cglobal cdef_filter_8x8_8bpc, 5, 11, 32, 4*64, dst, stride, left, top, bot, \
     pxor          m31, m31
     lea            r3, [r8+r3*8]  ; gf_shr + (damping - 30) * 8
     vpermb         m4, m30, m12   ; pxtl
-    mova           m1, m0
+    movu           m1, m0
     vpermb         m5, m30, m13   ; pxtr
-    mova           m2, m0
+    movu           m2, m0
     vpermb         m6, m30, m14   ; pxbl
-    mova           m3, m0
+    movu           m3, m0
     vpermb         m7, m30, m15   ; pxbr
     cmp           r6b, 0x0f
     jne .mask_edges               ; mask edges only if required
@@ -581,9 +581,9 @@ cglobal cdef_filter_8x8_8bpc, 5, 11, 32, 4*64, dst, stride, left, top, bot, \
     vgf2p8affineqb m21, m17, m28, 0 ; abs(dtr) >> shift
     vgf2p8affineqb m22, m18, m28, 0 ; abs(dbl) >> shift
     vgf2p8affineqb m23, m19, m28, 0 ; abs(dbl) >> shift
-    mova          m24, m27
-    mova          m25, m27
-    mova          m26, m27
+    movu          m24, m27
+    movu          m25, m27
+    movu          m26, m27
     movifnidn     t1d, secm
     vpsubb    m24{k1}, m31, m27   ; apply_sign(pri_tap_tl)
     vpsubb    m25{k2}, m31, m27   ; apply_sign(pri_tap_tr)
@@ -653,7 +653,7 @@ cglobal cdef_filter_8x8_8bpc, 5, 11, 32, 4*64, dst, stride, left, top, bot, \
     pminub        m14, m15
     pmaxub        m16, m17
     pmaxub        m18, m19
-    mova           m8, [base+end_perm_clip]
+    movu           m8, [base+end_perm_clip]
     vpcmpw         k2, m20, m31, 1
     vpcmpw         k3, m22, m31, 1
     vpshldw        m4, m21, 8
@@ -693,7 +693,7 @@ cglobal cdef_filter_8x8_8bpc, 5, 11, 32, 4*64, dst, stride, left, top, bot, \
     movifnidn     t1d, secm
     call .sec
 .end_no_clip:
-    mova          xm8, [base+end_perm]
+    movu          xm8, [base+end_perm]
     kxnorb         k1, k1, k1
     vpshldd        m4, m0, 8  ; (px << 8) + ((sum > -8) << 4)
     vpshldd        m5, m1, 8
@@ -745,25 +745,25 @@ ALIGN function_align
     vpshufbitqmb   k2, m27, m20
     vpshufbitqmb   k3, m28, m20
     vpshufbitqmb   k4, m29, m20
-    mova           m8, m4
-    mova           m9, m5
-    mova          m10, m6
-    mova          m11, m7
+    movu           m8, m4
+    movu           m9, m5
+    movu          m10, m6
+    movu          m11, m7
     vpermb     m8{k1}, m20, m12
     vpermb     m9{k2}, m20, m13
     vpermb    m10{k3}, m20, m14
     vpermb    m11{k4}, m20, m15
-    mova   [rsp+0x00], m26
-    mova   [rsp+0x40], m27
-    mova   [rsp+0x80], m28
-    mova   [rsp+0xC0], m29
+    movu   [rsp+0x00], m26
+    movu   [rsp+0x40], m27
+    movu   [rsp+0x80], m28
+    movu   [rsp+0xC0], m29
     CDEF_FILTER_8x8_PRI
     test          t1d, t1d
     jz .end_no_clip
-    mova          m26, [rsp+0x00]
-    mova          m27, [rsp+0x40]
-    mova          m28, [rsp+0x80]
-    mova          m29, [rsp+0xC0]
+    movu          m26, [rsp+0x00]
+    movu          m27, [rsp+0x40]
+    movu          m28, [rsp+0x80]
+    movu          m29, [rsp+0xC0]
     call .mask_edges_sec
     jmp .end_clip
 .mask_edges_sec:
@@ -773,10 +773,10 @@ ALIGN function_align
     vpshufbitqmb   k2, m27, m20
     vpshufbitqmb   k3, m28, m20
     vpshufbitqmb   k4, m29, m20
-    mova          m16, m4
-    mova          m17, m5
-    mova          m18, m6
-    mova          m19, m7
+    movu          m16, m4
+    movu          m17, m5
+    movu          m18, m6
+    movu          m19, m7
     vpermb    m16{k1}, m20, m12
     vpermb    m17{k2}, m20, m13
     vpermb    m18{k3}, m20, m14
@@ -840,10 +840,10 @@ ALIGN function_align
     pminub        m21, m25
     pminub        m22, m26
     pminub        m23, m27
-    mova          m24, m30
-    mova          m25, m30
-    mova          m26, m30
-    mova          m27, m30
+    movu          m24, m30
+    movu          m25, m30
+    movu          m26, m30
+    movu          m27, m30
     vpsubb    m24{k1}, m31, m30
     vpsubb    m25{k2}, m31, m30
     vpsubb    m26{k3}, m31, m30

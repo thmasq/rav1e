@@ -112,7 +112,7 @@ SECTION .text
 %if %1 == 0
     SWAP             m13, m16
 %else
-    mova             m13, %3
+    movu             m13, %3
 %endif
     SWAP             m16, m25
     punpcklbw        m25, m14, m13
@@ -172,7 +172,7 @@ SECTION .text
 %if %2 == 0
     SWAP             m16, m25
 %else
-    mova              %3, m25
+    movu              %3, m25
 %endif
     punpcklqdq       m25, m24, m11
     punpckhqdq       m24, m11
@@ -190,36 +190,36 @@ SECTION .text
 %define is_h 0
 %if %1 == 4
     lea               t0, [dstq+mstrideq*2]
-    mova              m3, [t0  +strideq*0]    ; p1
-    mova              m4, [t0  +strideq*1]    ; p0
-    mova              m5, [t0  +strideq*2]    ; q0
-    mova              m6, [t0  +stride3q ]    ; q1
+    movu              m3, [t0  +strideq*0]    ; p1
+    movu              m4, [t0  +strideq*1]    ; p0
+    movu              m5, [t0  +strideq*2]    ; q0
+    movu              m6, [t0  +stride3q ]    ; q1
 %else
     ; load 6-8 pixels, remainder (for wd=16) will be read inline
 %if %1 == 16
     lea               t0, [dstq+mstrideq*8]
-    mova             m16, [t0  +strideq*1]
-    mova             m17, [t0  +strideq*2]
-    mova             m18, [t0  +stride3q ]
+    movu             m16, [t0  +strideq*1]
+    movu             m17, [t0  +strideq*2]
+    movu             m18, [t0  +stride3q ]
 %endif
     lea               t0, [dstq+mstrideq*4]
 %if %1 != 6
-    mova             m25, [t0  +strideq*0]
+    movu             m25, [t0  +strideq*0]
 %endif
-    mova             m13, [t0  +strideq*1]
-    mova              m3, [t0  +strideq*2]
-    mova              m4, [t0  +stride3q ]
-    mova              m5, [dstq+strideq*0]
-    mova              m6, [dstq+strideq*1]
-    mova             m14, [dstq+strideq*2]
+    movu             m13, [t0  +strideq*1]
+    movu              m3, [t0  +strideq*2]
+    movu              m4, [t0  +stride3q ]
+    movu              m5, [dstq+strideq*0]
+    movu              m6, [dstq+strideq*1]
+    movu             m14, [dstq+strideq*2]
 %if %1 != 6
-    mova             m22, [dstq+stride3q ]
+    movu             m22, [dstq+stride3q ]
 %endif
 %if %1 == 16
     lea               t0, [dstq+strideq*4]
-    mova             m29, [t0  +strideq*0]
-    mova             m30, [t0  +strideq*1]
-    mova             m31, [t0  +strideq*2]
+    movu             m29, [t0  +strideq*0]
+    movu             m30, [t0  +strideq*1]
+    movu             m31, [t0  +strideq*2]
 %endif
 %endif
 %else ; h
@@ -451,7 +451,7 @@ SECTION .text
     SWAP             m29, m25
     SWAP             m30, m13
     SWAP             m31, m14
-    mova      [rsp+4*64], m22
+    movu      [rsp+4*64], m22
     ; 4,5,6,7,8,9,10,11 -> 25,13,3,4,5,6,14,22
     SWAP              25, 4, 7
     SWAP              13, 5, 8
@@ -679,7 +679,7 @@ SECTION .text
     vmovdqu8 [t0+strideq*2]{k4}, m8         ; p5
 %else
     vpblendmb     m8{k4}, m2, m8
-    mova      [rsp+1*64], m8
+    movu      [rsp+1*64], m8
 %endif
 
     ; sub p6*2, add p3/q1 [reuse p6/p3 from A][-p6,+q1|save] B
@@ -703,7 +703,7 @@ SECTION .text
     vmovdqu8 [t0+stride3q]{k4}, m8          ; p4
 %else
     vpblendmb     m8{k4}, m7, m8
-    mova      [rsp+2*64], m8
+    movu      [rsp+2*64], m8
 %endif
 
     ; sub p6/p5, add p2/q2 [-p6,+p2][-p5,+q2|save] C
@@ -729,7 +729,7 @@ SECTION .text
     vmovdqu8 [t0+strideq*4]{k4}, m8         ; p3
 %else
     vpblendmb     m8{k4}, m25, m8
-    mova      [rsp+3*64], m8
+    movu      [rsp+3*64], m8
 %endif
 
     ; sub p6/p4, add p1/q3 [-p6,+p1][-p4,+q3|save] D
@@ -983,7 +983,7 @@ SECTION .text
  %if %1 == 8
     vmovdqu8 [t0+strideq*1]{k2}, m8
  %else
-    mova  [t0+strideq*1], m10
+    movu  [t0+strideq*1], m10
  %endif
 %endif
 
@@ -1002,7 +1002,7 @@ SECTION .text
     packuswb          m8, m11
     vpblendmb     m8{k2}, m3, m8            ; p1
 %ifidn %2, v
-    mova  [t0+strideq*2], m8
+    movu  [t0+strideq*2], m8
 %else
     SWAP             m18, m8
 %endif
@@ -1022,7 +1022,7 @@ SECTION .text
     packuswb          m8, m11
     vpblendmb     m8{k2}, m4, m8            ; p0
 %ifidn %2, v
-    mova   [t0+stride3q], m8
+    movu   [t0+stride3q], m8
 %else
     SWAP             m29, m8
 %endif
@@ -1044,7 +1044,7 @@ SECTION .text
     packuswb          m8, m11
     vpblendmb    m11{k2}, m5, m8            ; q0
 %ifidn %2, v
-    mova [dstq+strideq*0], m11
+    movu [dstq+strideq*0], m11
 %endif
 
     pmaddubsw        m24, pbm1_1
@@ -1062,7 +1062,7 @@ SECTION .text
     packuswb          m8, m13
     vpblendmb    m13{k2}, m6, m8            ; q1
 %ifidn %2, v
-    mova [dstq+strideq*1], m13
+    movu [dstq+strideq*1], m13
 %endif
 
     punpcklbw        m24, m3, m6
@@ -1087,7 +1087,7 @@ SECTION .text
  %if %1 == 8
     vmovdqu8 [dstq+strideq*2]{k2}, m2
  %else
-    mova [dstq+strideq*2], m2
+    movu [dstq+strideq*2], m2
  %endif
 %endif
 
@@ -1155,11 +1155,11 @@ SECTION .text
     SWAP               7, 26
     SWAP               8, 11
     SWAP               9, 13
-    mova             m24, [rsp+0*64]
+    movu             m24, [rsp+0*64]
     SWAP             m26, m28
-    mova              m2, [rsp+1*64]
-    mova              m3, [rsp+2*64]
-    mova              m4, [rsp+3*64]
+    movu              m2, [rsp+1*64]
+    movu              m3, [rsp+2*64]
+    movu              m4, [rsp+3*64]
     SWAP             m11, m16
     SWAP             m25, m17
     SWAP             m13, m27
@@ -1270,7 +1270,7 @@ SECTION .text
     packuswb          m2, m12
     vpblendmb     m2{k2}, m3, m2            ; p1
 %ifidn %2, v
-    mova  [t0+strideq*2], m2
+    movu  [t0+strideq*2], m2
 %endif
 
     pmaddubsw         m8, pbm1_1
@@ -1288,7 +1288,7 @@ SECTION .text
     packuswb         m12, m13
     vpblendmb    m12{k2}, m4, m12           ; p0
 %ifidn %2, v
-    mova   [t0+stride3q], m12
+    movu   [t0+stride3q], m12
 %endif
 
     vpbroadcastd      m9, [pb_m1_2]
@@ -1306,7 +1306,7 @@ SECTION .text
     packuswb         m14, m13
     vpblendmb    m14{k2}, m5, m14           ; q0
 %ifidn %2, v
-    mova [dstq+strideq*0], m14
+    movu [dstq+strideq*0], m14
 %endif
 
     pmaddubsw         m8, m9
@@ -1322,16 +1322,16 @@ SECTION .text
     packuswb          m0, m1
     vpblendmb     m0{k2}, m6, m0            ; q1
 %ifidn %2, v
-    mova [dstq+strideq*1], m0
+    movu [dstq+strideq*1], m0
 %else
     TRANSPOSE_16x4_AND_WRITE_4x32 2, 12, 14, 0, 1
 %endif
 %else ; %1 == 4
 %ifidn %2, v
-    mova  [t0+strideq*0], m3                ; p1
-    mova  [t0+strideq*1], m4                ; p0
-    mova  [t0+strideq*2], m5                ; q0
-    mova  [t0+stride3q ], m6                ; q1
+    movu  [t0+strideq*0], m3                ; p1
+    movu  [t0+strideq*1], m4                ; p0
+    movu  [t0+strideq*2], m5                ; q0
+    movu  [t0+stride3q ], m6                ; q1
 %else
     TRANSPOSE_16x4_AND_WRITE_4x32 3, 4, 5, 6, 7
 %endif
@@ -1349,8 +1349,8 @@ cglobal lpf_v_sb_y_8bpc, 7, 10, 32, dst, stride, mask, l, l_stride, \
     mov         mstrideq, strideq
     neg         mstrideq
     lea         stride3q, [strideq*3]
-    mova             m21, [pb_4x0_4x4_4x8_4x12]
-    mova             m20, [pb_mask]
+    movu             m21, [pb_4x0_4x4_4x8_4x12]
+    movu             m20, [pb_mask]
     vpbroadcastd     m19, [pb_128]
     vpbroadcastd     m28, [pb_m1_1]
     vpbroadcastd     m27, [pw_2048]
@@ -1452,8 +1452,8 @@ cglobal lpf_v_sb_uv_8bpc, 7, 10, 22, dst, stride, mask, l, l_stride, \
     mov         mstrideq, strideq
     neg         mstrideq
     lea         stride3q, [strideq*3]
-    mova             m21, [pb_4x0_4x4_4x8_4x12]
-    mova             m20, [pb_mask]
+    movu             m21, [pb_4x0_4x4_4x8_4x12]
+    movu             m20, [pb_mask]
     vpbroadcastd     m19, [pb_128]
     vpbroadcastd     m17, [pb_m1_1]
     vpbroadcastd     m16, [pw_4096]
@@ -1502,7 +1502,7 @@ cglobal lpf_h_sb_uv_8bpc, 7, 12, 22, dst, stride, mask, l, l_stride, \
     pmulld           m21, m19, [hmulA]
     pmulld           m20, [hmulB]
     pmulld           m19, [hmulC]
-    mova             m18, [pb_mask]
+    movu             m18, [pb_mask]
     vpbroadcastd     m17, [pb_128]
     vpbroadcastd     m16, [pw_4096]
  %define pbshuf [pb_4x0_4x4_4x8_4x12]

@@ -270,7 +270,7 @@ cglobal ipred_dc_8bpc, 3, 7, 5, dst, stride, tl, w, h, stride3
     jg .s8
     RET
 .h16:
-    mova               xmm1, [tlq-16]
+    movu               xmm1, [tlq-16]
     vpdpbusd            xm0, xmm1, xm3
     jmp                  wq
 .w16:
@@ -294,16 +294,16 @@ cglobal ipred_dc_8bpc, 3, 7, 5, dst, stride, tl, w, h, stride3
 .w16_end:
     vpbroadcastb        xm0, xmm0
 .s16:
-    mova   [dstq+strideq*0], xm0
-    mova   [dstq+strideq*1], xm0
-    mova   [dstq+strideq*2], xm0
-    mova   [dstq+stride3q ], xm0
+    movu   [dstq+strideq*0], xm0
+    movu   [dstq+strideq*1], xm0
+    movu   [dstq+strideq*2], xm0
+    movu   [dstq+stride3q ], xm0
     lea                dstq, [dstq+strideq*4]
     sub                  hd, 4
     jg .s16
     RET
 .h32:
-    mova                ym1, [tlq-32]
+    movu                ym1, [tlq-32]
     vpdpbusd            ym0, ym1, ym3
     jmp                  wq
 .w32:
@@ -326,17 +326,17 @@ cglobal ipred_dc_8bpc, 3, 7, 5, dst, stride, tl, w, h, stride3
 .w32_end:
     vpbroadcastb        ym0, xmm0
 .s32:
-    mova   [dstq+strideq*0], ym0
-    mova   [dstq+strideq*1], ym0
-    mova   [dstq+strideq*2], ym0
-    mova   [dstq+stride3q ], ym0
+    movu   [dstq+strideq*0], ym0
+    movu   [dstq+strideq*1], ym0
+    movu   [dstq+strideq*2], ym0
+    movu   [dstq+stride3q ], ym0
     lea                dstq, [dstq+strideq*4]
     sub                  hd, 4
     jg .s32
     RET
 .h64:
-    mova                ym1, [tlq-64]
-    mova                ym2, [tlq-32]
+    movu                ym1, [tlq-64]
+    movu                ym2, [tlq-32]
     vpdpbusd            ym0, ym1, ym3
     vpdpbusd            ym0, ym2, ym3
     jmp                  wq
@@ -361,10 +361,10 @@ cglobal ipred_dc_8bpc, 3, 7, 5, dst, stride, tl, w, h, stride3
 .w64_end:
     vpbroadcastb         m0, xmm0
 .s64:
-    mova   [dstq+strideq*0], m0
-    mova   [dstq+strideq*1], m0
-    mova   [dstq+strideq*2], m0
-    mova   [dstq+stride3q ], m0
+    movu   [dstq+strideq*0], m0
+    movu   [dstq+strideq*1], m0
+    movu   [dstq+strideq*2], m0
+    movu   [dstq+stride3q ], m0
     lea                dstq, [dstq+strideq*4]
     sub                  hd, 4
     jg .s64
@@ -401,7 +401,7 @@ cglobal ipred_h_8bpc, 3, 7, 8, dst, stride, tl, w, h, stride3
     add                  wq, r6
     jmp                  wq
 .w4:
-    mova               xmm1, [base+ipred_h_shuf+16]
+    movu               xmm1, [base+ipred_h_shuf+16]
 .w4_loop:
     movd               xmm0, [tlq+hq-4]
     pshufb             xmm0, xmm1
@@ -433,7 +433,7 @@ cglobal ipred_h_8bpc, 3, 7, 8, dst, stride, tl, w, h, stride3
 .w16_loop:
     vpbroadcastd         m0, [tlq+hq-4]
     pshufb               m0, m1
-    mova          [dstq+strideq*0], xm0
+    movu          [dstq+strideq*0], xm0
     vextracti32x4 [dstq+strideq*1], m0, 2
     vextracti32x4 [dstq+strideq*2], ym0, 1
     vextracti32x4 [dstq+stride3q ], m0, 3
@@ -448,9 +448,9 @@ cglobal ipred_h_8bpc, 3, 7, 8, dst, stride, tl, w, h, stride3
     vpbroadcastd         m1, [tlq+hq-4]
     pshufb               m0, m1, m2
     pshufb               m1, m3
-    mova          [dstq+strideq*0], ym0
+    movu          [dstq+strideq*0], ym0
     vextracti32x8 [dstq+strideq*1], m0, 1
-    mova          [dstq+strideq*2], ym1
+    movu          [dstq+strideq*2], ym1
     vextracti32x8 [dstq+stride3q ], m1, 1
     lea                dstq, [dstq+strideq*4]
     sub                  hd, 4
@@ -467,10 +467,10 @@ cglobal ipred_h_8bpc, 3, 7, 8, dst, stride, tl, w, h, stride3
     pshufb               m1, m3, m5
     pshufb               m2, m3, m6
     pshufb               m3, m7
-    mova   [dstq+strideq*0], m0
-    mova   [dstq+strideq*1], m1
-    mova   [dstq+strideq*2], m2
-    mova   [dstq+stride3q ], m3
+    movu   [dstq+strideq*0], m0
+    movu   [dstq+strideq*1], m1
+    movu   [dstq+strideq*2], m2
+    movu   [dstq+stride3q ], m3
     lea                dstq, [dstq+strideq*4]
     sub                  hd, 4
     jg .w64_loop
@@ -510,7 +510,7 @@ cglobal ipred_paeth_8bpc, 3, 7, 10, dst, stride, tl, w, h, top, stride3
 INIT_YMM avx512icl
 .w4:
     vpbroadcastd         m6, [topq]
-    mova                 m9, [ipred_h_shuf]
+    movu                 m9, [ipred_h_shuf]
     psubusb              m7, m5, m6
     psubusb              m0, m6, m5
     por                  m7, m0 ; ldiff
@@ -573,7 +573,7 @@ INIT_ZMM avx512icl
     vpbroadcastd         m4, [tlq+hq-4]
     pshufb               m4, m9
     PAETH
-    mova          [dstq+strideq*0], xm0
+    movu          [dstq+strideq*0], xm0
     vextracti32x4 [dstq+strideq*1], m0, 2
     vextracti32x4 [dstq+strideq*2], ym0, 1
     vextracti32x4 [dstq+stride3q ], m0, 3
@@ -583,7 +583,7 @@ INIT_ZMM avx512icl
     RET
 .w32:
     vbroadcasti32x8      m6, [topq]
-    mova                ym9, ym8
+    movu                ym9, ym8
     psubusb              m7, m5, m6
     psubusb              m0, m6, m5
     por                  m7, m0
@@ -591,7 +591,7 @@ INIT_ZMM avx512icl
     vpbroadcastd         m4, [tlq+hq-2]
     pshufb               m4, m9
     PAETH
-    mova          [dstq+strideq*0], ym0
+    movu          [dstq+strideq*0], ym0
     vextracti32x8 [dstq+strideq*1], m0, 1
     lea                dstq, [dstq+strideq*2]
     sub                  hd, 2
@@ -605,7 +605,7 @@ INIT_ZMM avx512icl
 .w64_loop:
     vpbroadcastb         m4, [tlq+hq-1]
     PAETH
-    mova             [dstq], m0
+    movu             [dstq], m0
     add                dstq, strideq
     dec                  hd
     jg .w64_loop
@@ -628,7 +628,7 @@ cglobal ipred_smooth_v_8bpc, 3, 7, 7, dst, stride, tl, w, h, weights, stride3
 .w4:
     vpbroadcastd         m2, [tlq+1]
     movshdup             m5, [smooth_shuf]
-    mova                ym6, [smooth_endA]
+    movu                ym6, [smooth_endA]
     punpcklbw            m2, m4 ; top, bottom
     pmaddubsw            m3, m2, m0
     paddw                m1, m2 ;   1 * top + 256 * bottom + 128, overflow is ok
@@ -658,7 +658,7 @@ cglobal ipred_smooth_v_8bpc, 3, 7, 7, dst, stride, tl, w, h, weights, stride3
 .w8:
     vpbroadcastq         m2, [tlq+1]
     movshdup             m5, [smooth_shuf]
-    mova                ym6, [smooth_endA]
+    movu                ym6, [smooth_endA]
     punpcklbw            m2, m4
     pmaddubsw            m3, m2, m0
     paddw                m1, m2
@@ -681,7 +681,7 @@ cglobal ipred_smooth_v_8bpc, 3, 7, 7, dst, stride, tl, w, h, weights, stride3
 .w16:
     vbroadcasti32x4      m3, [tlq+1]
     movshdup             m6, [smooth_shuf]
-    mova                 m7, [smooth_endB]
+    movu                 m7, [smooth_endB]
     punpcklbw            m2, m3, m4
     punpckhbw            m3, m4
     pmaddubsw            m4, m2, m0
@@ -698,7 +698,7 @@ cglobal ipred_smooth_v_8bpc, 3, 7, 7, dst, stride, tl, w, h, weights, stride3
     paddw                m0, m4
     paddw                m1, m5
     vpermt2b             m0, m7, m1
-    mova          [dstq+strideq*0], xm0
+    movu          [dstq+strideq*0], xm0
     vextracti32x4 [dstq+strideq*1], m0, 2
     vextracti32x4 [dstq+strideq*2], ym0, 1
     vextracti32x4 [dstq+stride3q ], m0, 3
@@ -709,7 +709,7 @@ cglobal ipred_smooth_v_8bpc, 3, 7, 7, dst, stride, tl, w, h, weights, stride3
 .w32:
     vbroadcasti32x8      m3, [tlq+1]
     movshdup             m6, [smooth_shuf]
-    mova                 m7, [smooth_endB]
+    movu                 m7, [smooth_endB]
     punpcklbw            m2, m3, m4
     punpckhbw            m3, m4
     pmaddubsw            m4, m2, m0
@@ -726,7 +726,7 @@ cglobal ipred_smooth_v_8bpc, 3, 7, 7, dst, stride, tl, w, h, weights, stride3
     paddw                m0, m4
     paddw                m1, m5
     vpermt2b             m0, m7, m1
-    mova          [dstq+strideq*0], ym0
+    movu          [dstq+strideq*0], ym0
     vextracti32x8 [dstq+strideq*1], m0, 1
     lea                dstq, [dstq+strideq*2]
     add                  hq, 2
@@ -734,7 +734,7 @@ cglobal ipred_smooth_v_8bpc, 3, 7, 7, dst, stride, tl, w, h, weights, stride3
     RET
 .w64:
     movu                 m3, [tlq+1]
-    mova                 m6, [smooth_endB]
+    movu                 m6, [smooth_endB]
     punpcklbw            m2, m3, m4
     punpckhbw            m3, m4
     pmaddubsw            m4, m2, m0
@@ -750,7 +750,7 @@ cglobal ipred_smooth_v_8bpc, 3, 7, 7, dst, stride, tl, w, h, weights, stride3
     paddw                m0, m4
     paddw                m1, m5
     vpermt2b             m0, m6, m1
-    mova             [dstq], m0
+    movu             [dstq], m0
     add                dstq, strideq
     inc                  hq
     jl .w64_loop
@@ -774,10 +774,10 @@ cglobal ipred_smooth_h_8bpc, 4, 7, 11, dst, stride, tl, w, h, stride3
 .w4:
     movsldup             m3, [smooth_shuf]
     vpbroadcastq         m7, [smooth_weights+4*2]
-    mova                ym8, [smooth_endA]
+    movu                ym8, [smooth_endA]
 .w4_loop:
     vpbroadcastq         m0, [tlq+hq-8]
-    mova                 m2, m4
+    movu                 m2, m4
     vpshufb          m2{k1}, m0, m3 ; left, right
     pmaddubsw            m0, m2, m5
     pmaddubsw            m1, m2, m7
@@ -804,10 +804,10 @@ cglobal ipred_smooth_h_8bpc, 4, 7, 11, dst, stride, tl, w, h, stride3
 .w8:
     movsldup             m3, [smooth_shuf]
     vbroadcasti32x4      m7, [smooth_weights+8*2]
-    mova                ym8, [smooth_endA]
+    movu                ym8, [smooth_endA]
 .w8_loop:
     vpbroadcastd         m0, [tlq+hq-4]
-    mova                 m2, m4
+    movu                 m2, m4
     vpshufb          m2{k1}, m0, m3
     pmaddubsw            m0, m2, m5
     pmaddubsw            m1, m2, m7
@@ -828,10 +828,10 @@ cglobal ipred_smooth_h_8bpc, 4, 7, 11, dst, stride, tl, w, h, stride3
     movsldup             m7, [smooth_shuf]
     vbroadcasti32x4      m8, [smooth_weights+16*2]
     vbroadcasti32x4      m9, [smooth_weights+16*3]
-    mova                m10, [smooth_endB]
+    movu                m10, [smooth_endB]
 .w16_loop:
     vpbroadcastd         m0, [tlq+hq-4]
-    mova                 m3, m4
+    movu                 m3, m4
     vpshufb          m3{k1}, m0, m7
     pmaddubsw            m2, m3, m5
     pmaddubsw            m0, m3, m8
@@ -841,7 +841,7 @@ cglobal ipred_smooth_h_8bpc, 4, 7, 11, dst, stride, tl, w, h, stride3
     paddw                m0, m2
     paddw                m1, m2
     vpermt2b             m0, m10, m1
-    mova          [dstq+strideq*0], xm0
+    movu          [dstq+strideq*0], xm0
     vextracti32x4 [dstq+strideq*1], m0, 2
     vextracti32x4 [dstq+strideq*2], ym0, 1
     vextracti32x4 [dstq+stride3q ], m0, 3
@@ -850,14 +850,14 @@ cglobal ipred_smooth_h_8bpc, 4, 7, 11, dst, stride, tl, w, h, stride3
     jg .w16_loop
     RET
 .w32:
-    mova                m10, [smooth_endA]
+    movu                m10, [smooth_endA]
     vpbroadcastd        ym7, [pb_1]
     vbroadcasti32x8      m8, [smooth_weights+32*2]
     vbroadcasti32x8      m9, [smooth_weights+32*3]
     vshufi32x4          m10, m10, q3120
 .w32_loop:
     vpbroadcastd         m0, [tlq+hq-2]
-    mova                 m3, m4
+    movu                 m3, m4
     vpshufb          m3{k1}, m0, m7
     pmaddubsw            m2, m3, m5
     pmaddubsw            m0, m3, m8
@@ -867,18 +867,18 @@ cglobal ipred_smooth_h_8bpc, 4, 7, 11, dst, stride, tl, w, h, stride3
     paddw                m0, m2
     paddw                m1, m2
     vpermt2b             m0, m10, m1
-    mova          [dstq+strideq*0], ym0
+    movu          [dstq+strideq*0], ym0
     vextracti32x8 [dstq+strideq*1], m0, 1
     lea                dstq, [dstq+strideq*2]
     sub                  hd, 2
     jg .w32_loop
     RET
 .w64:
-    mova                 m7, [smooth_weights+64*2]
-    mova                 m8, [smooth_weights+64*3]
-    mova                 m9, [smooth_endA]
+    movu                 m7, [smooth_weights+64*2]
+    movu                 m8, [smooth_weights+64*3]
+    movu                 m9, [smooth_endA]
 .w64_loop:
-    mova                 m3, m4
+    movu                 m3, m4
     vpbroadcastb     m3{k1}, [tlq+hq-1]
     pmaddubsw            m2, m3, m5
     pmaddubsw            m0, m3, m7
@@ -888,7 +888,7 @@ cglobal ipred_smooth_h_8bpc, 4, 7, 11, dst, stride, tl, w, h, stride3
     paddw                m0, m2
     paddw                m1, m2
     vpermt2b             m0, m9, m1
-    mova             [dstq], m0
+    movu             [dstq], m0
     add                dstq, strideq
     dec                  hd
     jg .w64_loop
@@ -916,7 +916,7 @@ cglobal ipred_smooth_8bpc, 4, 7, 16, dst, stride, tl, w, h, v_weights, stride3
     movsldup             m4, [smooth_shuf]
     movshdup             m5, [smooth_shuf]
     vpbroadcastq         m9, [smooth_weights+4*2]
-    mova               ym11, [smooth_endA]
+    movu               ym11, [smooth_endA]
 
     punpcklbw            m8, m0     ; top, bottom
     pmaddubsw           m10, m8, m7
@@ -926,7 +926,7 @@ cglobal ipred_smooth_8bpc, 4, 7, 16, dst, stride, tl, w, h, v_weights, stride3
     vpbroadcastq         m1, [tlq+hq-8]
     vbroadcasti32x4      m0, [v_weightsq]
     add          v_weightsq, 16
-    mova                 m2, m6
+    movu                 m2, m6
     vpshufb          m2{k1}, m1, m4 ; left, right
     pmaddubsw            m1, m2, m7 ; 127 * left - 127 * right
     pshufb               m0, m5
@@ -958,7 +958,7 @@ cglobal ipred_smooth_8bpc, 4, 7, 16, dst, stride, tl, w, h, v_weights, stride3
     movsldup             m4, [smooth_shuf]
     movshdup             m5, [smooth_shuf]
     vbroadcasti32x4      m9, [smooth_weights+8*2]
-    mova               ym11, [smooth_endA]
+    movu               ym11, [smooth_endA]
     punpcklbw            m8, m0
     pmaddubsw           m10, m8, m7
     paddw                m1, m8
@@ -967,7 +967,7 @@ cglobal ipred_smooth_8bpc, 4, 7, 16, dst, stride, tl, w, h, v_weights, stride3
     vpbroadcastd         m1, [tlq+hq-4]
     vpbroadcastq         m0, [v_weightsq]
     add          v_weightsq, 8
-    mova                 m2, m6
+    movu                 m2, m6
     vpshufb          m2{k1}, m1, m4
     pmaddubsw            m1, m2, m7
     pshufb               m0, m5
@@ -993,7 +993,7 @@ cglobal ipred_smooth_8bpc, 4, 7, 16, dst, stride, tl, w, h, v_weights, stride3
     movshdup            m10, [smooth_shuf]
     vbroadcasti32x4     m11, [smooth_weights+16*2]
     vbroadcasti32x4     m12, [smooth_weights+16*3]
-    mova                m15, [smooth_endB]
+    movu                m15, [smooth_endB]
     punpcklbw            m8, m9, m0
     punpckhbw            m9, m0
     pmaddubsw           m13, m8, m7
@@ -1006,7 +1006,7 @@ cglobal ipred_smooth_8bpc, 4, 7, 16, dst, stride, tl, w, h, v_weights, stride3
     vpbroadcastd         m0, [tlq+hq-4]
     vpbroadcastq         m1, [v_weightsq]
     add          v_weightsq, 8
-    mova                 m4, m6
+    movu                 m4, m6
     vpshufb          m4{k1}, m0, m5
     pmaddubsw            m2, m4, m7
     pshufb               m1, m10
@@ -1022,7 +1022,7 @@ cglobal ipred_smooth_8bpc, 4, 7, 16, dst, stride, tl, w, h, v_weights, stride3
     pavgw                m0, m3
     pavgw                m1, m4
     vpermt2b             m0, m15, m1
-    mova          [dstq+strideq*0], xm0
+    movu          [dstq+strideq*0], xm0
     vextracti32x4 [dstq+strideq*1], m0, 2
     vextracti32x4 [dstq+strideq*2], ym0, 1
     vextracti32x4 [dstq+stride3q ], m0, 3
@@ -1033,9 +1033,9 @@ cglobal ipred_smooth_8bpc, 4, 7, 16, dst, stride, tl, w, h, v_weights, stride3
 .w32:
     vbroadcasti32x8      m9, [tlq+hq+1]
     movshdup            m10, [smooth_shuf]
-    mova                m12, [smooth_weights+32*2]
+    movu                m12, [smooth_weights+32*2]
     vpbroadcastd        ym5, [pb_1]
-    mova                m15, [smooth_endB]
+    movu                m15, [smooth_endB]
     punpcklbw            m8, m9, m0
     punpckhbw            m9, m0
     pmaddubsw           m13, m8, m7
@@ -1050,7 +1050,7 @@ cglobal ipred_smooth_8bpc, 4, 7, 16, dst, stride, tl, w, h, v_weights, stride3
     vpbroadcastd         m0, [tlq+hq-2]
     vpbroadcastd         m1, [v_weightsq]
     add          v_weightsq, 4
-    mova                 m4, m6
+    movu                 m4, m6
     vpshufb          m4{k1}, m0, m5
     pmaddubsw            m2, m4, m7
     pshufb               m1, m10
@@ -1066,7 +1066,7 @@ cglobal ipred_smooth_8bpc, 4, 7, 16, dst, stride, tl, w, h, v_weights, stride3
     pavgw                m0, m3
     pavgw                m1, m4
     vpermt2b             m0, m15, m1
-    mova          [dstq+strideq*0], ym0
+    movu          [dstq+strideq*0], ym0
     vextracti32x8 [dstq+strideq*1], m0, 1
     lea                dstq, [dstq+strideq*2]
     sub                  hd, 2
@@ -1074,9 +1074,9 @@ cglobal ipred_smooth_8bpc, 4, 7, 16, dst, stride, tl, w, h, v_weights, stride3
     RET
 .w64:
     movu                 m9, [tlq+hq+1]
-    mova                m11, [smooth_weights+64*2]
-    mova                 m2, [smooth_weights+64*3]
-    mova                m14, [smooth_endB]
+    movu                m11, [smooth_weights+64*2]
+    movu                 m2, [smooth_weights+64*3]
+    movu                m14, [smooth_endB]
     punpcklbw            m8, m9, m0
     punpckhbw            m9, m0
     pmaddubsw           m12, m8, m7
@@ -1088,7 +1088,7 @@ cglobal ipred_smooth_8bpc, 4, 7, 16, dst, stride, tl, w, h, v_weights, stride3
     paddw               m12, m0
     paddw               m13, m1
 .w64_loop:
-    mova                 m4, m6
+    movu                 m4, m6
     vpbroadcastb     m4{k1}, [tlq+hq-1]
     vpbroadcastw         m1, [v_weightsq]
     add          v_weightsq, 2
@@ -1105,7 +1105,7 @@ cglobal ipred_smooth_8bpc, 4, 7, 16, dst, stride, tl, w, h, v_weights, stride3
     pavgw                m0, m3
     pavgw                m1, m4
     vpermt2b             m0, m14, m1
-    mova             [dstq], m0
+    movu             [dstq], m0
     add                dstq, strideq
     dec                  hd
     jg .w64_loop
@@ -1147,7 +1147,7 @@ cglobal pal_pred_8bpc, 4, 7, 5, dst, stride, pal, idx, w, h, stride3
 .w16:
     pshufb               m0, m4, [idxq]
     add                idxq, 64
-    mova          [dstq+strideq*0], xm0
+    movu          [dstq+strideq*0], xm0
     vextracti32x4 [dstq+strideq*1], ym0, 1
     vextracti32x4 [dstq+strideq*2], m0, 2
     vextracti32x4 [dstq+stride3q ], m0, 3
@@ -1159,9 +1159,9 @@ cglobal pal_pred_8bpc, 4, 7, 5, dst, stride, pal, idx, w, h, stride3
     pshufb               m0, m4, [idxq+64*0]
     pshufb               m1, m4, [idxq+64*1]
     add                idxq, 64*2
-    mova          [dstq+strideq*0], ym0
+    movu          [dstq+strideq*0], ym0
     vextracti32x8 [dstq+strideq*1], m0, 1
-    mova          [dstq+strideq*2], ym1
+    movu          [dstq+strideq*2], ym1
     vextracti32x8 [dstq+stride3q ], m1, 1
     lea                dstq, [dstq+strideq*4]
     sub                  hd, 4
@@ -1173,10 +1173,10 @@ cglobal pal_pred_8bpc, 4, 7, 5, dst, stride, pal, idx, w, h, stride3
     pshufb               m2, m4, [idxq+64*2]
     pshufb               m3, m4, [idxq+64*3]
     add                idxq, 64*4
-    mova   [dstq+strideq*0], m0
-    mova   [dstq+strideq*1], m1
-    mova   [dstq+strideq*2], m2
-    mova   [dstq+stride3q ], m3
+    movu   [dstq+strideq*0], m0
+    movu   [dstq+strideq*1], m1
+    movu   [dstq+strideq*2], m2
+    movu   [dstq+stride3q ], m3
     lea                dstq, [dstq+strideq*4]
     sub                  hd, 4
     jg .w64
@@ -1215,9 +1215,9 @@ cglobal ipred_filter_8bpc, 4, 7, 14, dst, stride, tl, w, h, flt
     vbroadcasti32x4      m8, [r6+fltq+16*1]
     vbroadcasti32x4      m9, [r6+fltq+16*2] ; p6 p5 p0 __
     vbroadcasti32x4     m10, [r6+fltq+16*3]
-    mova               xmm0, xm6
+    movu               xmm0, xm6
     vpdpbusd           xmm0, xmm2, xm7
-    mova               xmm1, xm6
+    movu               xmm1, xm6
     vpdpbusd           xmm1, xmm2, xm8
     vpdpbusd           xmm0, xmm3, xm9
     vpdpbusd           xmm1, xmm3, xm10
@@ -1225,7 +1225,7 @@ cglobal ipred_filter_8bpc, 4, 7, 14, dst, stride, tl, w, h, flt
     cmp                  wd, 8
     jb .w4
     vpbroadcastd        ym2, [tlq+5]
-    mova                m11, [base+filter_perm]
+    movu                m11, [base+filter_perm]
     mov                  r5, 0xffffffffffff000f
     psrldq             xmm2, 1           ; __ t0
     kmovq                k1, r5          ; 0x000f
@@ -1237,9 +1237,9 @@ cglobal ipred_filter_8bpc, 4, 7, 14, dst, stride, tl, w, h, flt
     vpbroadcastd        xm3, [tlq-4]
     kandnq               k2, k3, k1      ; 0xffffffffffff0000
     vpermb          ym3{k2}, ym11, ymm2  ; l3 l2 l1 __   b3 a3 t3 __
-    mova                ym0, ym6
+    movu                ym0, ym6
     vpdpbusd            ym0, ym2, ym7
-    mova                ym1, ym6
+    movu                ym1, ym6
     vpdpbusd            ym1, ym2, ym8
     pshufb          ym5{k2}, ym2, ym11   ; a0 b0   __ t0
     vpbroadcastd         m2, [tlq+9]
@@ -1252,15 +1252,15 @@ cglobal ipred_filter_8bpc, 4, 7, 14, dst, stride, tl, w, h, flt
     packuswb            ym5, ym0         ; a0 b0 c0 d0   __ t1 a1 b1
     pshufd           m2{k3}, m5, q3333   ; d0 d0 d0 d0   b1 b1 b1 b1   t2 t2 t2 t2
     vpermb           m3{k2}, m11, m5     ; l5 l4 l3 __   d3 c3 b3 __   b7 a7 t7 __
-    mova                 m4, m6
+    movu                 m4, m6
     vpdpbusd             m4, m2, m7
-    mova                 m1, m6
+    movu                 m1, m6
     vpdpbusd             m1, m2, m8
     psrldq               m0, m2, 1       ; __ d0         __ b0         __ t0
     vpbroadcastd         m2, [tlq+13]
     vpdpbusd             m4, m3, m9
     vpdpbusd             m1, m3, m10
-    mova                m12, [base+filter_end]
+    movu                m12, [base+filter_end]
     lea                 r5d, [hq-6]
     mov                  r6, dstq
     cmovp                hd, r5d         ; w == 16 ? h : h - 6
@@ -1271,15 +1271,15 @@ cglobal ipred_filter_8bpc, 4, 7, 14, dst, stride, tl, w, h, flt
 .w16_loop:
     vpbroadcastd        xm3, [tlq-8]
     vpermb           m3{k2}, m11, m0     ; l7 l6 l5 __   f3 e3 d3 __   d7 c7 b7 __   bb ab tb __
-    mova                 m1, m6
+    movu                 m1, m6
     vpdpbusd             m1, m2, m7
-    mova                 m0, m6
+    movu                 m0, m6
     vpdpbusd             m0, m2, m8
     sub                 tlq, 2
     vpdpbusd             m1, m3, m9
     vpdpbusd             m0, m3, m10
     packssdw             m1, m0
-    mova                 m0, m4
+    movu                 m0, m4
     psraw                m4, m1, 4       ; g0 h0         e1 f1         c2 d2         a3 b3
     packuswb             m0, m4          ; e0 f0 g0 h0   c1 d1 e1 f1   a2 b2 c2 d2   __ __ a3 b3
     pshufd               m2, m0, q3333   ; h0 h0 h0 h0   f1 f1 f1 f1   d2 d2 d2 d2   b3 b3 b3 b3
@@ -1291,16 +1291,16 @@ cglobal ipred_filter_8bpc, 4, 7, 14, dst, stride, tl, w, h, flt
     jg .w16_loop
     cmp                  wd, 16
     je .ret
-    mova               xm13, [filter_perm+16]
-    mova               xmm3, [r6+strideq*0]
+    movu               xm13, [filter_perm+16]
+    movu               xmm3, [r6+strideq*0]
     punpckhdq          xmm3, [r6+strideq*1]
     vpbroadcastd     m2{k1}, [tlq+r5+17] ; t4 t4 t4 t4   f1 f1 f1 f1   d2 d2 d2 d2   b3 b3 b3 b3
     pinsrb              xm3, xmm3, [tlq+r5+16], 7
     pshufb              xm3, xm13
     vpermb           m3{k2}, m11, m0     ; bf af tf __   h3 g3 f3 __   f7 e7 d7 __   db cb bb __
-    mova                 m0, m6
+    movu                 m0, m6
     vpdpbusd             m0, m2, m7
-    mova                 m1, m6
+    movu                 m1, m6
     vpdpbusd             m1, m2, m8
     kunpckbw             k5, k3, k1      ; 0xff0f
     lea                  r3, [strideq*3]
@@ -1319,9 +1319,9 @@ cglobal ipred_filter_8bpc, 4, 7, 14, dst, stride, tl, w, h, flt
     pinsrb             xmm3, [r6+strideq*2+15], 11
     pshufb              xm3, xmm3, xm13
     vpermb           m3{k2}, m11, m1     ; df cf bf __   bj aj tj __   h7 g7 f7 __   fb eb db __
-    mova                 m4, m6
+    movu                 m4, m6
     vpdpbusd             m4, m2, m7
-    mova                 m1, m6
+    movu                 m1, m6
     vpdpbusd             m1, m2, m8
     kxnord               k3, k3, k4      ; 0xfffff0ff
     lea                  r4, [strideq*5]
@@ -1340,9 +1340,9 @@ cglobal ipred_filter_8bpc, 4, 7, 14, dst, stride, tl, w, h, flt
     pinsrb             xmm3, [r6+strideq*4+15], 11
     pshufb              xm3, xmm3, xm13
     vpermb           m3{k2}, m11, m1     ; ff ef df __   dj cj bj __   bn an tn __   hb hb fb __
-    mova                 m0, m6
+    movu                 m0, m6
     vpdpbusd             m0, m2, m7
-    mova                 m1, m6
+    movu                 m1, m6
     vpdpbusd             m1, m2, m8
     kunpckwd             k1, k1, k2      ; 0x000f0000
     vpdpbusd             m0, m3, m9
@@ -1363,14 +1363,14 @@ cglobal ipred_filter_8bpc, 4, 7, 14, dst, stride, tl, w, h, flt
     pshufb              xm3, xmm3, xm13
     vpermb           m3{k2}, m11, m1     ; hf gf ff __   fj ej dj __   dn cn bn __   br ar tr __
 .w32_loop_tail:
-    mova                 m4, m6
+    movu                 m4, m6
     vpdpbusd             m4, m2, m7
-    mova                 m1, m6
+    movu                 m1, m6
     vpdpbusd             m1, m2, m8
     vpdpbusd             m4, m3, m9
     vpdpbusd             m1, m3, m10
     packssdw             m4, m1
-    mova                 m1, m0
+    movu                 m1, m0
     psraw                m0, m4, 4       ; g4 h4         e5 f5         c6 d6         a7 b7
     packuswb             m1, m0          ; e4 f4 g4 h4   c5 d5 e5 f5   a6 b6 c6 d6   __ __ a7 b7
     pshufd               m2, m1, q3333   ; h4 h4 h4 h4   f5 f5 f5 f5   d6 d6 d6 d6   b7 b7 b7 b7
@@ -1389,14 +1389,14 @@ cglobal ipred_filter_8bpc, 4, 7, 14, dst, stride, tl, w, h, flt
     vpermb              ym3, ym11, ymm2
 .w8_loop:
     vpbroadcastd    ym3{k1}, [tlq-4]     ; l3 l2 l1 __   b3 a3 t3 __
-    mova                ym0, ym6
+    movu                ym0, ym6
     vpdpbusd            ym0, ym2, ym7
-    mova                ym1, ym6
+    movu                ym1, ym6
     vpdpbusd            ym1, ym2, ym8
     sub                 tlq, 2
     vpdpbusd            ym0, ym3, ym9
     vpdpbusd            ym1, ym3, ym10
-    mova                ym3, ym5
+    movu                ym3, ym5
     packssdw            ym0, ym1
     psraw               ym5, ym0, 4      ; c0 d0         a1 b1
     packuswb            ym3, ym5         ; a0 b0 c0 d0   __ __ a1 b1
@@ -1410,9 +1410,9 @@ cglobal ipred_filter_8bpc, 4, 7, 14, dst, stride, tl, w, h, flt
     RET
 .w4_loop:
     vpbroadcastd       xmm3, [tlq-4]     ; l3 l2 l1 __
-    mova               xmm0, xm6
+    movu               xmm0, xm6
     vpdpbusd           xmm0, xmm2, xm7
-    mova               xmm1, xm6
+    movu               xmm1, xm6
     vpdpbusd           xmm1, xmm2, xm8
     sub                 tlq, 2
     vpdpbusd           xmm0, xmm3, xm9

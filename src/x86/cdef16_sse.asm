@@ -75,7 +75,7 @@ DECLARE_REG_TMP 8, 6
 %macro CDEF_FILTER 2 ; w, h
 %if ARCH_X86_64
     DEFINE_ARGS dst, stride, _, tmp, pridmp, pri, sec, dir
-    mova            m8, [base+pw_2048]
+    movu            m8, [base+pw_2048]
 %else
     DEFINE_ARGS dst, pridmp, tmp, sec, pri, _, dir
     %define         m8  [base+pw_2048]
@@ -102,7 +102,7 @@ DECLARE_REG_TMP 8, 6
     lea           priq, [base+pri_taps+priq*2]
     test          secd, secd
     jz .pri_only
-    mova         [rsp], m6
+    movu         [rsp], m6
     movd            m6, secd
     tzcnt         secd, secd
     sub        pridmpd, tmpd
@@ -181,7 +181,7 @@ ALIGN function_align
     movq            m3, [tmpq+offq+32*0] ; k0p1
     movhps          m3, [tmpq+offq+32*1]
 %else
-    mova            m1, [dstq]
+    movu            m1, [dstq]
     movu            m2, [tmpq+offq]
     neg           offq
     movu            m3, [tmpq+offq]
@@ -238,7 +238,7 @@ ALIGN function_align
     lea           dstq, [dstq+strideq*2]
 %else
     add           tmpq, 32
-    mova        [dstq], m0
+    movu        [dstq], m0
     add           dstq, strideq
 %endif
     ret
@@ -254,7 +254,7 @@ ALIGN function_align
     movq            m3, [tmpq+offq+32*0] ; k0s1
     movhps          m3, [tmpq+offq+32*1]
 %else
-    mova            m1, [dstq]
+    movu            m1, [dstq]
     movu            m2, [tmpq+offq]
     neg           offq
     movu            m3, [tmpq+offq]
@@ -362,7 +362,7 @@ ALIGN function_align
     lea           dstq, [dstq+strideq*2]
 %else
     add           tmpq, 32
-    mova        [dstq], m0
+    movu        [dstq], m0
     add           dstq, strideq
 %endif
     ret
@@ -378,7 +378,7 @@ ALIGN function_align
     movq            m3, [tmpq+offq+32*0] ; k0s1
     movhps          m3, [tmpq+offq+32*1]
 %else
-    mova            m1, [dstq]
+    movu            m1, [dstq]
     movu            m2, [tmpq+offq]
     neg           offq
     movu            m3, [tmpq+offq]
@@ -393,8 +393,8 @@ ALIGN function_align
     pabsw           m7, m3
     pmaxsw          m5, m2, m3
     pminsw          m4, m7
-    mova            m9, m5
-    mova           m10, m4
+    movu            m9, m5
+    movu           m10, m4
 %endif
     psubw           m2, m1               ; diff_k0s0
     psubw           m3, m1               ; diff_k0s1
@@ -432,8 +432,8 @@ ALIGN function_align
     pminsw          m7, m3
     pmaxsw          m3, m9, m4
     pmaxsw          m3, m5
-    mova           m10, m7
-    mova            m9, m3
+    movu           m10, m7
+    movu            m9, m3
 %endif
     psubw           m4, m1               ; diff_k0s2
     psubw           m5, m1               ; diff_k0s3
@@ -473,8 +473,8 @@ ALIGN function_align
     pminsw          m7, m5
     pmaxsw          m5, m9, m2
     pmaxsw          m5, m3
-    mova           m10, m7
-    mova            m9, m5
+    movu           m10, m7
+    movu            m9, m5
 %endif
     paddw           m0, m4               ; constrain(diff_k0)
     psubw           m2, m1               ; diff_k1s0
@@ -515,8 +515,8 @@ ALIGN function_align
     pminsw          m7, m3
     pmaxsw          m3, m9, m4
     pmaxsw          m3, m5
-    mova           m10, m7
-    mova            m9, m3
+    movu           m10, m7
+    movu            m9, m3
 %endif
     psubw           m4, m1               ; diff_k1s2
     psubw           m5, m1               ; diff_k1s3
@@ -556,8 +556,8 @@ ALIGN function_align
     pminsw          m7, m5
     pmaxsw          m5, m9, m2
     pmaxsw          m5, m3
-    mova           m10, m7
-    mova            m9, m5
+    movu           m10, m7
+    movu            m9, m5
 %endif
     psubw           m2, m1               ; diff_k0p0
     psubw           m3, m1               ; diff_k0p1
@@ -596,8 +596,8 @@ ALIGN function_align
     pminsw          m3, m2
     pmaxsw          m2, m9, m4
     pmaxsw          m2, m5
-    mova           m10, m3
-    mova            m9, m2
+    movu           m10, m3
+    movu            m9, m2
 %endif
     psubw           m4, m1               ; diff_k1p0
     psubw           m5, m1               ; diff_k1p1
@@ -636,7 +636,7 @@ ALIGN function_align
     lea           dstq, [dstq+strideq*2]
 %else
     add           tmpq, 32
-    mova        [dstq], m0
+    movu        [dstq], m0
     add           dstq, strideq
 %endif
     ret
@@ -664,17 +664,17 @@ cglobal cdef_filter_4x4_16bpc, 2, 7, 8, -32*11, dst, stride, edge, top, left
     movu            m2, [t1  +strideq*0]
     movu            m3, [t1  +strideq*1]
     movddup         m7, [base+pw_m16384]
-    mova   [px+32*0+0], m0
-    mova   [px+32*1+0], m1
-    mova   [px+32*2+0], m2
-    mova   [px+32*3+0], m3
+    movu   [px+32*0+0], m0
+    movu   [px+32*1+0], m1
+    movu   [px+32*2+0], m2
+    movu   [px+32*3+0], m3
     test         edgeb, 4 ; HAVE_TOP
     jz .no_top
     movifnidn     topq, topmp
     movu            m0, [topq+strideq*0]
     movu            m1, [topq+strideq*1]
-    mova   [px-32*2+0], m0
-    mova   [px-32*1+0], m1
+    movu   [px-32*2+0], m0
+    movu   [px-32*1+0], m1
     test         edgeb, 1 ; HAVE_LEFT
     jz .top_no_left
     movd            m0, [topq+strideq*0-4]
@@ -683,8 +683,8 @@ cglobal cdef_filter_4x4_16bpc, 2, 7, 8, -32*11, dst, stride, edge, top, left
     movd   [px-32*1-4], m1
     jmp .top_done
 .no_top:
-    mova   [px-32*2+0], m7
-    mova   [px-32*1+0], m7
+    movu   [px-32*2+0], m7
+    movu   [px-32*1+0], m7
 .top_no_left:
     movd   [px-32*2-4], m7
     movd   [px-32*1-4], m7
@@ -694,8 +694,8 @@ cglobal cdef_filter_4x4_16bpc, 2, 7, 8, -32*11, dst, stride, edge, top, left
     movifnidn     botq, r4mp
     movu            m0, [botq+strideq*0]
     movu            m1, [botq+strideq*1]
-    mova   [px+32*4+0], m0
-    mova   [px+32*5+0], m1
+    movu   [px+32*4+0], m0
+    movu   [px+32*5+0], m1
     test         edgeb, 1 ; HAVE_LEFT
     jz .bottom_no_left
     movd            m0, [botq+strideq*0-4]
@@ -704,8 +704,8 @@ cglobal cdef_filter_4x4_16bpc, 2, 7, 8, -32*11, dst, stride, edge, top, left
     movd   [px+32*5-4], m1
     jmp .bottom_done
 .no_bottom:
-    mova   [px+32*4+0], m7
-    mova   [px+32*5+0], m7
+    movu   [px+32*4+0], m7
+    movu   [px+32*5+0], m7
 .bottom_no_left:
     movd   [px+32*4-4], m7
     movd   [px+32*5-4], m7
@@ -750,22 +750,22 @@ cglobal cdef_filter_4x8_16bpc, 2, 7, 8, -32*15, dst, stride, edge, top, left
     lea             t1, [t1  +strideq*2]
     movu            m6, [t1  +strideq*0]
     movu            m7, [t1  +strideq*1]
-    mova   [px+32*0+0], m0
-    mova   [px+32*1+0], m1
-    mova   [px+32*2+0], m2
-    mova   [px+32*3+0], m3
-    mova   [px+32*4+0], m4
-    mova   [px+32*5+0], m5
-    mova   [px+32*6+0], m6
-    mova   [px+32*7+0], m7
+    movu   [px+32*0+0], m0
+    movu   [px+32*1+0], m1
+    movu   [px+32*2+0], m2
+    movu   [px+32*3+0], m3
+    movu   [px+32*4+0], m4
+    movu   [px+32*5+0], m5
+    movu   [px+32*6+0], m6
+    movu   [px+32*7+0], m7
     movddup         m7, [base+pw_m16384]
     test         edgeb, 4 ; HAVE_TOP
     jz .no_top
     movifnidn     topq, topmp
     movu            m0, [topq+strideq*0]
     movu            m1, [topq+strideq*1]
-    mova   [px-32*2+0], m0
-    mova   [px-32*1+0], m1
+    movu   [px-32*2+0], m0
+    movu   [px-32*1+0], m1
     test         edgeb, 1 ; HAVE_LEFT
     jz .top_no_left
     movd            m0, [topq+strideq*0-4]
@@ -774,8 +774,8 @@ cglobal cdef_filter_4x8_16bpc, 2, 7, 8, -32*15, dst, stride, edge, top, left
     movd   [px-32*1-4], m1
     jmp .top_done
 .no_top:
-    mova   [px-32*2+0], m7
-    mova   [px-32*1+0], m7
+    movu   [px-32*2+0], m7
+    movu   [px-32*1+0], m7
 .top_no_left:
     movd   [px-32*2-4], m7
     movd   [px-32*1-4], m7
@@ -785,8 +785,8 @@ cglobal cdef_filter_4x8_16bpc, 2, 7, 8, -32*15, dst, stride, edge, top, left
     movifnidn     botq, r4mp
     movu            m0, [botq+strideq*0]
     movu            m1, [botq+strideq*1]
-    mova   [px+32*8+0], m0
-    mova   [px+32*9+0], m1
+    movu   [px+32*8+0], m0
+    movu   [px+32*9+0], m1
     test         edgeb, 1 ; HAVE_LEFT
     jz .bottom_no_left
     movd            m0, [botq+strideq*0-4]
@@ -795,8 +795,8 @@ cglobal cdef_filter_4x8_16bpc, 2, 7, 8, -32*15, dst, stride, edge, top, left
     movd   [px+32*9-4], m1
     jmp .bottom_done
 .no_bottom:
-    mova   [px+32*8+0], m7
-    mova   [px+32*9+0], m7
+    movu   [px+32*8+0], m7
+    movu   [px+32*9+0], m7
 .bottom_no_left:
     movd   [px+32*8-4], m7
     movd   [px+32*9-4], m7
@@ -838,52 +838,52 @@ cglobal cdef_filter_8x8_16bpc, 2, 7, 8, -32*15, dst, stride, edge, top, left
 %endif
     mov          edged, r9m
     LEA             t0, dir_table
-    mova            m0, [dstq+strideq*0+ 0]
+    movu            m0, [dstq+strideq*0+ 0]
     movd            m1, [dstq+strideq*0+16]
-    mova            m2, [dstq+strideq*1+ 0]
+    movu            m2, [dstq+strideq*1+ 0]
     movd            m3, [dstq+strideq*1+16]
     lea             t1, [dstq+strideq*2]
-    mova            m4, [t1  +strideq*0+ 0]
+    movu            m4, [t1  +strideq*0+ 0]
     movd            m5, [t1  +strideq*0+16]
-    mova            m6, [t1  +strideq*1+ 0]
+    movu            m6, [t1  +strideq*1+ 0]
     movd            m7, [t1  +strideq*1+16]
     lea             t1, [t1  +strideq*2]
-    mova  [px+32*0+ 0], m0
+    movu  [px+32*0+ 0], m0
     movd  [px+32*0+16], m1
-    mova  [px+32*1+ 0], m2
+    movu  [px+32*1+ 0], m2
     movd  [px+32*1+16], m3
-    mova  [px+32*2+ 0], m4
+    movu  [px+32*2+ 0], m4
     movd  [px+32*2+16], m5
-    mova  [px+32*3+ 0], m6
+    movu  [px+32*3+ 0], m6
     movd  [px+32*3+16], m7
-    mova            m0, [t1  +strideq*0+ 0]
+    movu            m0, [t1  +strideq*0+ 0]
     movd            m1, [t1  +strideq*0+16]
-    mova            m2, [t1  +strideq*1+ 0]
+    movu            m2, [t1  +strideq*1+ 0]
     movd            m3, [t1  +strideq*1+16]
     lea             t1, [t1  +strideq*2]
-    mova            m4, [t1  +strideq*0+ 0]
+    movu            m4, [t1  +strideq*0+ 0]
     movd            m5, [t1  +strideq*0+16]
-    mova            m6, [t1  +strideq*1+ 0]
+    movu            m6, [t1  +strideq*1+ 0]
     movd            m7, [t1  +strideq*1+16]
-    mova  [px+32*4+ 0], m0
+    movu  [px+32*4+ 0], m0
     movd  [px+32*4+16], m1
-    mova  [px+32*5+ 0], m2
+    movu  [px+32*5+ 0], m2
     movd  [px+32*5+16], m3
-    mova  [px+32*6+ 0], m4
+    movu  [px+32*6+ 0], m4
     movd  [px+32*6+16], m5
-    mova  [px+32*7+ 0], m6
+    movu  [px+32*7+ 0], m6
     movd  [px+32*7+16], m7
     movddup         m7, [base+pw_m16384]
     test         edgeb, 4 ; HAVE_TOP
     jz .no_top
     movifnidn     topq, topmp
-    mova            m0, [topq+strideq*0+ 0]
-    mova            m1, [topq+strideq*0+16]
-    mova            m2, [topq+strideq*1+ 0]
-    mova            m3, [topq+strideq*1+16]
-    mova  [px-32*2+ 0], m0
+    movu            m0, [topq+strideq*0+ 0]
+    movu            m1, [topq+strideq*0+16]
+    movu            m2, [topq+strideq*1+ 0]
+    movu            m3, [topq+strideq*1+16]
+    movu  [px-32*2+ 0], m0
     movd  [px-32*2+16], m1
-    mova  [px-32*1+ 0], m2
+    movu  [px-32*1+ 0], m2
     movd  [px-32*1+16], m3
     test         edgeb, 1 ; HAVE_LEFT
     jz .top_no_left
@@ -893,9 +893,9 @@ cglobal cdef_filter_8x8_16bpc, 2, 7, 8, -32*15, dst, stride, edge, top, left
     movd   [px-32*1-4], m1
     jmp .top_done
 .no_top:
-    mova  [px-32*2+ 0], m7
+    movu  [px-32*2+ 0], m7
     movd  [px-32*2+16], m7
-    mova  [px-32*1+ 0], m7
+    movu  [px-32*1+ 0], m7
     movd  [px-32*1+16], m7
 .top_no_left:
     movd  [px-32*2- 4], m7
@@ -904,13 +904,13 @@ cglobal cdef_filter_8x8_16bpc, 2, 7, 8, -32*15, dst, stride, edge, top, left
     test         edgeb, 8 ; HAVE_BOTTOM
     jz .no_bottom
     movifnidn     botq, r4mp
-    mova            m0, [botq+strideq*0+ 0]
+    movu            m0, [botq+strideq*0+ 0]
     movd            m1, [botq+strideq*0+16]
-    mova            m2, [botq+strideq*1+ 0]
+    movu            m2, [botq+strideq*1+ 0]
     movd            m3, [botq+strideq*1+16]
-    mova  [px+32*8+ 0], m0
+    movu  [px+32*8+ 0], m0
     movd  [px+32*8+16], m1
-    mova  [px+32*9+ 0], m2
+    movu  [px+32*9+ 0], m2
     movd  [px+32*9+16], m3
     test         edgeb, 1 ; HAVE_LEFT
     jz .bottom_no_left
@@ -920,9 +920,9 @@ cglobal cdef_filter_8x8_16bpc, 2, 7, 8, -32*15, dst, stride, edge, top, left
     movd  [px+32*9- 4], m1
     jmp .bottom_done
 .no_bottom:
-    mova  [px+32*8+ 0], m7
+    movu  [px+32*8+ 0], m7
     movd  [px+32*8+16], m7
-    mova  [px+32*9+ 0], m7
+    movu  [px+32*9+ 0], m7
     movd  [px+32*9+16], m7
 .bottom_no_left:
     movd  [px+32*8- 4], m7
@@ -964,14 +964,14 @@ cglobal cdef_dir_16bpc, 4, 7, 16, src, stride, var, bdmax
     shr         bdmaxd, 11 ; 0 for 10bpc, 1 for 12bpc
     movddup         m7, [r6+bdmaxq*8]
     lea             r6, [strideq*3]
-    mova            m0, [srcq+strideq*0]
-    mova            m1, [srcq+strideq*1]
-    mova            m2, [srcq+strideq*2]
-    mova            m3, [srcq+r6       ]
+    movu            m0, [srcq+strideq*0]
+    movu            m1, [srcq+strideq*1]
+    movu            m2, [srcq+strideq*2]
+    movu            m3, [srcq+r6       ]
     lea           srcq, [srcq+strideq*4]
-    mova            m4, [srcq+strideq*0]
-    mova            m5, [srcq+strideq*1]
-    mova            m6, [srcq+strideq*2]
+    movu            m4, [srcq+strideq*0]
+    movu            m5, [srcq+strideq*1]
+    movu            m6, [srcq+strideq*2]
     REPX {pmulhuw x, m7}, m0, m1, m2, m3, m4, m5, m6
     pmulhuw         m7, [srcq+r6       ]
     pxor            m8, m8
@@ -1001,16 +1001,16 @@ cglobal cdef_dir_16bpc, 2, 4, 8, 96, src, stride, var, bdmax
     packuswb        m2, m3, m4
     psubw           m3, m1
     psubw           m4, m1
-    mova    [esp+0x00], m3
-    mova    [esp+0x10], m4
+    movu    [esp+0x00], m3
+    movu    [esp+0x10], m4
     packuswb        m3, m5, m6
     psadbw          m2, m0
     psadbw          m3, m0
     psubw           m5, m1
     psubw           m6, m1
     packssdw        m2, m3
-    mova    [esp+0x20], m5
-    mova    [esp+0x50], m6
+    movu    [esp+0x20], m5
+    movu    [esp+0x50], m6
     pmulhuw         m4, m7, [srcq+strideq*0]
     pmulhuw         m5, m7, [srcq+strideq*1]
     pmulhuw         m6, m7, [srcq+strideq*2]

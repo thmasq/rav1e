@@ -213,8 +213,8 @@ cglobal put_bilin_16bpc, 4, 7, 0, dst, ds, src, ss, w, h, mxy
     movu                 m0, [srcq+ssq*0]
     movu                 m1, [srcq+ssq*1]
     lea                srcq, [srcq+ssq*2]
-    mova       [dstq+dsq*0], m0
-    mova       [dstq+dsq*1], m1
+    movu       [dstq+dsq*0], m0
+    movu       [dstq+dsq*1], m1
     lea                dstq, [dstq+dsq*2]
     sub                  hd, 2
     jg .put_w8
@@ -225,10 +225,10 @@ cglobal put_bilin_16bpc, 4, 7, 0, dst, ds, src, ss, w, h, mxy
     movu                 m2, [srcq+ssq*1+16*0]
     movu                 m3, [srcq+ssq*1+16*1]
     lea                srcq, [srcq+ssq*2]
-    mova  [dstq+dsq*0+16*0], m0
-    mova  [dstq+dsq*0+16*1], m1
-    mova  [dstq+dsq*1+16*0], m2
-    mova  [dstq+dsq*1+16*1], m3
+    movu  [dstq+dsq*0+16*0], m0
+    movu  [dstq+dsq*0+16*1], m1
+    movu  [dstq+dsq*1+16*0], m2
+    movu  [dstq+dsq*1+16*1], m3
     lea                dstq, [dstq+dsq*2]
     sub                  hd, 2
     jg .put_w16
@@ -239,10 +239,10 @@ cglobal put_bilin_16bpc, 4, 7, 0, dst, ds, src, ss, w, h, mxy
     movu                 m2, [srcq+16*2]
     movu                 m3, [srcq+16*3]
     add                srcq, ssq
-    mova        [dstq+16*0], m0
-    mova        [dstq+16*1], m1
-    mova        [dstq+16*2], m2
-    mova        [dstq+16*3], m3
+    movu        [dstq+16*0], m0
+    movu        [dstq+16*1], m1
+    movu        [dstq+16*2], m2
+    movu        [dstq+16*3], m3
     add                dstq, dsq
     dec                  hd
     jg .put_w32
@@ -252,19 +252,19 @@ cglobal put_bilin_16bpc, 4, 7, 0, dst, ds, src, ss, w, h, mxy
     movu                 m1, [srcq+16*1]
     movu                 m2, [srcq+16*2]
     movu                 m3, [srcq+16*3]
-    mova        [dstq+16*0], m0
-    mova        [dstq+16*1], m1
-    mova        [dstq+16*2], m2
-    mova        [dstq+16*3], m3
+    movu        [dstq+16*0], m0
+    movu        [dstq+16*1], m1
+    movu        [dstq+16*2], m2
+    movu        [dstq+16*3], m3
     movu                 m0, [srcq+16*4]
     movu                 m1, [srcq+16*5]
     movu                 m2, [srcq+16*6]
     movu                 m3, [srcq+16*7]
     add                srcq, ssq
-    mova        [dstq+16*4], m0
-    mova        [dstq+16*5], m1
-    mova        [dstq+16*6], m2
-    mova        [dstq+16*7], m3
+    movu        [dstq+16*4], m0
+    movu        [dstq+16*5], m1
+    movu        [dstq+16*6], m2
+    movu        [dstq+16*7], m3
     add                dstq, dsq
     dec                  hd
     jg .put_w64
@@ -277,35 +277,35 @@ cglobal put_bilin_16bpc, 4, 7, 0, dst, ds, src, ss, w, h, mxy
     movu                 m1, [srcq-16*7]
     movu                 m2, [srcq-16*6]
     movu                 m3, [srcq-16*5]
-    mova        [dstq-16*8], m0
-    mova        [dstq-16*7], m1
-    mova        [dstq-16*6], m2
-    mova        [dstq-16*5], m3
+    movu        [dstq-16*8], m0
+    movu        [dstq-16*7], m1
+    movu        [dstq-16*6], m2
+    movu        [dstq-16*5], m3
     movu                 m0, [srcq-16*4]
     movu                 m1, [srcq-16*3]
     movu                 m2, [srcq-16*2]
     movu                 m3, [srcq-16*1]
-    mova        [dstq-16*4], m0
-    mova        [dstq-16*3], m1
-    mova        [dstq-16*2], m2
-    mova        [dstq-16*1], m3
+    movu        [dstq-16*4], m0
+    movu        [dstq-16*3], m1
+    movu        [dstq-16*2], m2
+    movu        [dstq-16*1], m3
     movu                 m0, [srcq+16*0]
     movu                 m1, [srcq+16*1]
     movu                 m2, [srcq+16*2]
     movu                 m3, [srcq+16*3]
-    mova        [dstq+16*0], m0
-    mova        [dstq+16*1], m1
-    mova        [dstq+16*2], m2
-    mova        [dstq+16*3], m3
+    movu        [dstq+16*0], m0
+    movu        [dstq+16*1], m1
+    movu        [dstq+16*2], m2
+    movu        [dstq+16*3], m3
     movu                 m0, [srcq+16*4]
     movu                 m1, [srcq+16*5]
     movu                 m2, [srcq+16*6]
     movu                 m3, [srcq+16*7]
     add                srcq, ssq
-    mova        [dstq+16*4], m0
-    mova        [dstq+16*5], m1
-    mova        [dstq+16*6], m2
-    mova        [dstq+16*7], m3
+    movu        [dstq+16*4], m0
+    movu        [dstq+16*5], m1
+    movu        [dstq+16*6], m2
+    movu        [dstq+16*7], m3
     add                dstq, dsq
     dec                  hd
     jg .put_w128_loop
@@ -313,7 +313,7 @@ cglobal put_bilin_16bpc, 4, 7, 0, dst, ds, src, ss, w, h, mxy
 .h:
     movd                 m5, mxyd
     mov                mxyd, r7m ; my
-    mova                 m4, [base+pw_16]
+    movu                 m4, [base+pw_16]
     pshufb               m5, [base+pw_256]
     psubw                m4, m5
     test               mxyd, mxyd
@@ -378,8 +378,8 @@ cglobal put_bilin_16bpc, 4, 7, 0, dst, ds, src, ss, w, h, mxy
     paddw                m1, m2
     psrlw                m0, 4
     psrlw                m1, 4
-    mova       [dstq+dsq*0], m0
-    mova       [dstq+dsq*1], m1
+    movu       [dstq+dsq*0], m0
+    movu       [dstq+dsq*1], m1
     lea                dstq, [dstq+dsq*2]
     sub                  hd, 2
     jg .h_w8
@@ -405,8 +405,8 @@ cglobal put_bilin_16bpc, 4, 7, 0, dst, ds, src, ss, w, h, mxy
     paddw                m1, m2
     psrlw                m0, 4
     psrlw                m1, 4
-    mova   [dstq+r6*2+16*0], m0
-    mova   [dstq+r6*2+16*1], m1
+    movu   [dstq+r6*2+16*0], m0
+    movu   [dstq+r6*2+16*1], m1
     add                  r6, 16
     jl .h_w16_loop
     add                srcq, ssq
@@ -481,8 +481,8 @@ cglobal put_bilin_16bpc, 4, 7, 0, dst, ds, src, ss, w, h, mxy
     psubw                m2, m0, m3
     pmulhrsw             m2, m5
     paddw                m2, m3
-    mova       [dstq+dsq*0], m1
-    mova       [dstq+dsq*1], m2
+    movu       [dstq+dsq*0], m1
+    movu       [dstq+dsq*1], m2
     lea                dstq, [dstq+dsq*2]
     sub                  hd, 2
     jg .v_w8_loop
@@ -510,15 +510,15 @@ cglobal put_bilin_16bpc, 4, 7, 0, dst, ds, src, ss, w, h, mxy
 .hv:
     WIN64_SPILL_XMM       8
     shl                mxyd, 11
-    mova                 m3, [base+pw_2]
+    movu                 m3, [base+pw_2]
     movd                 m6, mxyd
-    mova                 m7, [base+pw_8192]
+    movu                 m7, [base+pw_8192]
     pshufb               m6, [base+pw_256]
     test          dword r8m, 0x800
     jnz .hv_12bpc
     psllw                m4, 2
     psllw                m5, 2
-    mova                 m7, [base+pw_2048]
+    movu                 m7, [base+pw_2048]
 .hv_12bpc:
     movifnidn            hd, hm
     cmp                  wd, 4
@@ -543,7 +543,7 @@ cglobal put_bilin_16bpc, 4, 7, 0, dst, ds, src, ss, w, h, mxy
     paddw                m1, m2
     psrlw                m1, 2            ; 1 _ 2 _
     shufpd               m2, m0, m1, 0x01 ; 0 _ 1 _
-    mova                 m0, m1
+    movu                 m0, m1
     psubw                m1, m2
     paddw                m1, m1
     pmulhw               m1, m6
@@ -576,7 +576,7 @@ cglobal put_bilin_16bpc, 4, 7, 0, dst, ds, src, ss, w, h, mxy
     paddw                m1, m2
     psrlw                m1, 2            ; 1 2
     shufpd               m2, m0, m1, 0x01 ; 0 1
-    mova                 m0, m1
+    movu                 m0, m1
     psubw                m1, m2
     paddw                m1, m1
     pmulhw               m1, m6
@@ -622,7 +622,7 @@ cglobal put_bilin_16bpc, 4, 7, 0, dst, ds, src, ss, w, h, mxy
     pmulhw               m2, m6
     paddw                m2, m0
     pmulhrsw             m2, m7
-    mova       [dstq+dsq*0], m2
+    movu       [dstq+dsq*0], m2
     movu                 m0, [srcq+ssq*0]
     movu                 m2, [srcq+ssq*0+2]
     pmullw               m0, m4
@@ -635,7 +635,7 @@ cglobal put_bilin_16bpc, 4, 7, 0, dst, ds, src, ss, w, h, mxy
     pmulhw               m2, m6
     paddw                m2, m1
     pmulhrsw             m2, m7
-    mova       [dstq+dsq*1], m2
+    movu       [dstq+dsq*1], m2
     lea                dstq, [dstq+dsq*2]
     sub                  hd, 2
     jg .hv_w8_loop
@@ -675,7 +675,7 @@ cglobal prep_bilin_16bpc, 4, 7, 0, tmp, src, stride, w, h, mxy, stride3
     tzcnt                wd, wd
     movzx                wd, word [base+prep_ssse3_table+wq*2]
     mov                 r5d, r7m ; bitdepth_max
-    mova                 m5, [base+pw_8192]
+    movu                 m5, [base+pw_8192]
     add                  wq, r6
     shr                 r5d, 11
     movddup              m4, [base+prep_mul+r5*8]
@@ -691,8 +691,8 @@ cglobal prep_bilin_16bpc, 4, 7, 0, tmp, src, stride, w, h, mxy, stride3
     pmullw               m1, m4
     psubw                m0, m5
     psubw                m1, m5
-    mova        [tmpq+16*0], m0
-    mova        [tmpq+16*1], m1
+    movu        [tmpq+16*0], m0
+    movu        [tmpq+16*1], m1
     add                tmpq, 16*2
     sub                  hd, 4
     jg .prep_w4
@@ -705,10 +705,10 @@ cglobal prep_bilin_16bpc, 4, 7, 0, tmp, src, stride, w, h, mxy, stride3
     lea                srcq, [srcq+strideq*4]
     REPX     {pmullw x, m4}, m0, m1, m2, m3
     REPX     {psubw  x, m5}, m0, m1, m2, m3
-    mova        [tmpq+16*0], m0
-    mova        [tmpq+16*1], m1
-    mova        [tmpq+16*2], m2
-    mova        [tmpq+16*3], m3
+    movu        [tmpq+16*0], m0
+    movu        [tmpq+16*1], m1
+    movu        [tmpq+16*2], m2
+    movu        [tmpq+16*3], m3
     add                tmpq, 16*4
     sub                  hd, 4
     jg .prep_w8
@@ -721,10 +721,10 @@ cglobal prep_bilin_16bpc, 4, 7, 0, tmp, src, stride, w, h, mxy, stride3
     lea                srcq, [srcq+strideq*2]
     REPX     {pmullw x, m4}, m0, m1, m2, m3
     REPX     {psubw  x, m5}, m0, m1, m2, m3
-    mova        [tmpq+16*0], m0
-    mova        [tmpq+16*1], m1
-    mova        [tmpq+16*2], m2
-    mova        [tmpq+16*3], m3
+    movu        [tmpq+16*0], m0
+    movu        [tmpq+16*1], m1
+    movu        [tmpq+16*2], m2
+    movu        [tmpq+16*3], m3
     add                tmpq, 16*4
     sub                  hd, 2
     jg .prep_w16
@@ -737,10 +737,10 @@ cglobal prep_bilin_16bpc, 4, 7, 0, tmp, src, stride, w, h, mxy, stride3
     add                srcq, strideq
     REPX     {pmullw x, m4}, m0, m1, m2, m3
     REPX     {psubw  x, m5}, m0, m1, m2, m3
-    mova        [tmpq+16*0], m0
-    mova        [tmpq+16*1], m1
-    mova        [tmpq+16*2], m2
-    mova        [tmpq+16*3], m3
+    movu        [tmpq+16*0], m0
+    movu        [tmpq+16*1], m1
+    movu        [tmpq+16*2], m2
+    movu        [tmpq+16*3], m3
     add                tmpq, 16*4
     dec                  hd
     jg .prep_w32
@@ -752,10 +752,10 @@ cglobal prep_bilin_16bpc, 4, 7, 0, tmp, src, stride, w, h, mxy, stride3
     movu                 m3, [srcq+16*3]
     REPX     {pmullw x, m4}, m0, m1, m2, m3
     REPX     {psubw  x, m5}, m0, m1, m2, m3
-    mova        [tmpq+16*0], m0
-    mova        [tmpq+16*1], m1
-    mova        [tmpq+16*2], m2
-    mova        [tmpq+16*3], m3
+    movu        [tmpq+16*0], m0
+    movu        [tmpq+16*1], m1
+    movu        [tmpq+16*2], m2
+    movu        [tmpq+16*3], m3
     movu                 m0, [srcq+16*4]
     movu                 m1, [srcq+16*5]
     movu                 m2, [srcq+16*6]
@@ -763,10 +763,10 @@ cglobal prep_bilin_16bpc, 4, 7, 0, tmp, src, stride, w, h, mxy, stride3
     add                srcq, strideq
     REPX     {pmullw x, m4}, m0, m1, m2, m3
     REPX     {psubw  x, m5}, m0, m1, m2, m3
-    mova        [tmpq+16*4], m0
-    mova        [tmpq+16*5], m1
-    mova        [tmpq+16*6], m2
-    mova        [tmpq+16*7], m3
+    movu        [tmpq+16*4], m0
+    movu        [tmpq+16*5], m1
+    movu        [tmpq+16*6], m2
+    movu        [tmpq+16*7], m3
     add                tmpq, 16*8
     dec                  hd
     jg .prep_w64
@@ -778,20 +778,20 @@ cglobal prep_bilin_16bpc, 4, 7, 0, tmp, src, stride, w, h, mxy, stride3
     movu                 m3, [srcq+16* 3]
     REPX     {pmullw x, m4}, m0, m1, m2, m3
     REPX     {psubw  x, m5}, m0, m1, m2, m3
-    mova        [tmpq+16*0], m0
-    mova        [tmpq+16*1], m1
-    mova        [tmpq+16*2], m2
-    mova        [tmpq+16*3], m3
+    movu        [tmpq+16*0], m0
+    movu        [tmpq+16*1], m1
+    movu        [tmpq+16*2], m2
+    movu        [tmpq+16*3], m3
     movu                 m0, [srcq+16* 4]
     movu                 m1, [srcq+16* 5]
     movu                 m2, [srcq+16* 6]
     movu                 m3, [srcq+16* 7]
     REPX     {pmullw x, m4}, m0, m1, m2, m3
     REPX     {psubw  x, m5}, m0, m1, m2, m3
-    mova        [tmpq+16*4], m0
-    mova        [tmpq+16*5], m1
-    mova        [tmpq+16*6], m2
-    mova        [tmpq+16*7], m3
+    movu        [tmpq+16*4], m0
+    movu        [tmpq+16*5], m1
+    movu        [tmpq+16*6], m2
+    movu        [tmpq+16*7], m3
     movu                 m0, [srcq+16* 8]
     movu                 m1, [srcq+16* 9]
     movu                 m2, [srcq+16*10]
@@ -799,10 +799,10 @@ cglobal prep_bilin_16bpc, 4, 7, 0, tmp, src, stride, w, h, mxy, stride3
     add                tmpq, 16*16
     REPX     {pmullw x, m4}, m0, m1, m2, m3
     REPX     {psubw  x, m5}, m0, m1, m2, m3
-    mova        [tmpq-16*8], m0
-    mova        [tmpq-16*7], m1
-    mova        [tmpq-16*6], m2
-    mova        [tmpq-16*5], m3
+    movu        [tmpq-16*8], m0
+    movu        [tmpq-16*7], m1
+    movu        [tmpq-16*6], m2
+    movu        [tmpq-16*5], m3
     movu                 m0, [srcq+16*12]
     movu                 m1, [srcq+16*13]
     movu                 m2, [srcq+16*14]
@@ -810,19 +810,19 @@ cglobal prep_bilin_16bpc, 4, 7, 0, tmp, src, stride, w, h, mxy, stride3
     add                srcq, strideq
     REPX     {pmullw x, m4}, m0, m1, m2, m3
     REPX     {psubw  x, m5}, m0, m1, m2, m3
-    mova        [tmpq-16*4], m0
-    mova        [tmpq-16*3], m1
-    mova        [tmpq-16*2], m2
-    mova        [tmpq-16*1], m3
+    movu        [tmpq-16*4], m0
+    movu        [tmpq-16*3], m1
+    movu        [tmpq-16*2], m2
+    movu        [tmpq-16*1], m3
     dec                  hd
     jg .prep_w128
     RET
 .h:
     movd                 m4, mxyd
     mov                mxyd, r6m ; my
-    mova                 m3, [base+pw_16]
+    movu                 m3, [base+pw_16]
     pshufb               m4, [base+pw_256]
-    mova                 m5, [base+pw_32766]
+    movu                 m5, [base+pw_32766]
     psubw                m3, m4
     test          dword r7m, 0x800
     jnz .h_12bpc
@@ -845,7 +845,7 @@ cglobal prep_bilin_16bpc, 4, 7, 0, tmp, src, stride, w, h, mxy, stride3
     psubw                m0, m5
     paddw                m0, m1
     psraw                m0, 2
-    mova             [tmpq], m0
+    movu             [tmpq], m0
     add                tmpq, 16
     sub                  hd, 2
     jg .h_w4
@@ -866,8 +866,8 @@ cglobal prep_bilin_16bpc, 4, 7, 0, tmp, src, stride, w, h, mxy, stride3
     paddw                m1, m2
     psraw                m0, 2
     psraw                m1, 2
-    mova        [tmpq+16*0], m0
-    mova        [tmpq+16*1], m1
+    movu        [tmpq+16*0], m0
+    movu        [tmpq+16*1], m1
     add                tmpq, 16*2
     sub                  hd, 2
     jg .h_w8
@@ -892,8 +892,8 @@ cglobal prep_bilin_16bpc, 4, 7, 0, tmp, src, stride, w, h, mxy, stride3
     paddw                m1, m2
     psraw                m0, 2
     psraw                m1, 2
-    mova        [tmpq+16*0], m0
-    mova        [tmpq+16*1], m1
+    movu        [tmpq+16*0], m0
+    movu        [tmpq+16*1], m1
     add                tmpq, 16*2
     add                  r6, 16
     jl .h_w16_loop
@@ -903,9 +903,9 @@ cglobal prep_bilin_16bpc, 4, 7, 0, tmp, src, stride, w, h, mxy, stride3
     RET
 .v:
     movd                 m4, mxyd
-    mova                 m3, [base+pw_16]
+    movu                 m3, [base+pw_16]
     pshufb               m4, [base+pw_256]
-    mova                 m5, [base+pw_32766]
+    movu                 m5, [base+pw_32766]
     psubw                m3, m4
     test          dword r7m, 0x800
     jnz .v_12bpc
@@ -928,7 +928,7 @@ cglobal prep_bilin_16bpc, 4, 7, 0, tmp, src, stride, w, h, mxy, stride3
     psubw                m1, m5
     paddw                m1, m2
     psraw                m1, 2
-    mova             [tmpq], m1
+    movu             [tmpq], m1
     add                tmpq, 16
     sub                  hd, 2
     jg .v_w4_loop
@@ -945,12 +945,12 @@ cglobal prep_bilin_16bpc, 4, 7, 0, tmp, src, stride, w, h, mxy, stride3
     movu                 m0, [srcq+strideq*0]
     psraw                m1, 2
     pmullw               m2, m3
-    mova        [tmpq+16*0], m1
+    movu        [tmpq+16*0], m1
     pmullw               m1, m4, m0
     psubw                m2, m5
     paddw                m1, m2
     psraw                m1, 2
-    mova        [tmpq+16*1], m1
+    movu        [tmpq+16*1], m1
     add                tmpq, 16*2
     sub                  hd, 2
     jg .v_w8_loop
@@ -980,12 +980,12 @@ cglobal prep_bilin_16bpc, 4, 7, 0, tmp, src, stride, w, h, mxy, stride3
     movu                 m0, [srcq+strideq*0]
     psraw                m1, 2
     pmullw               m2, m3
-    mova        [tmpq+wq*0], m1
+    movu        [tmpq+wq*0], m1
     pmullw               m1, m4, m0
     psubw                m2, m5
     paddw                m1, m2
     psraw                m1, 2
-    mova        [tmpq+wq*2], m1
+    movu        [tmpq+wq*2], m1
     lea                tmpq, [tmpq+wq*4]
     sub                  hd, 2
     jg .v_w16_loop
@@ -1038,11 +1038,11 @@ cglobal prep_bilin_16bpc, 4, 7, 0, tmp, src, stride, w, h, mxy, stride3
     paddw                m1, m2
     psraw                m1, 2            ; 1 2
     shufpd               m2, m0, m1, 0x01 ; 0 1
-    mova                 m0, m1
+    movu                 m0, m1
     psubw                m1, m2
     pmulhrsw             m1, m6
     paddw                m1, m2
-    mova             [tmpq], m1
+    movu             [tmpq], m1
     add                tmpq, 16
     sub                  hd, 2
     jg .hv_w4_loop
@@ -1067,7 +1067,7 @@ cglobal prep_bilin_16bpc, 4, 7, 0, tmp, src, stride, w, h, mxy, stride3
     psubw                m2, m1, m0
     pmulhrsw             m2, m6
     paddw                m2, m0
-    mova        [tmpq+16*0], m2
+    movu        [tmpq+16*0], m2
     movu                 m0, [srcq+strideq*0]
     movu                 m2, [srcq+strideq*0+2]
     pmullw               m0, m3
@@ -1078,7 +1078,7 @@ cglobal prep_bilin_16bpc, 4, 7, 0, tmp, src, stride, w, h, mxy, stride3
     psubw                m2, m0, m1
     pmulhrsw             m2, m6
     paddw                m2, m1
-    mova        [tmpq+16*1], m2
+    movu        [tmpq+16*1], m2
     add                tmpq, 16*2
     sub                  hd, 2
     jg .hv_w8_loop
@@ -1116,7 +1116,7 @@ cglobal prep_bilin_16bpc, 4, 7, 0, tmp, src, stride, w, h, mxy, stride3
     psubw                m2, m1, m0
     pmulhrsw             m2, m6
     paddw                m2, m0
-    mova        [tmpq+wq*0], m2
+    movu        [tmpq+wq*0], m2
     movu                 m0, [srcq+strideq*0]
     movu                 m2, [srcq+strideq*0+2]
     pmullw               m0, m3
@@ -1127,7 +1127,7 @@ cglobal prep_bilin_16bpc, 4, 7, 0, tmp, src, stride, w, h, mxy, stride3
     psubw                m2, m0, m1
     pmulhrsw             m2, m6
     paddw                m2, m1
-    mova        [tmpq+wq*2], m2
+    movu        [tmpq+wq*2], m2
     lea                tmpq, [tmpq+wq*4]
     sub                  hd, 2
     jg .hv_w16_loop
@@ -1252,7 +1252,7 @@ cglobal put_8tap_16bpc, 4, 9, 0, dst, ds, src, ss, w, h, mx, my
     psraw                m3, 8 ; sign-extend
     je .h_w4
 .h_w2:
-    mova                 m2, [base+spel_h_shuf2]
+    movu                 m2, [base+spel_h_shuf2]
     pshufd               m3, m3, q2121
 .h_w2_loop:
     movu                 m0, [srcq+ssq*0]
@@ -1278,8 +1278,8 @@ cglobal put_8tap_16bpc, 4, 9, 0, dst, ds, src, ss, w, h, mx, my
     RET
 .h_w4:
     WIN64_SPILL_XMM       8
-    mova                 m6, [base+spel_h_shufA]
-    mova                 m7, [base+spel_h_shufB]
+    movu                 m6, [base+spel_h_shufA]
+    movu                 m7, [base+spel_h_shufB]
     pshufd               m2, m3, q1111
     pshufd               m3, m3, q2222
 .h_w4_loop:
@@ -1309,8 +1309,8 @@ cglobal put_8tap_16bpc, 4, 9, 0, dst, ds, src, ss, w, h, mx, my
     shr                 mxd, 16
     movq                 m3, [base+subpel_filters+mxq*8]
     movifnidn          dstq, dstmp
-    mova                 m6, [base+spel_h_shufA]
-    mova                 m7, [base+spel_h_shufB]
+    movu                 m6, [base+spel_h_shufA]
+    movu                 m7, [base+spel_h_shufB]
 %if UNIX64
     mov                  wd, wd
 %endif
@@ -1325,10 +1325,10 @@ cglobal put_8tap_16bpc, 4, 9, 0, dst, ds, src, ss, w, h, mx, my
     pshufd               m1, m3, q1111
     pshufd               m2, m3, q2222
     pshufd               m3, m3, q3333
-    mova                 m8, m0
-    mova                 m9, m1
-    mova                m10, m2
-    mova                m11, m3
+    movu                 m8, m0
+    movu                 m9, m1
+    movu                m10, m2
+    movu                m11, m3
 %else
     pshufd               m8, m3, q0000
     pshufd               m9, m3, q1111
@@ -1369,7 +1369,7 @@ cglobal put_8tap_16bpc, 4, 9, 0, dst, ds, src, ss, w, h, mx, my
     pxor                 m1, m1
     pminsw               m0, m5
     pmaxsw               m0, m1
-    mova        [dstq+r6*2], m0
+    movu        [dstq+r6*2], m0
     add                  r6, 8
     jl .h_w8_loop
     add                srcq, ssq
@@ -1403,10 +1403,10 @@ cglobal put_8tap_16bpc, 4, 9, 0, dst, ds, src, ss, w, h, mx, my
     pshufd               m1, m3, q1111
     pshufd               m2, m3, q2222
     pshufd               m3, m3, q3333
-    mova                 m8, m0
-    mova                 m9, m1
-    mova                m10, m2
-    mova                m11, m3
+    movu                 m8, m0
+    movu                 m9, m1
+    movu                m10, m2
+    movu                m11, m3
 %else
     pshufd               m8, m3, q0000
     pshufd               m9, m3, q1111
@@ -1441,10 +1441,10 @@ cglobal put_8tap_16bpc, 4, 9, 0, dst, ds, src, ss, w, h, mx, my
     movd                 m4, [srcq+ssq*1]
     lea                srcq, [srcq+ssq*2]
     pmaddwd              m5, m8, m1  ; a0 b0
-    mova                 m1, m2
+    movu                 m1, m2
     pmaddwd              m2, m9      ; a1 b1
     paddd                m5, m2
-    mova                 m2, m3
+    movu                 m2, m3
     pmaddwd              m3, m10     ; a2 b2
     paddd                m5, m3
     punpckldq            m3, m0, m4  ; 6 7
@@ -1500,20 +1500,20 @@ cglobal put_8tap_16bpc, 4, 9, 0, dst, ds, src, ss, w, h, mx, my
 %if ARCH_X86_32
     jmp .v_w4_loop_start
 .v_w4_loop:
-    mova                 m1, m12
-    mova                 m2, m13
-    mova                 m3, m14
+    movu                 m1, m12
+    movu                 m2, m13
+    movu                 m3, m14
 .v_w4_loop_start:
     pmaddwd              m1, m8      ; a0
     pmaddwd              m2, m8      ; b0
-    mova                m12, m3
-    mova                m13, m4
+    movu                m12, m3
+    movu                m13, m4
     pmaddwd              m3, m9      ; a1
     pmaddwd              m4, m9      ; b1
     paddd                m1, m3
     paddd                m2, m4
-    mova                m14, m5
-    mova                 m4, m6
+    movu                m14, m5
+    movu                 m4, m6
     pmaddwd              m5, m10     ; a2
     pmaddwd              m6, m10     ; b2
     paddd                m1, m5
@@ -1561,14 +1561,14 @@ cglobal put_8tap_16bpc, 4, 9, 0, dst, ds, src, ss, w, h, mx, my
 .v_w4_loop:
     pmaddwd             m12, m8, m1  ; a0
     pmaddwd             m13, m8, m2  ; b0
-    mova                 m1, m3
-    mova                 m2, m4
+    movu                 m1, m3
+    movu                 m2, m4
     pmaddwd              m3, m9      ; a1
     pmaddwd              m4, m9      ; b1
     paddd               m12, m3
     paddd               m13, m4
-    mova                 m3, m5
-    mova                 m4, m6
+    movu                 m3, m5
+    movu                 m4, m6
     pmaddwd              m5, m10     ; a2
     pmaddwd              m6, m10     ; b2
     paddd               m12, m5
@@ -1611,7 +1611,7 @@ cglobal put_8tap_16bpc, 4, 9, 0, dst, ds, src, ss, w, h, mx, my
 %endif
 %if ARCH_X86_32
     movd                 m4, r8m
-    mova                 m6, [base+pd_512]
+    movu                 m6, [base+pd_512]
     pshufb               m4, [base+pw_256]
 %else
 %if WIN64
@@ -1633,11 +1633,11 @@ cglobal put_8tap_16bpc, 4, 9, 0, dst, ds, src, ss, w, h, mx, my
 %if ARCH_X86_32
     mov                dstq, dstmp
     mov                 dsq, dsmp
-    mova                 m5, [base+spel_h_shuf2]
+    movu                 m5, [base+spel_h_shuf2]
     ALLOC_STACK       -16*8
 %else
-    mova                 m6, [base+pd_512]
-    mova                 m9, [base+spel_h_shuf2]
+    movu                 m6, [base+pd_512]
+    movu                 m9, [base+spel_h_shuf2]
 %endif
     pshuflw              m0, m0, q2121
     pxor                 m7, m7
@@ -1657,12 +1657,12 @@ cglobal put_8tap_16bpc, 4, 9, 0, dst, ds, src, ss, w, h, mx, my
     pshufd               m1, m3, q1111
     pshufd               m2, m3, q2222
     pshufd               m3, m3, q3333
-    mova                 m9, m5
-    mova                m11, m0
-    mova                m12, m1
-    mova                m13, m2
-    mova                m14, m3
-    mova                m15, m4
+    movu                 m9, m5
+    movu                m11, m0
+    movu                m12, m1
+    movu                m13, m2
+    movu                m14, m3
+    movu                m15, m4
 %else
     pshufd              m11, m3, q0000
     pshufd              m12, m3, q1111
@@ -1713,10 +1713,10 @@ cglobal put_8tap_16bpc, 4, 9, 0, dst, ds, src, ss, w, h, mx, my
     pmaddwd              m5, m7
     phaddd               m4, m5
     pmaddwd              m5, m11, m1   ; a0 b0
-    mova                 m1, m2
+    movu                 m1, m2
     pmaddwd              m2, m12       ; a1 b1
     paddd                m5, m2
-    mova                 m2, m3
+    movu                 m2, m3
     pmaddwd              m3, m13       ; a2 b2
     paddd                m5, m3
     paddd                m4, m6
@@ -1724,7 +1724,7 @@ cglobal put_8tap_16bpc, 4, 9, 0, dst, ds, src, ss, w, h, mx, my
     packssdw             m0, m4
     pshufd               m3, m0, q2103
     punpckhwd            m3, m0        ; 67 78
-    mova                 m0, m4
+    movu                 m0, m4
     pmaddwd              m4, m14, m3   ; a3 b3
     paddd                m5, m6
     paddd                m5, m4
@@ -1757,15 +1757,15 @@ cglobal put_8tap_16bpc, 4, 9, 0, dst, ds, src, ss, w, h, mx, my
 %endif
     mov                dstq, dstmp
     mov                 dsq, dsmp
-    mova                 m0, [base+spel_h_shufA]
-    mova                 m1, [base+spel_h_shufB]
+    movu                 m0, [base+spel_h_shufA]
+    movu                 m1, [base+spel_h_shufB]
     ALLOC_STACK      -16*15
-    mova                 m8, m0
-    mova                 m9, m1
-    mova                m14, m6
+    movu                 m8, m0
+    movu                 m9, m1
+    movu                m14, m6
 %else
-    mova                 m8, [base+spel_h_shufA]
-    mova                 m9, [base+spel_h_shufB]
+    movu                 m8, [base+spel_h_shufA]
+    movu                 m9, [base+spel_h_shufB]
 %endif
     pxor                 m0, m0
     punpcklbw            m0, m2
@@ -1788,16 +1788,16 @@ cglobal put_8tap_16bpc, 4, 9, 0, dst, ds, src, ss, w, h, mx, my
 %else
     mov               srcmp, srcq
 %endif
-    mova         [tmp+16*5], m4
+    movu         [tmp+16*5], m4
     lea                  wd, [wq+hq-(1<<16)]
     pshufd               m1, m0, q0000
     pshufd               m2, m0, q1111
     pshufd               m5, m0, q2222
     pshufd               m0, m0, q3333
-    mova                m10, m1
-    mova                m11, m2
-    mova                m12, m5
-    mova                m13, m0
+    movu                m10, m1
+    movu                m11, m2
+    movu                m12, m5
+    movu                m13, m0
 %else
 %if WIN64
     %define tmp rsp
@@ -1812,16 +1812,16 @@ cglobal put_8tap_16bpc, 4, 9, 0, dst, ds, src, ss, w, h, mx, my
     pshufd              m11, m0, q1111
     pshufd              m12, m0, q2222
     pshufd              m13, m0, q3333
-    mova         [tmp+16*5], m15
+    movu         [tmp+16*5], m15
 %endif
     pshufd               m0, m3, q0000
     pshufd               m1, m3, q1111
     pshufd               m2, m3, q2222
     pshufd               m3, m3, q3333
-    mova         [tmp+16*1], m0
-    mova         [tmp+16*2], m1
-    mova         [tmp+16*3], m2
-    mova         [tmp+16*4], m3
+    movu         [tmp+16*1], m0
+    movu         [tmp+16*2], m1
+    movu         [tmp+16*3], m2
+    movu         [tmp+16*4], m3
 %macro PUT_8TAP_HV_H 4-5 m14 ; dst/src+0, src+8, tmp, shift, [pd_512]
     pshufb              m%3, m%1, m8 ; 0 1 1 2 2 3 3 4
     pshufb              m%1, m9      ; 2 3 3 4 4 5 5 6
@@ -1839,7 +1839,7 @@ cglobal put_8tap_16bpc, 4, 9, 0, dst, ds, src, ss, w, h, mx, my
 %endmacro
 .hv_w4_loop0:
 %if ARCH_X86_64
-    mova                m14, [pd_512]
+    movu                m14, [pd_512]
 %endif
     movu                 m4, [srcq+ssq*0+0]
     movu                 m1, [srcq+ssq*0+8]
@@ -1877,23 +1877,23 @@ cglobal put_8tap_16bpc, 4, 9, 0, dst, ds, src, ss, w, h, mx, my
 %if ARCH_X86_32
     jmp .hv_w4_loop_start
 .hv_w4_loop:
-    mova                 m1, [tmp+16*6]
-    mova                 m2, m15
+    movu                 m1, [tmp+16*6]
+    movu                 m2, m15
 .hv_w4_loop_start:
-    mova                 m7, [tmp+16*1]
+    movu                 m7, [tmp+16*1]
     pmaddwd              m1, m7      ; a0
     pmaddwd              m2, m7      ; b0
-    mova                 m7, [tmp+16*2]
-    mova         [tmp+16*6], m3
+    movu                 m7, [tmp+16*2]
+    movu         [tmp+16*6], m3
     pmaddwd              m3, m7      ; a1
-    mova                m15, m4
+    movu                m15, m4
     pmaddwd              m4, m7      ; b1
-    mova                 m7, [tmp+16*3]
+    movu                 m7, [tmp+16*3]
     paddd                m1, m3
     paddd                m2, m4
-    mova                 m3, m5
+    movu                 m3, m5
     pmaddwd              m5, m7      ; a2
-    mova                 m4, m6
+    movu                 m4, m6
     pmaddwd              m6, m7      ; b2
     paddd                m1, m5
     paddd                m2, m6
@@ -1902,11 +1902,11 @@ cglobal put_8tap_16bpc, 4, 9, 0, dst, ds, src, ss, w, h, mx, my
     lea                srcq, [srcq+ssq*2]
     PUT_8TAP_HV_H         7, 5, 6, 10
     packssdw             m0, m7      ; 6 7
-    mova         [tmp+16*0], m0
+    movu         [tmp+16*0], m0
     movu                 m0, [srcq+ssq*0+0]
     movu                 m5, [srcq+ssq*0+8]
     PUT_8TAP_HV_H         0, 5, 6, 10
-    mova                 m6, [tmp+16*0]
+    movu                 m6, [tmp+16*0]
     packssdw             m7, m0      ; 7 8
     punpcklwd            m5, m6, m7  ; 67
     punpckhwd            m6, m7      ; 78
@@ -1945,20 +1945,20 @@ cglobal put_8tap_16bpc, 4, 9, 0, dst, ds, src, ss, w, h, mx, my
     sub                  wd, 1<<16
 %else
 .hv_w4_loop:
-    mova                m15, [tmp+16*1]
+    movu                m15, [tmp+16*1]
     pmaddwd             m14, m15, m1 ; a0
     pmaddwd             m15, m2      ; b0
-    mova                 m7, [tmp+16*2]
-    mova                 m1, m3
+    movu                 m7, [tmp+16*2]
+    movu                 m1, m3
     pmaddwd              m3, m7      ; a1
-    mova                 m2, m4
+    movu                 m2, m4
     pmaddwd              m4, m7      ; b1
-    mova                 m7, [tmp+16*3]
+    movu                 m7, [tmp+16*3]
     paddd               m14, m3
     paddd               m15, m4
-    mova                 m3, m5
+    movu                 m3, m5
     pmaddwd              m5, m7      ; a2
-    mova                 m4, m6
+    movu                 m4, m6
     pmaddwd              m6, m7      ; b2
     paddd               m14, m5
     paddd               m15, m6
@@ -1967,11 +1967,11 @@ cglobal put_8tap_16bpc, 4, 9, 0, dst, ds, src, ss, w, h, mx, my
     lea                srcq, [srcq+ssq*2]
     PUT_8TAP_HV_H         7, 5, 6, 10, [pd_512]
     packssdw             m0, m7      ; 6 7
-    mova         [tmp+16*0], m0
+    movu         [tmp+16*0], m0
     movu                 m0, [srcq+ssq*0+0]
     movu                 m5, [srcq+ssq*0+8]
     PUT_8TAP_HV_H         0, 5, 6, 10, [pd_512]
-    mova                 m6, [tmp+16*0]
+    movu                 m6, [tmp+16*0]
     packssdw             m7, m0      ; 7 8
     punpcklwd            m5, m6, m7  ; 67
     punpckhwd            m6, m7      ; 78
@@ -2048,7 +2048,7 @@ cglobal prep_8tap_16bpc, 4, 8, 0, tmp, src, ss, w, h, mx, my
     tzcnt                wd, wd
     mov                 myd, r7m ; bitdepth_max
     movzx                wd, word [base+prep_ssse3_table+wq*2]
-    mova                 m5, [base+pw_8192]
+    movu                 m5, [base+pw_8192]
     shr                 myd, 11
     add                  wq, t2
     movddup              m4, [base+prep_mul+myq*8]
@@ -2069,8 +2069,8 @@ cglobal prep_8tap_16bpc, 4, 8, 0, tmp, src, ss, w, h, mx, my
     jne .h_w8
     movzx               mxd, mxb
     movq                 m0, [base+subpel_filters+mxq*8]
-    mova                 m3, [base+spel_h_shufA]
-    mova                 m4, [base+spel_h_shufB]
+    movu                 m3, [base+spel_h_shufA]
+    movu                 m4, [base+spel_h_shufB]
     movifnidn          tmpq, tmpmp
     sub                srcq, 2
     WIN64_SPILL_XMM       8
@@ -2101,7 +2101,7 @@ cglobal prep_8tap_16bpc, 4, 8, 0, tmp, src, ss, w, h, mx, my
     psrad                m0, 4
     psrad                m1, 4
     packssdw             m0, m1
-    mova             [tmpq], m0
+    movu             [tmpq], m0
     add                tmpq, 16
     sub                  hd, 2
     jg .h_w4_loop
@@ -2110,8 +2110,8 @@ cglobal prep_8tap_16bpc, 4, 8, 0, tmp, src, ss, w, h, mx, my
     WIN64_SPILL_XMM      11
     shr                 mxd, 16
     movq                 m2, [base+subpel_filters+mxq*8]
-    mova                 m4, [base+spel_h_shufA]
-    mova                 m6, [base+spel_h_shufB]
+    movu                 m4, [base+spel_h_shufA]
+    movu                 m6, [base+spel_h_shufB]
     movifnidn          tmpq, r0mp
     add                  wd, wd
     punpcklbw            m2, m2
@@ -2129,9 +2129,9 @@ cglobal prep_8tap_16bpc, 4, 8, 0, tmp, src, ss, w, h, mx, my
     pshufd               m0, m2, q1111
     pshufd               m1, m2, q2222
     pshufd               m2, m2, q3333
-    mova                 m8, m0
-    mova                 m9, m1
-    mova                m10, m2
+    movu                 m8, m0
+    movu                 m9, m1
+    movu                m10, m2
 %else
     pshufd               m8, m2, q1111
     pshufd               m9, m2, q2222
@@ -2168,7 +2168,7 @@ cglobal prep_8tap_16bpc, 4, 8, 0, tmp, src, ss, w, h, mx, my
     psrad                m0, 4
     psrad                m1, 4
     packssdw             m0, m1
-    mova          [tmpq+r6], m0
+    movu          [tmpq+r6], m0
     add                  r6, 16
     jl .h_w8_loop
     add                srcq, ssq
@@ -2203,10 +2203,10 @@ cglobal prep_8tap_16bpc, 4, 8, 0, tmp, src, ss, w, h, mx, my
     pshufd               m1, m3, q1111
     pshufd               m2, m3, q2222
     pshufd               m3, m3, q3333
-    mova                 m8, m0
-    mova                 m9, m1
-    mova                m10, m2
-    mova                m11, m3
+    movu                 m8, m0
+    movu                 m9, m1
+    movu                m10, m2
+    movu                m11, m3
 %else
     pshufd               m8, m3, q0000
     pshufd               m9, m3, q1111
@@ -2244,20 +2244,20 @@ cglobal prep_8tap_16bpc, 4, 8, 0, tmp, src, ss, w, h, mx, my
 %if ARCH_X86_32
     jmp .v_loop_start
 .v_loop:
-    mova                 m1, m12
-    mova                 m2, m13
-    mova                 m3, m14
+    movu                 m1, m12
+    movu                 m2, m13
+    movu                 m3, m14
 .v_loop_start:
     pmaddwd              m1, m8      ; a0
     pmaddwd              m2, m8      ; b0
-    mova                m12, m3
-    mova                m13, m4
+    movu                m12, m3
+    movu                m13, m4
     pmaddwd              m3, m9      ; a1
     pmaddwd              m4, m9      ; b1
     paddd                m1, m3
     paddd                m2, m4
-    mova                m14, m5
-    mova                 m4, m6
+    movu                m14, m5
+    movu                 m4, m6
     pmaddwd              m5, m10     ; a2
     pmaddwd              m6, m10     ; b2
     paddd                m1, m5
@@ -2298,14 +2298,14 @@ cglobal prep_8tap_16bpc, 4, 8, 0, tmp, src, ss, w, h, mx, my
 .v_loop:
     pmaddwd             m12, m8, m1  ; a0
     pmaddwd             m13, m8, m2  ; b0
-    mova                 m1, m3
-    mova                 m2, m4
+    movu                 m1, m3
+    movu                 m2, m4
     pmaddwd              m3, m9      ; a1
     pmaddwd              m4, m9      ; b1
     paddd               m12, m3
     paddd               m13, m4
-    mova                 m3, m5
-    mova                 m4, m6
+    movu                 m3, m5
+    movu                 m4, m6
     pmaddwd              m5, m10     ; a2
     pmaddwd              m6, m10     ; b2
     paddd               m12, m5
@@ -2358,19 +2358,19 @@ cglobal prep_8tap_16bpc, 4, 8, 0, tmp, src, ss, w, h, mx, my
 %if ARCH_X86_32
     mov                 ssq, r2mp
     mov                tmpq, r0mp
-    mova                 m0, [base+spel_h_shufA]
-    mova                 m1, [base+spel_h_shufB]
-    mova                 m4, [base+prep_8tap_2d_rnd]
+    movu                 m0, [base+spel_h_shufA]
+    movu                 m1, [base+spel_h_shufB]
+    movu                 m4, [base+prep_8tap_2d_rnd]
     ALLOC_STACK      -16*14
-    mova                 m8, m0
-    mova                 m9, m1
-    mova                m14, m4
+    movu                 m8, m0
+    movu                 m9, m1
+    movu                m14, m4
 %else
 %if WIN64
     ALLOC_STACK        16*6, 16
 %endif
-    mova                 m8, [base+spel_h_shufA]
-    mova                 m9, [base+spel_h_shufB]
+    movu                 m8, [base+spel_h_shufA]
+    movu                 m9, [base+spel_h_shufB]
 %endif
     pxor                 m0, m0
     punpcklbw            m0, m2
@@ -2396,10 +2396,10 @@ cglobal prep_8tap_16bpc, 4, 8, 0, tmp, src, ss, w, h, mx, my
     pshufd               m2, m0, q1111
     pshufd               m5, m0, q2222
     pshufd               m0, m0, q3333
-    mova                m10, m1
-    mova                m11, m2
-    mova                m12, m5
-    mova                m13, m0
+    movu                m10, m1
+    movu                m11, m2
+    movu                m12, m5
+    movu                m13, m0
 %else
 %if WIN64
     %define             tmp  rsp
@@ -2417,13 +2417,13 @@ cglobal prep_8tap_16bpc, 4, 8, 0, tmp, src, ss, w, h, mx, my
     pshufd               m1, m3, q1111
     pshufd               m2, m3, q2222
     pshufd               m3, m3, q3333
-    mova         [tmp+16*1], m0
-    mova         [tmp+16*2], m1
-    mova         [tmp+16*3], m2
-    mova         [tmp+16*4], m3
+    movu         [tmp+16*1], m0
+    movu         [tmp+16*2], m1
+    movu         [tmp+16*3], m2
+    movu         [tmp+16*4], m3
 .hv_loop0:
 %if ARCH_X86_64
-    mova                m14, [prep_8tap_2d_rnd]
+    movu                m14, [prep_8tap_2d_rnd]
 %endif
     movu                 m4, [srcq+ssq*0+0]
     movu                 m1, [srcq+ssq*0+8]
@@ -2462,25 +2462,25 @@ cglobal prep_8tap_16bpc, 4, 8, 0, tmp, src, ss, w, h, mx, my
 %if ARCH_X86_32
     jmp .hv_loop_start
 .hv_loop:
-    mova                 m1, [tmp+16*5]
-    mova                 m2, m15
+    movu                 m1, [tmp+16*5]
+    movu                 m2, m15
 .hv_loop_start:
-    mova                 m7, [tmp+16*1]
+    movu                 m7, [tmp+16*1]
     pmaddwd              m1, m7      ; a0
     pmaddwd              m2, m7      ; b0
-    mova                 m7, [tmp+16*2]
-    mova         [tmp+16*5], m3
+    movu                 m7, [tmp+16*2]
+    movu         [tmp+16*5], m3
     pmaddwd              m3, m7      ; a1
-    mova                m15, m4
+    movu                m15, m4
     pmaddwd              m4, m7      ; b1
-    mova                 m7, [tmp+16*3]
+    movu                 m7, [tmp+16*3]
     paddd                m1, m14
     paddd                m2, m14
     paddd                m1, m3
     paddd                m2, m4
-    mova                 m3, m5
+    movu                 m3, m5
     pmaddwd              m5, m7      ; a2
-    mova                 m4, m6
+    movu                 m4, m6
     pmaddwd              m6, m7      ; b2
     paddd                m1, m5
     paddd                m2, m6
@@ -2489,11 +2489,11 @@ cglobal prep_8tap_16bpc, 4, 8, 0, tmp, src, ss, w, h, mx, my
     lea                srcq, [srcq+ssq*2]
     PUT_8TAP_HV_H         7, 5, 6, 6
     packssdw             m0, m7      ; 6 7
-    mova         [tmp+16*0], m0
+    movu         [tmp+16*0], m0
     movu                 m0, [srcq+ssq*0+0]
     movu                 m5, [srcq+ssq*0+8]
     PUT_8TAP_HV_H         0, 5, 6, 6
-    mova                 m6, [tmp+16*0]
+    movu                 m6, [tmp+16*0]
     packssdw             m7, m0      ; 7 8
     punpcklwd            m5, m6, m7  ; 67
     punpckhwd            m6, m7      ; 78
@@ -2524,23 +2524,23 @@ cglobal prep_8tap_16bpc, 4, 8, 0, tmp, src, ss, w, h, mx, my
 %endif
 %else
 .hv_loop:
-    mova                m15, [tmp+16*1]
-    mova                 m7, [prep_8tap_2d_rnd]
+    movu                m15, [tmp+16*1]
+    movu                 m7, [prep_8tap_2d_rnd]
     pmaddwd             m14, m15, m1 ; a0
     pmaddwd             m15, m2      ; b0
     paddd               m14, m7
     paddd               m15, m7
-    mova                 m7, [tmp+16*2]
-    mova                 m1, m3
+    movu                 m7, [tmp+16*2]
+    movu                 m1, m3
     pmaddwd              m3, m7      ; a1
-    mova                 m2, m4
+    movu                 m2, m4
     pmaddwd              m4, m7      ; b1
-    mova                 m7, [tmp+16*3]
+    movu                 m7, [tmp+16*3]
     paddd               m14, m3
     paddd               m15, m4
-    mova                 m3, m5
+    movu                 m3, m5
     pmaddwd              m5, m7      ; a2
-    mova                 m4, m6
+    movu                 m4, m6
     pmaddwd              m6, m7      ; b2
     paddd               m14, m5
     paddd               m15, m6
@@ -2549,11 +2549,11 @@ cglobal prep_8tap_16bpc, 4, 8, 0, tmp, src, ss, w, h, mx, my
     lea                srcq, [srcq+ssq*2]
     PUT_8TAP_HV_H         7, 5, 6, 6, [prep_8tap_2d_rnd]
     packssdw             m0, m7      ; 6 7
-    mova         [tmp+16*0], m0
+    movu         [tmp+16*0], m0
     movu                 m0, [srcq+ssq*0+0]
     movu                 m5, [srcq+ssq*0+8]
     PUT_8TAP_HV_H         0, 5, 6, 6, [prep_8tap_2d_rnd]
-    mova                 m6, [tmp+16*0]
+    movu                 m6, [tmp+16*0]
     packssdw             m7, m0      ; 7 8
     punpcklwd            m5, m6, m7  ; 67
     punpckhwd            m6, m7      ; 78
@@ -2685,14 +2685,14 @@ cglobal prep_8tap_16bpc, 4, 8, 0, tmp, src, ss, w, h, mx, my
     REPX   {pmaddwd x, m15}, m5, m6
     phaddd               m7, m5
     phaddd               m2, m6
-    mova                 m5, [esp+0x00]
+    movu                 m5, [esp+0x00]
     movd                 m6, [esp+0x10]
     paddd                m7, m5
     paddd                m2, m5
     psrad                m7, m6
     psrad                m2, m6
     packssdw             m7, m2
-    mova           [stk+%1], m7
+    movu           [stk+%1], m7
  %endmacro
 %endif
 
@@ -2768,7 +2768,7 @@ cglobal prep_8tap_16bpc, 4, 8, 0, tmp, src, ss, w, h, mx, my
     psrad                m4, m12
     packssdw             m0, m4
   %if %2 != 0
-    mova           [stk+%2], m0
+    movu           [stk+%2], m0
   %endif
  %endmacro
 %endif
@@ -2942,14 +2942,14 @@ cglobal prep_8tap_scaled_16bpc, 0, 6, 8, 0x200, tmp, src, ss, w, h, mx, my, dx, 
 %endif
 %if ARCH_X86_64
     shr                 r7d, 11
-    mova                m10, [base+pd_0x3ff]
+    movu                m10, [base+pd_0x3ff]
     movddup             m11, [base+s_8tap_h_rnd+r7*8]
     movd                m12, [base+s_8tap_h_sh+r7*4]
  %if isput
     movddup             m13, [base+put_s_8tap_v_rnd+r7*8]
     movd                 m7, [base+put_s_8tap_v_sh+r7*4]
   %define pxmaxm [rsp]
-    mova             pxmaxm, m15
+    movu             pxmaxm, m15
     punpcklqdq          m12, m7
  %endif
     lea                ss3q, [ssq*3]
@@ -2971,15 +2971,15 @@ cglobal prep_8tap_scaled_16bpc, 0, 6, 8, 0x200, tmp, src, ss, w, h, mx, my, dx, 
   %define stk esp+0x40
     movddup              m5, [base+put_s_8tap_v_rnd+r3*8]
     movd                 m6, [base+put_s_8tap_v_sh+r3*4]
-    mova             pxmaxm, m15
+    movu             pxmaxm, m15
     punpcklqdq           m2, m6
-    mova                m13, m5
+    movu                m13, m5
  %else
   %define m13 [base+pd_m524256]
  %endif
     mov                 ssd, ssm
-    mova                m11, m1
-    mova                m12, m2
+    movu                m11, m1
+    movu                m12, m2
  MCT_8TAP_SCALED_REMAP_REGS_TO_DEFAULT
     mov                  r1, [esp+0x1f4]
     lea                  r0, [ssd*3]
@@ -3022,7 +3022,7 @@ cglobal prep_8tap_scaled_16bpc, 0, 6, 8, 0x200, tmp, src, ss, w, h, mx, my, dx, 
     punpckldq            m9, m8
     paddd               m14, m9 ; mx+dx*[0-1]
  %if ARCH_X86_64
-    mova                 m9, [base+pd_0x4000]
+    movu                 m9, [base+pd_0x4000]
  %endif
     pshufd              m15, m15, q0000
     pand                 m8, m14, m10
@@ -3035,8 +3035,8 @@ cglobal prep_8tap_scaled_16bpc, 0, 6, 8, 0x200, tmp, src, ss, w, h, mx, my, dx, 
  %else
     movd                r3d, m15
  %endif
-    mova                 m5, [base+bdct_lb_q]
-    mova                 m6, [base+spel_s_shuf2]
+    movu                 m5, [base+bdct_lb_q]
+    movu                 m6, [base+spel_s_shuf2]
     movd                m15, [base+subpel_filters+r4*8+2]
  %if ARCH_X86_64
     movd                 m7, [base+subpel_filters+r6*8+2]
@@ -3051,7 +3051,7 @@ cglobal prep_8tap_scaled_16bpc, 0, 6, 8, 0x200, tmp, src, ss, w, h, mx, my, dx, 
     mov                  r3, r3m
     pshufb              m14, m5
     paddb               m14, m6
-    mova              [stk], m14
+    movu              [stk], m14
     SWAP                 m5, m0
     SWAP                 m6, m3
   %define m15 m6
@@ -3097,7 +3097,7 @@ cglobal prep_8tap_scaled_16bpc, 0, 6, 8, 0x200, tmp, src, ss, w, h, mx, my, dx, 
     packssdw             m4, m6 ; 4 5 6 7
     SWAP                 m1, m4
  %else
-    mova         [stk+0x10], m15
+    movu         [stk+0x10], m15
     phaddd               m0, m1
     phaddd               m2, m3
     movu                 m1, [srcq+ssq*0]
@@ -3125,10 +3125,10 @@ cglobal prep_8tap_scaled_16bpc, 0, 6, 8, 0x200, tmp, src, ss, w, h, mx, my, dx, 
  %if ARCH_X86_32
     mov                 myd, mym
     mov                  r0, r0m
-    mova         [stk+0x20], m3
-    mova         [stk+0x30], m0
-    mova         [stk+0x40], m2
-    mova         [stk+0x50], m4
+    movu         [stk+0x20], m3
+    movu         [stk+0x30], m0
+    movu         [stk+0x40], m2
+    movu         [stk+0x50], m4
  %endif
 .w2_loop:
     and                 myd, 0x3ff
@@ -3200,10 +3200,10 @@ cglobal prep_8tap_scaled_16bpc, 0, 6, 8, 0x200, tmp, src, ss, w, h, mx, my, dx, 
  %if ARCH_X86_32
     SWAP                 m3, m5
     SWAP                 m2, m7
-    mova                 m3, [stk+0x20]
-    mova                 m0, [stk+0x30]
-    mova                 m2, [stk+0x40]
-    mova                 m4, [stk+0x50]
+    movu                 m3, [stk+0x20]
+    movu                 m0, [stk+0x30]
+    movu                 m2, [stk+0x40]
+    movu                 m4, [stk+0x50]
  %endif
     jz .w2_loop
  %if ARCH_X86_32
@@ -3226,17 +3226,17 @@ cglobal prep_8tap_scaled_16bpc, 0, 6, 8, 0x200, tmp, src, ss, w, h, mx, my, dx, 
     punpcklqdq           m1, m4, m4         ; 6 7 6 7
     punpcklwd            m4, m1, m5         ; 67 __
  %if ARCH_X86_32
-    mova         [stk+0x20], m3
-    mova         [stk+0x30], m0
-    mova         [stk+0x40], m2
-    mova         [stk+0x50], m4
+    movu         [stk+0x20], m3
+    movu         [stk+0x30], m0
+    movu         [stk+0x40], m2
+    movu         [stk+0x50], m4
  %endif
     jmp .w2_loop
 .w2_skip_line:
     movu                 m6, [srcq+ssq*1]
     lea                srcq, [srcq+ssq*2]
-    mova                 m3, m0             ; 01 12
-    mova                 m0, m2             ; 23 34
+    movu                 m3, m0             ; 01 12
+    movu                 m0, m2             ; 23 34
     pshufb               m5, m14
     pshufb               m6, m14
     pmaddwd              m5, m15
@@ -3250,10 +3250,10 @@ cglobal prep_8tap_scaled_16bpc, 0, 6, 8, 0x200, tmp, src, ss, w, h, mx, my, dx, 
     punpcklwd            m2, m1, m5         ; 45 56
     punpckhwd            m4, m1, m5         ; 67 __
  %if ARCH_X86_32
-    mova         [stk+0x20], m3
-    mova         [stk+0x30], m0
-    mova         [stk+0x40], m2
-    mova         [stk+0x50], m4
+    movu         [stk+0x20], m3
+    movu         [stk+0x30], m0
+    movu         [stk+0x40], m2
+    movu         [stk+0x50], m4
  %endif
     jmp .w2_loop
 %endif
@@ -3261,10 +3261,10 @@ INIT_XMM ssse3
 .w4:
 %if ARCH_X86_64
     mov                 myd, mym
-    mova         [rsp+0x10], m11
-    mova         [rsp+0x20], m12
+    movu         [rsp+0x10], m11
+    movu         [rsp+0x20], m12
  %if isput
-    mova         [rsp+0x30], m13
+    movu         [rsp+0x30], m13
  %endif
     movzx               t0d, t0b
     sub                srcq, 2
@@ -3279,7 +3279,7 @@ INIT_XMM ssse3
 %endif
     pmaddwd              m8, [base+rescale_mul]
 %if ARCH_X86_64
-    mova                 m9, [base+pd_0x4000]
+    movu                 m9, [base+pd_0x4000]
 %else
  %define m9 [base+pd_0x4000]
 %endif
@@ -3296,8 +3296,8 @@ INIT_XMM ssse3
     pshufd               m7, m7, q0321
     movd                r6d, m15
     movd               r13d, m7
-    mova                m10, [base+bdct_lb_q+ 0]
-    mova                m11, [base+bdct_lb_q+16]
+    movu                m10, [base+bdct_lb_q+ 0]
+    movu                m11, [base+bdct_lb_q+16]
     movd                m13, [base+subpel_filters+ r4*8+2]
     movd                 m2, [base+subpel_filters+ r6*8+2]
     movd                m15, [base+subpel_filters+r11*8+2]
@@ -3309,8 +3309,8 @@ INIT_XMM ssse3
     pshufd               m7, m7, q0321
     movd                 rX, m15
     movd                 r5, m7
-    mova                 m5, [base+bdct_lb_q+ 0]
-    mova                 m6, [base+bdct_lb_q+16]
+    movu                 m5, [base+bdct_lb_q+ 0]
+    movu                 m6, [base+bdct_lb_q+16]
     movd                 m1, [base+subpel_filters+r0*8+2]
     movd                 m2, [base+subpel_filters+rX*8+2]
     movd                 m3, [base+subpel_filters+r4*8+2]
@@ -3349,12 +3349,12 @@ INIT_XMM ssse3
     psraw               m13, 8
     pshufb              m12, m14, m10
     pshufb              m14, m11
-    mova                m10, [base+spel_s_shuf2]
+    movu                m10, [base+spel_s_shuf2]
     movd                r4d, m14
     shr                 r4d, 24
 %if ARCH_X86_32
-    mova         [stk+0x20], m13
-    mova         [stk+0x30], m15
+    movu         [stk+0x20], m13
+    movu         [stk+0x30], m15
     pxor                 m2, m2
 %endif
     pshufb               m7, m14, m2
@@ -3378,7 +3378,7 @@ INIT_XMM ssse3
     REPX   {pmaddwd x, m13}, m7, m9, m8, m10
     REPX    {pshufb x, m14}, m1, m2, m3, m4
     REPX   {pmaddwd x, m15}, m1, m2, m3, m4
-    mova                 m5, [rsp+0x10]
+    movu                 m5, [rsp+0x10]
     movd                xm6, [rsp+0x20]
     phaddd               m7, m1
     phaddd               m9, m3
@@ -3421,27 +3421,27 @@ INIT_XMM ssse3
     punpcklwd            m2, m9, m6 ; 45
     punpckhwd            m9, m6     ; 56
     punpcklwd            m3, m10    ; 67
-    mova         [rsp+0x40], m7
-    mova         [rsp+0x50], m8
-    mova         [rsp+0x60], m9
+    movu         [rsp+0x40], m7
+    movu         [rsp+0x50], m8
+    movu         [rsp+0x60], m9
 %else
-    mova         [stk+0x00], m12
-    mova         [stk+0x10], m14
+    movu         [stk+0x00], m12
+    movu         [stk+0x10], m14
     add                  r4, srcq
     MC_4TAP_SCALED_H   0x40 ; 0 1
     MC_4TAP_SCALED_H   0x50 ; 2 3
     MC_4TAP_SCALED_H   0x60 ; 4 5
     MC_4TAP_SCALED_H   0x70 ; 6 7
-    mova                 m4, [stk+0x40]
-    mova                 m5, [stk+0x50]
-    mova                 m6, [stk+0x60]
-    mova                 m7, [stk+0x70]
+    movu                 m4, [stk+0x40]
+    movu                 m5, [stk+0x50]
+    movu                 m6, [stk+0x60]
+    movu                 m7, [stk+0x70]
     mov          [stk+0xc0], r4
     shufps               m1, m4, m5, q1032 ; 1 2
     shufps               m2, m5, m6, q1032 ; 3 4
     shufps               m3, m6, m7, q1032 ; 5 6
     pshufd               m0, m7, q1032     ; 7 _
-    mova         [stk+0xb0], m0
+    movu         [stk+0xb0], m0
     punpcklwd            m0, m4, m1         ; 01
     punpckhwd            m4, m1             ; 12
     punpcklwd            m1, m5, m2         ; 23
@@ -3451,13 +3451,13 @@ INIT_XMM ssse3
     punpcklwd            m3, m7, [stk+0xb0] ; 67
     mov                 myd, mym
     mov                  r0, r0m
-    mova         [stk+0x40], m0 ; 01
-    mova         [stk+0x50], m1 ; 23
-    mova         [stk+0x60], m2 ; 45
-    mova         [stk+0x70], m3 ; 67
-    mova         [stk+0x80], m4 ; 12
-    mova         [stk+0x90], m5 ; 34
-    mova         [stk+0xa0], m6 ; 56
+    movu         [stk+0x40], m0 ; 01
+    movu         [stk+0x50], m1 ; 23
+    movu         [stk+0x60], m2 ; 45
+    movu         [stk+0x70], m3 ; 67
+    movu         [stk+0x80], m4 ; 12
+    movu         [stk+0x90], m5 ; 34
+    movu         [stk+0xa0], m6 ; 56
  %define m12 [stk+0x00]
  %define m14 [stk+0x10]
  %define m13 [stk+0x20]
@@ -3551,18 +3551,18 @@ INIT_XMM ssse3
     add                 myd, dyd
     test                myd, ~0x3ff
     jz .w4_loop
-    mova                 m8, [rsp+0x10]
+    movu                 m8, [rsp+0x10]
     movd                 m9, [rsp+0x20]
     movu                 m4, [srcq]
     movu                 m5, [srcq+r4]
     test                myd, 0x400
     jz .w4_skip_line
-    mova                 m0, [rsp+0x40]
-    mova         [rsp+0x40], m1
-    mova                 m1, [rsp+0x50]
-    mova         [rsp+0x50], m2
-    mova                 m2, [rsp+0x60]
-    mova         [rsp+0x60], m3
+    movu                 m0, [rsp+0x40]
+    movu         [rsp+0x40], m1
+    movu                 m1, [rsp+0x50]
+    movu         [rsp+0x50], m2
+    movu                 m2, [rsp+0x60]
+    movu         [rsp+0x60], m3
     pshufb               m4, m12
     pshufb               m5, m14
     pmaddwd              m4, m13
@@ -3572,14 +3572,14 @@ INIT_XMM ssse3
     psrad                m4, m9
     packssdw             m4, m4
     punpcklwd            m3, m10, m4
-    mova                m10, m4
+    movu                m10, m4
     add                srcq, ssq
     jmp .w4_loop
 .w4_skip_line:
     movu                 m6, [srcq+ssq*1]
     movu                 m7, [srcq+r6]
-    mova                 m0, [rsp+0x50]
-    mova                m11, [rsp+0x60]
+    movu                 m0, [rsp+0x50]
+    movu                m11, [rsp+0x60]
     pshufb               m4, m12
     pshufb               m6, m12
     pshufb               m5, m14
@@ -3588,8 +3588,8 @@ INIT_XMM ssse3
     pmaddwd              m6, m13
     pmaddwd              m5, m15
     pmaddwd              m7, m15
-    mova         [rsp+0x40], m0
-    mova         [rsp+0x50], m11
+    movu         [rsp+0x40], m0
+    movu         [rsp+0x50], m11
     phaddd               m4, m5
     phaddd               m6, m7
     paddd                m4, m8
@@ -3598,11 +3598,11 @@ INIT_XMM ssse3
     psrad                m6, m9
     packssdw             m4, m6
     punpcklwd            m9, m10, m4
-    mova         [rsp+0x60], m9
+    movu         [rsp+0x60], m9
     pshufd              m10, m4, q1032
-    mova                 m0, m1
-    mova                 m1, m2
-    mova                 m2, m3
+    movu                 m0, m1
+    movu                 m1, m2
+    movu                 m2, m3
     punpcklwd            m3, m4, m10
     lea                srcq, [srcq+ssq*2]
     jmp .w4_loop
@@ -3613,10 +3613,10 @@ INIT_XMM ssse3
     add                 myd, dym
     test                myd, ~0x3ff
     jnz .w4_next_line
-    mova                 m0, [stk+0x40]
-    mova                 m1, [stk+0x50]
-    mova                 m2, [stk+0x60]
-    mova                 m3, [stk+0x70]
+    movu                 m0, [stk+0x40]
+    movu                 m1, [stk+0x50]
+    movu                 m2, [stk+0x60]
+    movu                 m3, [stk+0x70]
     jmp .w4_loop
 .w4_next_line:
     mov                  r5, [stk+0xc0]
@@ -3625,18 +3625,18 @@ INIT_XMM ssse3
     test                myd, 0x400
     jz .w4_skip_line
     add          [stk+0xc0], ssq
-    mova                 m0, [stk+0x80]
-    mova                 m3, [stk+0x50]
-    mova         [stk+0x40], m0
-    mova         [stk+0x80], m3
-    mova                 m1, [stk+0x90]
-    mova                 m6, [stk+0x60]
-    mova         [stk+0x50], m1
-    mova         [stk+0x90], m6
-    mova                 m2, [stk+0xa0]
-    mova                 m7, [stk+0x70]
-    mova         [stk+0x60], m2
-    mova         [stk+0xa0], m7
+    movu                 m0, [stk+0x80]
+    movu                 m3, [stk+0x50]
+    movu         [stk+0x40], m0
+    movu         [stk+0x80], m3
+    movu                 m1, [stk+0x90]
+    movu                 m6, [stk+0x60]
+    movu         [stk+0x50], m1
+    movu         [stk+0x90], m6
+    movu                 m2, [stk+0xa0]
+    movu                 m7, [stk+0x70]
+    movu         [stk+0x60], m2
+    movu         [stk+0xa0], m7
     pshufb               m4, m12
     pshufb               m5, m14
     pmaddwd              m4, m13
@@ -3646,8 +3646,8 @@ INIT_XMM ssse3
     psrad                m4, hsh_mem
     packssdw             m4, m4
     punpcklwd            m3, [stk+0xb0], m4
-    mova         [stk+0xb0], m4
-    mova         [stk+0x70], m3
+    movu         [stk+0xb0], m4
+    movu         [stk+0x70], m3
     add                srcq, ssq
     jmp .w4_loop
 .w4_skip_line:
@@ -3655,10 +3655,10 @@ INIT_XMM ssse3
     movu                 m7, [r5  +ssq*1]
     lea                  r5, [r5  +ssq*2]
     mov          [stk+0xc0], r5
-    mova                 m0, [stk+0x50]
-    mova                 m1, [stk+0x60]
-    mova                 m2, [stk+0x70]
-    mova                 m3, [stk+0x90]
+    movu                 m0, [stk+0x50]
+    movu                 m1, [stk+0x60]
+    movu                 m2, [stk+0x70]
+    movu                 m3, [stk+0x90]
     pshufb               m4, m12
     pshufb               m6, m12
     pshufb               m5, m14
@@ -3667,14 +3667,14 @@ INIT_XMM ssse3
     pmaddwd              m6, m13
     pmaddwd              m5, m15
     pmaddwd              m7, m15
-    mova         [stk+0x40], m0
-    mova         [stk+0x50], m1
-    mova         [stk+0x60], m2
-    mova         [stk+0x80], m3
+    movu         [stk+0x40], m0
+    movu         [stk+0x50], m1
+    movu         [stk+0x60], m2
+    movu         [stk+0x80], m3
     phaddd               m4, m5
     phaddd               m6, m7
-    mova                 m5, [stk+0xa0]
-    mova                 m7, [stk+0xb0]
+    movu                 m5, [stk+0xa0]
+    movu                 m7, [stk+0xb0]
     paddd                m4, hrnd_mem
     paddd                m6, hrnd_mem
     psrad                m4, hsh_mem
@@ -3682,11 +3682,11 @@ INIT_XMM ssse3
     packssdw             m4, m6
     punpcklwd            m7, m4
     pshufd               m6, m4, q1032
-    mova         [stk+0x90], m5
-    mova         [stk+0xa0], m7
-    mova         [stk+0xb0], m6
+    movu         [stk+0x90], m5
+    movu         [stk+0xa0], m7
+    movu         [stk+0xb0], m6
     punpcklwd            m3, m4, m6
-    mova         [stk+0x70], m3
+    movu         [stk+0x70], m3
     lea                srcq, [srcq+ssq*2]
     jmp .w4_loop
 %endif
@@ -3718,12 +3718,12 @@ INIT_XMM ssse3
  %ifidn %1, put
     movifnidn           dsm, dsq
  %endif
-    mova         [rsp+0x10], m11
+    movu         [rsp+0x10], m11
  %define hround m11
     shr                 t0d, 16
     movd                m15, t0d
  %if isprep
-    mova                m13, [base+pd_m524256]
+    movu                m13, [base+pd_m524256]
  %endif
 %else
  %define hround [esp+0x00]
@@ -3746,8 +3746,8 @@ INIT_XMM ssse3
     pmaddwd              m8, [base+rescale_mul] ; dx*[0-3]
     pshufd              m15, m15, q0000
     paddd               m14, m8 ; mx+dx*[0-3]
-    mova        [stk+0x100], m7
-    mova        [stk+0x120], m15
+    movu        [stk+0x100], m7
+    movu        [stk+0x120], m15
     mov         [stk+0x0f8], srcq
     mov         [stk+0x130], r0q ; dstq / tmpq
 %if ARCH_X86_64 && UNIX64
@@ -3770,13 +3770,13 @@ INIT_XMM ssse3
     mov                  r5, [stk+0x134]
     mov                  r0, [stk+0x130]
 %endif
-    mova                 m7, [stk+0x100]
-    mova                m14, [stk+0x110]
+    movu                 m7, [stk+0x100]
+    movu                m14, [stk+0x110]
 %if ARCH_X86_64
-    mova                m10, [base+pd_0x3ff]
-    mova                m11, [rsp+0x10]
+    movu                m10, [base+pd_0x3ff]
+    movu                m11, [rsp+0x10]
 %endif
-    mova                m15, [stk+0x120]
+    movu                m15, [stk+0x120]
     mov                srcq, [stk+0x0f8]
 %if ARCH_X86_64
     mov                 r0q, [stk+0x130] ; dstq / tmpq
@@ -3789,13 +3789,13 @@ INIT_XMM ssse3
     paddd               m14, m7
 .hloop:
 %if ARCH_X86_64
-    mova                 m9, [base+pq_0x40000000]
+    movu                 m9, [base+pq_0x40000000]
 %else
  %define m9 [base+pq_0x40000000]
 %endif
     pxor                 m1, m1
     psrld                m2, m14, 10
-    mova              [stk], m2
+    movu              [stk], m2
     pand                 m6, m14, m10
     psrld                m6, 6
     paddd                m5, m15, m6
@@ -3830,7 +3830,7 @@ INIT_XMM ssse3
     paddd               m15, m5
     pxor                 m2, m2
     pcmpeqd              m5, m2
-    mova        [stk+0x110], m14
+    movu        [stk+0x110], m14
     pshufd               m4, m15, q1032
 %if ARCH_X86_64
     movd               r10d, m15
@@ -3887,32 +3887,32 @@ INIT_XMM ssse3
     psraw               m15, 8
     psraw                m3, 8
     psraw                m9, 8
-    mova         [stk+0x10], m0
-    mova         [stk+0x20], m7
-    mova         [stk+0x30], m1
-    mova         [stk+0x40], m8
-    mova         [stk+0x50], m2
-    mova         [stk+0x60], m15
-    mova         [stk+0x70], m3
-    mova         [stk+0x80], m9
+    movu         [stk+0x10], m0
+    movu         [stk+0x20], m7
+    movu         [stk+0x30], m1
+    movu         [stk+0x40], m8
+    movu         [stk+0x50], m2
+    movu         [stk+0x60], m15
+    movu         [stk+0x70], m3
+    movu         [stk+0x80], m9
     MC_8TAP_SCALED_H 1, 2, 3, 4, 5, 6, 9, 10 ; 0
-    mova         [stk+0x90], m1
+    movu         [stk+0x90], m1
     MC_8TAP_SCALED_H 2, 3, 4, 5, 6, 1, 9, 10 ; 1
-    mova         [stk+0xa0], m2
+    movu         [stk+0xa0], m2
     MC_8TAP_SCALED_H 3, 4, 5, 6, 1, 2, 9, 10 ; 2
-    mova         [stk+0xb0], m3
+    movu         [stk+0xb0], m3
     MC_8TAP_SCALED_H 4, 5, 6, 1, 2, 3, 9, 10 ; 3
-    mova         [stk+0xc0], m4
+    movu         [stk+0xc0], m4
     MC_8TAP_SCALED_H 5, 6, 1, 2, 3, 4, 9, 10 ; 4
-    mova         [stk+0xd0], m5
+    movu         [stk+0xd0], m5
     MC_8TAP_SCALED_H 6, 1, 2, 3, 4, 5, 9, 10 ; 5
     MC_8TAP_SCALED_H 7, 1, 2, 3, 4, 5, 9, 10 ; 6
     MC_8TAP_SCALED_H 8, 1, 2, 3, 4, 5, 9, 10 ; 7
-    mova                 m5, [stk+0xd0]
-    mova                 m1, [stk+0x90]
-    mova                 m2, [stk+0xa0]
-    mova                 m3, [stk+0xb0]
-    mova                 m9, [stk+0xc0]
+    movu                 m5, [stk+0xd0]
+    movu                 m1, [stk+0x90]
+    movu                 m2, [stk+0xa0]
+    movu                 m3, [stk+0xb0]
+    movu                 m9, [stk+0xc0]
     mov                 myd, mym
     mov                 dyd, dym
     punpcklwd            m4, m5, m6 ; 45a
@@ -3923,10 +3923,10 @@ INIT_XMM ssse3
     punpckhwd            m1, m2     ; 01b
     punpcklwd            m2, m3, m9 ; 23a
     punpckhwd            m3, m9     ; 23b
-    mova         [stk+0x90], m4
-    mova         [stk+0xa0], m5
-    mova         [stk+0xb0], m6
-    mova         [stk+0xc0], m7
+    movu         [stk+0x90], m4
+    movu         [stk+0xa0], m5
+    movu         [stk+0xb0], m6
+    movu         [stk+0xc0], m7
  %define hround [rsp+0x10]
 .vloop:
     and                 myd, 0x3ff
@@ -3968,21 +3968,21 @@ INIT_XMM ssse3
     pshufd               m4, m4, q0321
     movd                 r4, m15
     movd                 r5, m4
-    mova                m14, [stk+0x110]
+    movu                m14, [stk+0x110]
     movq                 m2, [base+subpel_filters+r0*8]
     movq                 m3, [base+subpel_filters+rX*8]
     movhps               m2, [base+subpel_filters+r4*8]
     movhps               m3, [base+subpel_filters+r5*8]
     psrld               m14, 10
-    mova           [stk+16], m14
+    movu           [stk+16], m14
     mov                  r0, [stk+ 0]
     mov                  rX, [stk+ 4]
     mov                  r4, [stk+ 8]
     mov                  r5, [stk+12]
-    mova         [stk+0x20], m0
-    mova         [stk+0x30], m1
-    mova         [stk+0x40], m2
-    mova         [stk+0x50], m3
+    movu         [stk+0x20], m0
+    movu         [stk+0x30], m1
+    movu         [stk+0x40], m2
+    movu         [stk+0x50], m3
     pshufd               m4, m6, q1100
     pshufd               m6, m6, q3322
     pshufd               m7, m5, q1100
@@ -4015,14 +4015,14 @@ INIT_XMM ssse3
     psraw                m2, 8
     psraw                m7, 8
     psraw                m3, 8
-    mova        [stk+0x0a0], m4
-    mova        [stk+0x0b0], m0
-    mova        [stk+0x0c0], m5
-    mova        [stk+0x0d0], m1
-    mova        [stk+0x140], m6
-    mova        [stk+0x150], m2
-    mova        [stk+0x160], m7
-    mova        [stk+0x170], m3
+    movu        [stk+0x0a0], m4
+    movu        [stk+0x0b0], m0
+    movu        [stk+0x0c0], m5
+    movu        [stk+0x0d0], m1
+    movu        [stk+0x140], m6
+    movu        [stk+0x150], m2
+    movu        [stk+0x160], m7
+    movu        [stk+0x170], m3
     MC_8TAP_SCALED_H   0xa0, 0x20, 0 ; 0
     MC_8TAP_SCALED_H   0xa0, 0x30    ; 1
     MC_8TAP_SCALED_H   0xa0, 0x40    ; 2
@@ -4031,31 +4031,31 @@ INIT_XMM ssse3
     MC_8TAP_SCALED_H   0xa0, 0x70    ; 5
     MC_8TAP_SCALED_H   0xa0, 0x80    ; 6
     MC_8TAP_SCALED_H   0xa0, 0x90    ; 7
-    mova                 m5, [stk+0x60]
-    mova                 m6, [stk+0x70]
-    mova                 m7, [stk+0x80]
-    mova                 m0, [stk+0x90]
+    movu                 m5, [stk+0x60]
+    movu                 m6, [stk+0x70]
+    movu                 m7, [stk+0x80]
+    movu                 m0, [stk+0x90]
     mov                 myd, mym
     punpcklwd            m4, m5, m6      ; 45a
     punpckhwd            m5, m6          ; 45b
     punpcklwd            m6, m7, m0      ; 67a
     punpckhwd            m7, m0          ; 67b
-    mova         [stk+0x60], m4
-    mova         [stk+0x70], m5
-    mova         [stk+0x80], m6
-    mova         [stk+0x90], m7
-    mova                 m1, [stk+0x20]
-    mova                 m2, [stk+0x30]
-    mova                 m3, [stk+0x40]
-    mova                 m4, [stk+0x50]
+    movu         [stk+0x60], m4
+    movu         [stk+0x70], m5
+    movu         [stk+0x80], m6
+    movu         [stk+0x90], m7
+    movu                 m1, [stk+0x20]
+    movu                 m2, [stk+0x30]
+    movu                 m3, [stk+0x40]
+    movu                 m4, [stk+0x50]
     punpcklwd            m0, m1, m2      ; 01a
     punpckhwd            m1, m2          ; 01b
     punpcklwd            m2, m3, m4      ; 23a
     punpckhwd            m3, m4          ; 23b
-    mova         [stk+0x20], m0
-    mova         [stk+0x30], m1
-    mova         [stk+0x40], m2
-    mova         [stk+0x50], m3
+    movu         [stk+0x20], m0
+    movu         [stk+0x30], m1
+    movu         [stk+0x40], m2
+    movu         [stk+0x50], m3
 .vloop:
     mov                  r0, r0m
     mov                  r5, [esp+0x1f4]
@@ -4103,13 +4103,13 @@ INIT_XMM ssse3
     pxor                 m7, m7
     pmaxsw               m4, m7
     pminsw               m4, pxmaxm
-    mova             [dstq], m4
+    movu             [dstq], m4
     add                dstq, dsm
 %else
     psrad                m4, 6
     psrad                m5, 6
     packssdw             m4, m5
-    mova             [tmpq], m4
+    movu             [tmpq], m4
     add                tmpq, tmp_stridem
 %endif
     dec                  hd
@@ -4125,7 +4125,7 @@ INIT_XMM ssse3
     mov                 r7d, [stk+ 8]
     mov                 r9d, [stk+12]
     jz .skip_line
-    mova                m14, [base+unpckw]
+    movu                m14, [base+unpckw]
     movu                 m8, [srcq+r10*2]
     movu                 m9, [srcq+r11*2]
     movu                m10, [srcq+r13*2]
@@ -4152,7 +4152,7 @@ INIT_XMM ssse3
     pmaddwd              m7, [stk+0x40]
     phaddd               m8, m9
     phaddd              m10, m11
-    mova                m11, hround
+    movu                m11, hround
     phaddd               m4, m5
     phaddd               m6, m7
     phaddd               m8, m10
@@ -4175,28 +4175,28 @@ INIT_XMM ssse3
     punpcklwd            m7, m4 ; 78a
     punpckhqdq           m4, m4
     punpcklwd            m8, m4 ; 78b
-    mova         [stk+0x90], m5
-    mova         [stk+0xa0], m6
-    mova         [stk+0xb0], m7
-    mova         [stk+0xc0], m8
+    movu         [stk+0x90], m5
+    movu         [stk+0xa0], m6
+    movu         [stk+0xb0], m7
+    movu         [stk+0xc0], m8
     jmp .vloop
 .skip_line:
     MC_8TAP_SCALED_H 4, 8, 5, 6, 7, 9, 10, 11
     MC_8TAP_SCALED_H 8, 5, 6, 7, 9, 0, 10, 11
     mov                 myd, [stk+0x140]
     mov                 dyd, dym
-    mova                 m0, m2         ; 01a
-    mova                 m1, m3         ; 01b
-    mova                 m2, [stk+0x90] ; 23a
-    mova                 m3, [stk+0xa0] ; 23b
-    mova                 m5, [stk+0xb0] ; 45a
-    mova                 m6, [stk+0xc0] ; 45b
+    movu                 m0, m2         ; 01a
+    movu                 m1, m3         ; 01b
+    movu                 m2, [stk+0x90] ; 23a
+    movu                 m3, [stk+0xa0] ; 23b
+    movu                 m5, [stk+0xb0] ; 45a
+    movu                 m6, [stk+0xc0] ; 45b
     punpcklwd            m7, m4, m8     ; 67a
     punpckhwd            m4, m8         ; 67b
-    mova         [stk+0x90], m5
-    mova         [stk+0xa0], m6
-    mova         [stk+0xb0], m7
-    mova         [stk+0xc0], m4
+    movu         [stk+0x90], m5
+    movu         [stk+0xa0], m6
+    movu         [stk+0xb0], m7
+    movu         [stk+0xc0], m4
 %else
     mov                 r0m, r0
     mov                 myd, mym
@@ -4205,10 +4205,10 @@ INIT_XMM ssse3
     test                myd, ~0x3ff
     mov                 mym, myd
     jnz .next_line
-    mova                 m0, [stk+0x20]
-    mova                 m1, [stk+0x30]
-    mova                 m2, [stk+0x40]
-    mova                 m3, [stk+0x50]
+    movu                 m0, [stk+0x20]
+    movu                 m1, [stk+0x30]
+    movu                 m2, [stk+0x40]
+    movu                 m3, [stk+0x50]
     jmp .vloop
 .next_line:
     test                myd, 0x400
@@ -4218,7 +4218,7 @@ INIT_XMM ssse3
     mov                  r5, [stk+12]
     jz .skip_line
     MC_8TAP_SCALED_H 0xa0, 0xe0, 0 ; 8
-    mova                 m7, [base+unpckw]
+    movu                 m7, [base+unpckw]
     pshufd               m4, m7, q1032
     pshufb               m0, [stk+0x20], m7 ; 0a 1a
     pshufb               m1, [stk+0x30], m7 ; 0b 1b
@@ -4231,43 +4231,43 @@ INIT_XMM ssse3
     punpckhwd            m1, m3 ; 12b
     punpcklwd            m2, m5 ; 34a
     punpcklwd            m3, m6 ; 34b
-    mova         [stk+0x20], m0
-    mova         [stk+0x30], m1
-    mova         [stk+0x40], m2
-    mova         [stk+0x50], m3
+    movu         [stk+0x20], m0
+    movu         [stk+0x30], m1
+    movu         [stk+0x40], m2
+    movu         [stk+0x50], m3
     punpckhwd            m5, m7 ; 56a
-    mova         [stk+0x60], m5
+    movu         [stk+0x60], m5
     pshufb               m5, [stk+0x90], m4 ; 7b 6b
     punpcklwd            m7, [stk+0xe0] ; 78a
     punpckhwd            m6, m5 ; 56b
-    mova         [stk+0x70], m6
+    movu         [stk+0x70], m6
     movq                 m6, [stk+0xe8]
-    mova         [stk+0x80], m7
+    movu         [stk+0x80], m7
     punpcklwd            m5, m6
     mov                 myd, mym
-    mova         [stk+0x90], m5
+    movu         [stk+0x90], m5
     jmp .vloop
 .skip_line:
     MC_8TAP_SCALED_H 0xa0, 0xe0, 0 ; 8
     MC_8TAP_SCALED_H 0xa0, 0       ; 9
-    mova                 m7, [stk+0xe0]
-    mova                 m2, [stk+0x60] ; 23a
-    mova                 m3, [stk+0x70] ; 23b
-    mova                 m4, [stk+0x80] ; 45a
-    mova                 m5, [stk+0x90] ; 45b
+    movu                 m7, [stk+0xe0]
+    movu                 m2, [stk+0x60] ; 23a
+    movu                 m3, [stk+0x70] ; 23b
+    movu                 m4, [stk+0x80] ; 45a
+    movu                 m5, [stk+0x90] ; 45b
     punpcklwd            m6, m7, m0     ; 67a
     punpckhwd            m7, m0         ; 67b
-    mova                 m0, [stk+0x40] ; 01a
-    mova                 m1, [stk+0x50] ; 01b
+    movu                 m0, [stk+0x40] ; 01a
+    movu                 m1, [stk+0x50] ; 01b
     mov                 myd, mym
-    mova         [stk+0x40], m2
-    mova         [stk+0x50], m3
-    mova         [stk+0x60], m4
-    mova         [stk+0x70], m5
-    mova         [stk+0x80], m6
-    mova         [stk+0x90], m7
-    mova         [stk+0x20], m0
-    mova         [stk+0x30], m1
+    movu         [stk+0x40], m2
+    movu         [stk+0x50], m3
+    movu         [stk+0x60], m4
+    movu         [stk+0x70], m5
+    movu         [stk+0x80], m6
+    movu         [stk+0x90], m7
+    movu         [stk+0x20], m0
+    movu         [stk+0x30], m1
 %endif
     jmp .vloop
 INIT_XMM ssse3
@@ -4299,7 +4299,7 @@ INIT_XMM ssse3
     punpckldq            m9, m8
     paddd               m14, m9 ; mx+dx*[0-1]
  %if ARCH_X86_64
-    mova                 m9, [base+pd_0x4000]
+    movu                 m9, [base+pd_0x4000]
  %endif
     pshufd              m15, m15, q0000
     pand                 m8, m14, m10
@@ -4312,8 +4312,8 @@ INIT_XMM ssse3
  %else
     movd                r3d, m15
  %endif
-    mova                 m5, [base+bdct_lb_q]
-    mova                 m6, [base+spel_s_shuf2]
+    movu                 m5, [base+bdct_lb_q]
+    movu                 m6, [base+spel_s_shuf2]
     movd                m15, [base+subpel_filters+r4*8+2]
  %if ARCH_X86_64
     movd                 m7, [base+subpel_filters+r6*8+2]
@@ -4328,7 +4328,7 @@ INIT_XMM ssse3
     mov                  r3, r3m
     pshufb              m14, m5
     paddb               m14, m6
-    mova              [stk], m14
+    movu              [stk], m14
     SWAP                 m5, m0
     SWAP                 m6, m3
   %define m15 m6
@@ -4388,7 +4388,7 @@ INIT_XMM ssse3
     SWAP                 m1, m4
     movq                m10, r4
  %else
-    mova         [stk+0x10], m15
+    movu         [stk+0x10], m15
     phaddd               m0, m1
     phaddd               m2, m3
     movu                 m1, [srcq+ssq*0]
@@ -4419,10 +4419,10 @@ INIT_XMM ssse3
     pshufd               m9, m10, q2222
     pshufd              m10, m10, q3333
  %if ARCH_X86_32
-    mova         [stk+0x50], m7
-    mova         [stk+0x60], m8
-    mova         [stk+0x70], m9
-    mova         [stk+0x80], m10
+    movu         [stk+0x50], m7
+    movu         [stk+0x60], m8
+    movu         [stk+0x70], m9
+    movu         [stk+0x80], m10
   %define m7  [stk+0x50]
   %define m8  [stk+0x60]
   %define m9  [stk+0x70]
@@ -4441,7 +4441,7 @@ INIT_XMM ssse3
     movu                 m6, [srcq+ssq*1]
     lea                srcq, [srcq+ssq*2]
     pmaddwd              m5, m3, m7
-    mova                 m3, m0
+    movu                 m3, m0
     pmaddwd              m0, m8
     pshufb               m1, m14
     pshufb               m6, m14
@@ -4452,7 +4452,7 @@ INIT_XMM ssse3
     psrad                m1, m12
     packssdw             m1, m1
     paddd                m5, m0
-    mova                 m0, m2
+    movu                 m0, m2
     pmaddwd              m2, m9
     paddd                m5, m2
     palignr              m2, m1, m4, 12
@@ -4461,7 +4461,7 @@ INIT_XMM ssse3
     paddd                m5, m13
     paddd                m5, m4
     pxor                 m6, m6
-    mova                 m4, m1
+    movu                 m4, m1
     pshufd               m1, m12, q1032
     psrad                m5, m1
     packssdw             m5, m5
@@ -4479,10 +4479,10 @@ INIT_XMM ssse3
 .dy1_w4:
 %if ARCH_X86_64
     mov                 myd, mym
-    mova         [rsp+0x10], m11
-    mova         [rsp+0x20], m12
+    movu         [rsp+0x10], m11
+    movu         [rsp+0x20], m12
  %if isput
-    mova         [rsp+0x30], m13
+    movu         [rsp+0x30], m13
   %define vrnd_mem [rsp+0x30]
   %define stk rsp+0x40
  %else
@@ -4507,7 +4507,7 @@ INIT_XMM ssse3
 %endif
     pmaddwd              m8, [base+rescale_mul]
 %if ARCH_X86_64
-    mova                 m9, [base+pd_0x4000]
+    movu                 m9, [base+pd_0x4000]
 %endif
     pshufd              m15, m15, q0000
     paddd               m14, m8 ; mx+dx*[0-3]
@@ -4522,8 +4522,8 @@ INIT_XMM ssse3
     pshufd               m7, m7, q0321
     movd                r6d, m15
     movd               r13d, m7
-    mova                m10, [base+bdct_lb_q+ 0]
-    mova                m11, [base+bdct_lb_q+16]
+    movu                m10, [base+bdct_lb_q+ 0]
+    movu                m11, [base+bdct_lb_q+16]
     movd                m13, [base+subpel_filters+ r4*8+2]
     movd                 m2, [base+subpel_filters+ r6*8+2]
     movd                m15, [base+subpel_filters+r11*8+2]
@@ -4535,8 +4535,8 @@ INIT_XMM ssse3
     pshufd               m7, m7, q0321
     movd                 rX, m15
     movd                 r5, m7
-    mova                 m5, [base+bdct_lb_q+ 0]
-    mova                 m6, [base+bdct_lb_q+16]
+    movu                 m5, [base+bdct_lb_q+ 0]
+    movu                 m6, [base+bdct_lb_q+16]
     movd                 m1, [base+subpel_filters+r0*8+2]
     movd                 m2, [base+subpel_filters+rX*8+2]
     movd                 m3, [base+subpel_filters+r4*8+2]
@@ -4577,12 +4577,12 @@ INIT_XMM ssse3
     psraw               m13, 8
     pshufb              m12, m14, m10
     pshufb              m14, m11
-    mova                m10, [base+spel_s_shuf2]
+    movu                m10, [base+spel_s_shuf2]
     movd                r4d, m14
     shr                 r4d, 24
 %if ARCH_X86_32
-    mova         [stk+0x40], m13
-    mova         [stk+0x50], m15
+    movu         [stk+0x40], m13
+    movu         [stk+0x50], m15
     pxor                 m2, m2
 %endif
     pshufb               m7, m14, m2
@@ -4606,7 +4606,7 @@ INIT_XMM ssse3
     REPX   {pmaddwd x, m13}, m7, m9, m8, m10
     REPX    {pshufb x, m14}, m1, m3, m2, m4
     REPX   {pmaddwd x, m15}, m1, m3, m2, m4
-    mova                 m5, [rsp+0x10]
+    movu                 m5, [rsp+0x10]
     movd                xm6, [rsp+0x20]
     phaddd               m7, m1
     phaddd               m9, m3
@@ -4649,11 +4649,11 @@ INIT_XMM ssse3
     punpcklwd            m2, m9, m6 ; 45
     punpckhwd            m9, m6     ; 56
     movq                m10, r13
-    mova         [stk+0x00], m1
-    mova         [stk+0x10], m8
-    mova         [stk+0x20], m2
-    mova         [stk+0x30], m9
-    mova         [stk+0x40], m3
+    movu         [stk+0x00], m1
+    movu         [stk+0x10], m8
+    movu         [stk+0x20], m2
+    movu         [stk+0x30], m9
+    movu         [stk+0x40], m3
  %define hrnd_mem [rsp+0x10]
  %define hsh_mem  [rsp+0x20]
  %define vsh_mem  [rsp+0x28]
@@ -4663,8 +4663,8 @@ INIT_XMM ssse3
   %define vrnd_mem [base+pd_m524256]
  %endif
 %else
-    mova         [stk+0x20], m12
-    mova         [stk+0x30], m14
+    movu         [stk+0x20], m12
+    movu         [stk+0x30], m14
     add                  r4, srcq
     MC_4TAP_SCALED_H   0x60 ; 0 1
     MC_4TAP_SCALED_H   0x70 ; 2 3
@@ -4682,9 +4682,9 @@ INIT_XMM ssse3
     paddd                m7, [esp+0x00]
     psrad                m7, [esp+0x10]
     packssdw             m7, m7 ; 6 6
-    mova                 m4, [stk+0x60]
-    mova                 m5, [stk+0x70]
-    mova                 m6, [stk+0x80]
+    movu                 m4, [stk+0x60]
+    movu                 m5, [stk+0x70]
+    movu                 m6, [stk+0x80]
     mov                 myd, mym
     mov                  rX, [esp+0x1f4]
     xor                  r5, r5
@@ -4697,7 +4697,7 @@ INIT_XMM ssse3
     shufps               m1, m4, m5, q1032 ; 1 2
     shufps               m2, m5, m6, q1032 ; 3 4
     shufps               m3, m6, m7, q1032 ; 5 6
-    mova         [stk+0xa0], m7
+    movu         [stk+0xa0], m7
     punpcklwd            m0, m4, m1         ; 01
     punpckhwd            m4, m1             ; 12
     punpcklwd            m1, m5, m2         ; 23
@@ -4711,11 +4711,11 @@ INIT_XMM ssse3
     mov                  r1, r1m
  %endif
     mov                  r4, [stk+0xb0]
-    mova         [stk+0xc0], m4 ; 12
-    mova         [stk+0x60], m1 ; 23
-    mova         [stk+0x70], m2 ; 45
-    mova         [stk+0x80], m5 ; 34
-    mova         [stk+0x90], m6 ; 56
+    movu         [stk+0xc0], m4 ; 12
+    movu         [stk+0x60], m1 ; 23
+    movu         [stk+0x70], m2 ; 45
+    movu         [stk+0x80], m5 ; 34
+    movu         [stk+0x90], m6 ; 56
  %define m12 [stk+0x20]
  %define m14 [stk+0x30]
  %define m13 [stk+0x40]
@@ -4742,16 +4742,16 @@ INIT_XMM ssse3
  %xdefine m9  m6
  %xdefine m11 m5
  %xdefine m6  m4
-    mova         [stk+0x100], m3
-    mova         [stk+0x110], m4
-    mova         [stk+0x120], m5
-    mova         [stk+0x130], m10
+    movu         [stk+0x100], m3
+    movu         [stk+0x110], m4
+    movu         [stk+0x120], m5
+    movu         [stk+0x130], m10
  %define m3  [stk+0x100]
  %define m4  [stk+0x110]
  %define m5  [stk+0x120]
  %define m10 [stk+0x130]
-    mova                 m7, [stk+0xc0]
-    mova                 m8, [stk+0x80]
+    movu                 m7, [stk+0xc0]
+    movu                 m8, [stk+0x80]
 %endif
 .dy1_w4_loop:
     movu                m11, [srcq+ssq*0]
@@ -4792,12 +4792,12 @@ INIT_XMM ssse3
     packssdw            m11, m6                     ; 7 8
 %if ARCH_X86_64
     shufps               m9, [stk+0x40], m11, q1032 ; 6 7
-    mova                 m0, [stk+0x00]
-    mova         [stk+0x40], m11
+    movu                 m0, [stk+0x00]
+    movu         [stk+0x40], m11
 %else
     shufps               m9, [stk+0xa0], m11, q1032 ; 6 7
-    mova                 m0, [stk+0x60]
-    mova         [stk+0xa0], m11
+    movu                 m0, [stk+0x60]
+    movu         [stk+0xa0], m11
 %endif
     punpcklwd            m2, m9, m11 ; 67
     punpckhwd            m9, m11     ; 78
@@ -4811,9 +4811,9 @@ INIT_XMM ssse3
     paddd                m1, m6
     paddd                m8, m7
 %if ARCH_X86_64
-    mova                 m7, [stk+0x10]
+    movu                 m7, [stk+0x10]
 %else
-    mova                 m7, [stk+0x80]
+    movu                 m7, [stk+0x80]
 %endif
 %if isput
     psrad                m1, m11
@@ -4824,9 +4824,9 @@ INIT_XMM ssse3
 %endif
     packssdw             m1, m8
 %if ARCH_X86_64
-    mova                 m8, [stk+0x30]
+    movu                 m8, [stk+0x30]
 %else
-    mova                 m8, [stk+0x90]
+    movu                 m8, [stk+0x90]
 %endif
 %if isput
     pxor                 m6, m6
@@ -4836,21 +4836,21 @@ INIT_XMM ssse3
     movhps     [dstq+dsq*1], m1
     lea                dstq, [dstq+dsq*2]
 %else
-    mova             [tmpq], m1
+    movu             [tmpq], m1
     add                tmpq, 16
 %endif
 %if ARCH_X86_64
-    mova                 m1, [stk+0x20]
-    mova         [stk+0x10], m8
-    mova         [stk+0x00], m1
-    mova         [stk+0x20], m2
-    mova         [stk+0x30], m9
+    movu                 m1, [stk+0x20]
+    movu         [stk+0x10], m8
+    movu         [stk+0x00], m1
+    movu         [stk+0x20], m2
+    movu         [stk+0x30], m9
 %else
-    mova                 m1, [stk+0x70]
-    mova         [stk+0x80], m8
-    mova         [stk+0x60], m1
-    mova         [stk+0x70], m2
-    mova         [stk+0x90], m9
+    movu                 m1, [stk+0x70]
+    movu         [stk+0x80], m8
+    movu         [stk+0x60], m1
+    movu         [stk+0x70], m2
+    movu         [stk+0x90], m9
 %endif
     sub                  hd, 2
     jg .dy1_w4_loop
@@ -4881,13 +4881,13 @@ INIT_XMM ssse3
  %ifidn %1, put
     movifnidn           dsm, dsq
  %endif
-    mova         [rsp+0x10], m11
-    mova         [rsp+0x20], m12
+    movu         [rsp+0x10], m11
+    movu         [rsp+0x20], m12
  %define hround m11
  %if isput
-    mova         [rsp+0x30], m13
+    movu         [rsp+0x30], m13
  %else
-    mova                m13, [base+pd_m524256]
+    movu                m13, [base+pd_m524256]
  %endif
     shr                 t0d, 16
     shr                 myd, 6
@@ -4933,8 +4933,8 @@ INIT_XMM ssse3
 %endif
     punpcklbw            m3, m3
     psraw                m3, 8
-    mova        [stk+0x100], m7
-    mova        [stk+0x120], m15
+    movu        [stk+0x100], m7
+    movu        [stk+0x120], m15
     mov         [stk+0x0f8], srcq
     mov         [stk+0x130], r0q ; dstq / tmpq
     pshufd               m0, m3, q0000
@@ -4942,18 +4942,18 @@ INIT_XMM ssse3
     pshufd               m2, m3, q2222
     pshufd               m3, m3, q3333
 %if ARCH_X86_64
-    mova        [stk+0x140], m0
-    mova        [stk+0x150], m1
-    mova        [stk+0x160], m2
-    mova        [stk+0x170], m3
+    movu        [stk+0x140], m0
+    movu        [stk+0x150], m1
+    movu        [stk+0x160], m2
+    movu        [stk+0x170], m3
  %if UNIX64
     mov                  hm, hd
  %endif
 %else
-    mova        [stk+0x180], m0
-    mova        [stk+0x190], m1
-    mova        [stk+0x1a0], m2
-    mova        [stk+0x1b0], m3
+    movu        [stk+0x180], m0
+    movu        [stk+0x190], m1
+    movu        [stk+0x1a0], m2
+    movu        [stk+0x1b0], m3
     SWAP                 m5, m3
     mov                  r5, hm
     mov         [stk+0x134], r5
@@ -4970,13 +4970,13 @@ INIT_XMM ssse3
     mov                  r5, [stk+0x134]
     mov                  r0, [stk+0x130]
 %endif
-    mova                 m7, [stk+0x100]
-    mova                m14, [stk+0x110]
+    movu                 m7, [stk+0x100]
+    movu                m14, [stk+0x110]
 %if ARCH_X86_64
-    mova                m10, [base+pd_0x3ff]
-    mova                m11, [rsp+0x10]
+    movu                m10, [base+pd_0x3ff]
+    movu                m11, [rsp+0x10]
 %endif
-    mova                m15, [stk+0x120]
+    movu                m15, [stk+0x120]
     mov                srcq, [stk+0x0f8]
 %if ARCH_X86_64
     mov                 r0q, [stk+0x130] ; dstq / tmpq
@@ -4988,13 +4988,13 @@ INIT_XMM ssse3
     paddd               m14, m7
 .dy1_hloop:
 %if ARCH_X86_64
-    mova                 m9, [base+pq_0x40000000]
+    movu                 m9, [base+pq_0x40000000]
 %else
  %define m9 [base+pq_0x40000000]
 %endif
     pxor                 m1, m1
     psrld                m2, m14, 10
-    mova              [stk], m2
+    movu              [stk], m2
     pand                 m6, m14, m10
     psrld                m6, 6
     paddd                m5, m15, m6
@@ -5029,7 +5029,7 @@ INIT_XMM ssse3
     paddd               m15, m5
     pxor                 m2, m2
     pcmpeqd              m5, m2
-    mova        [stk+0x110], m14
+    movu        [stk+0x110], m14
     pshufd               m4, m15, q1032
 %if ARCH_X86_64
     movd               r10d, m15
@@ -5086,32 +5086,32 @@ INIT_XMM ssse3
     psraw               m15, 8
     psraw                m3, 8
     psraw                m9, 8
-    mova         [stk+0x10], m0
-    mova         [stk+0x20], m7
-    mova         [stk+0x30], m1
-    mova         [stk+0x40], m8
-    mova         [stk+0x50], m2
-    mova         [stk+0x60], m15
-    mova         [stk+0x70], m3
-    mova         [stk+0x80], m9
+    movu         [stk+0x10], m0
+    movu         [stk+0x20], m7
+    movu         [stk+0x30], m1
+    movu         [stk+0x40], m8
+    movu         [stk+0x50], m2
+    movu         [stk+0x60], m15
+    movu         [stk+0x70], m3
+    movu         [stk+0x80], m9
     MC_8TAP_SCALED_H 1, 2, 3, 4, 5, 6, 9, 10 ; 0
-    mova         [stk+0x90], m1
+    movu         [stk+0x90], m1
     MC_8TAP_SCALED_H 2, 3, 4, 5, 6, 1, 9, 10 ; 1
-    mova         [stk+0xa0], m2
+    movu         [stk+0xa0], m2
     MC_8TAP_SCALED_H 3, 4, 5, 6, 1, 2, 9, 10 ; 2
-    mova         [stk+0xb0], m3
+    movu         [stk+0xb0], m3
     MC_8TAP_SCALED_H 4, 5, 6, 1, 2, 3, 9, 10 ; 3
-    mova         [stk+0xc0], m4
+    movu         [stk+0xc0], m4
     MC_8TAP_SCALED_H 5, 6, 1, 2, 3, 4, 9, 10 ; 4
-    mova         [stk+0xd0], m5
+    movu         [stk+0xd0], m5
     MC_8TAP_SCALED_H 6, 1, 2, 3, 4, 5, 9, 10 ; 5
     MC_8TAP_SCALED_H 7, 1, 2, 3, 4, 5, 9, 10 ; 6
     MC_8TAP_SCALED_H 8, 1, 2, 3, 4, 5, 9, 10 ; 7
-    mova                 m5, [stk+0xd0]
-    mova                 m1, [stk+0x90]
-    mova                 m2, [stk+0xa0]
-    mova                 m3, [stk+0xb0]
-    mova                 m9, [stk+0xc0]
+    movu                 m5, [stk+0xd0]
+    movu                 m1, [stk+0x90]
+    movu                 m2, [stk+0xa0]
+    movu                 m3, [stk+0xb0]
+    movu                 m9, [stk+0xc0]
     punpcklwd            m4, m5, m6 ; 45a
     punpckhwd            m5, m6     ; 45b
     punpcklwd            m6, m7, m8 ; 67a
@@ -5120,14 +5120,14 @@ INIT_XMM ssse3
     punpckhwd            m1, m2     ; 01b
     punpcklwd            m2, m3, m9 ; 23a
     punpckhwd            m3, m9     ; 23b
-    mova                m10, [stk+0x140]
-    mova                m11, [stk+0x150]
-    mova                m14, [stk+0x160]
-    mova                m15, [stk+0x170]
-    mova         [stk+0x90], m4
-    mova         [stk+0xa0], m5
-    mova         [stk+0xb0], m6
-    mova         [stk+0xc0], m7
+    movu                m10, [stk+0x140]
+    movu                m11, [stk+0x150]
+    movu                m14, [stk+0x160]
+    movu                m15, [stk+0x170]
+    movu         [stk+0x90], m4
+    movu         [stk+0xa0], m5
+    movu         [stk+0xb0], m6
+    movu         [stk+0xc0], m7
  %define hround [rsp+0x10]
  %define shift  [rsp+0x20]
  %if isput
@@ -5162,21 +5162,21 @@ INIT_XMM ssse3
     pshufd               m4, m4, q0321
     movd                 r4, m15
     movd                 r5, m4
-    mova                m14, [stk+0x110]
+    movu                m14, [stk+0x110]
     movq                 m2, [base+subpel_filters+r0*8]
     movq                 m3, [base+subpel_filters+rX*8]
     movhps               m2, [base+subpel_filters+r4*8]
     movhps               m3, [base+subpel_filters+r5*8]
     psrld               m14, 10
-    mova           [stk+16], m14
+    movu           [stk+16], m14
     mov                  r0, [stk+ 0]
     mov                  rX, [stk+ 4]
     mov                  r4, [stk+ 8]
     mov                  r5, [stk+12]
-    mova         [stk+0x20], m0
-    mova         [stk+0x30], m1
-    mova         [stk+0x40], m2
-    mova         [stk+0x50], m3
+    movu         [stk+0x20], m0
+    movu         [stk+0x30], m1
+    movu         [stk+0x40], m2
+    movu         [stk+0x50], m3
     pshufd               m4, m6, q1100
     pshufd               m6, m6, q3322
     pshufd               m7, m5, q1100
@@ -5209,14 +5209,14 @@ INIT_XMM ssse3
     psraw                m2, 8
     psraw                m7, 8
     psraw                m3, 8
-    mova        [stk+0x0a0], m4
-    mova        [stk+0x0b0], m0
-    mova        [stk+0x0c0], m5
-    mova        [stk+0x0d0], m1
-    mova        [stk+0x140], m6
-    mova        [stk+0x150], m2
-    mova        [stk+0x160], m7
-    mova        [stk+0x170], m3
+    movu        [stk+0x0a0], m4
+    movu        [stk+0x0b0], m0
+    movu        [stk+0x0c0], m5
+    movu        [stk+0x0d0], m1
+    movu        [stk+0x140], m6
+    movu        [stk+0x150], m2
+    movu        [stk+0x160], m7
+    movu        [stk+0x170], m3
     MC_8TAP_SCALED_H   0xa0, 0x20, 0 ; 0
     MC_8TAP_SCALED_H   0xa0, 0x30    ; 1
     MC_8TAP_SCALED_H   0xa0, 0x40    ; 2
@@ -5225,35 +5225,35 @@ INIT_XMM ssse3
     MC_8TAP_SCALED_H   0xa0, 0x70    ; 5
     MC_8TAP_SCALED_H   0xa0, 0x80    ; 6
     MC_8TAP_SCALED_H   0xa0, 0x90    ; 7
-    mova                 m5, [stk+0x60]
-    mova                 m6, [stk+0x70]
-    mova                 m7, [stk+0x80]
-    mova                 m0, [stk+0x90]
+    movu                 m5, [stk+0x60]
+    movu                 m6, [stk+0x70]
+    movu                 m7, [stk+0x80]
+    movu                 m0, [stk+0x90]
     mov                  r0, r0m
     punpcklwd            m4, m5, m6      ; 45a
     punpckhwd            m5, m6          ; 45b
     punpcklwd            m6, m7, m0      ; 67a
     punpckhwd            m7, m0          ; 67b
-    mova         [stk+0x60], m4
-    mova         [stk+0x70], m5
-    mova         [stk+0x80], m6
-    mova         [stk+0x90], m7
-    mova                 m1, [stk+0x20]
-    mova                 m2, [stk+0x30]
-    mova                 m3, [stk+0x40]
-    mova                 m4, [stk+0x50]
+    movu         [stk+0x60], m4
+    movu         [stk+0x70], m5
+    movu         [stk+0x80], m6
+    movu         [stk+0x90], m7
+    movu                 m1, [stk+0x20]
+    movu                 m2, [stk+0x30]
+    movu                 m3, [stk+0x40]
+    movu                 m4, [stk+0x50]
     punpcklwd            m0, m1, m2      ; 01a
     punpckhwd            m1, m2          ; 01b
     punpcklwd            m2, m3, m4      ; 23a
     punpckhwd            m3, m4          ; 23b
-    mova                 m4, [stk+0x180]
-    mova                 m5, [stk+0x190]
-    mova                 m6, [stk+0x1a0]
-    mova                 m7, [stk+0x1b0]
-    mova         [stk+0x20], m0
-    mova         [stk+0x30], m1
-    mova         [stk+0x40], m2
-    mova         [stk+0x50], m3
+    movu                 m4, [stk+0x180]
+    movu                 m5, [stk+0x190]
+    movu                 m6, [stk+0x1a0]
+    movu                 m7, [stk+0x1b0]
+    movu         [stk+0x20], m0
+    movu         [stk+0x30], m1
+    movu         [stk+0x40], m2
+    movu         [stk+0x50], m3
 .dy1_vloop:
     pmaddwd              m0, m4
     pmaddwd              m1, m4
@@ -5282,13 +5282,13 @@ INIT_XMM ssse3
     pxor                 m7, m7
     pmaxsw               m4, m7
     pminsw               m4, pxmaxm
-    mova             [dstq], m4
+    movu             [dstq], m4
     add                dstq, dsm
 %else
     psrad                m4, 6
     psrad                m5, 6
     packssdw             m4, m5
-    mova             [tmpq], m4
+    movu             [tmpq], m4
     add                tmpq, tmp_stridem
 %endif
     dec                  hd
@@ -5313,8 +5313,8 @@ INIT_XMM ssse3
     pmaddwd              m7, [stk+0x40]
     phaddd               m8, m9
     phaddd              m12, m13
-    mova                 m9, [base+unpckw]
-    mova                m13, hround
+    movu                 m9, [base+unpckw]
+    movu                m13, hround
     phaddd               m4, m5
     phaddd               m6, m7
     phaddd               m8, m12
@@ -5324,7 +5324,7 @@ INIT_XMM ssse3
     pshufb               m1, m9             ; 0b 1b
     pshufb               m2, m5             ; 3a 2a
     pshufb               m3, m5             ; 3b 2b
-    mova                m12, shift
+    movu                m12, shift
     paddd                m4, m13
     paddd                m8, m13
     psrad                m4, m12
@@ -5343,11 +5343,11 @@ INIT_XMM ssse3
     punpcklwd            m8, m4  ; 78a
     punpckhqdq           m4, m4
     punpcklwd           m13, m4  ; 78b
-    mova         [stk+0x90], m6
-    mova         [stk+0xa0], m7
-    mova         [stk+0xb0], m8
-    mova         [stk+0xc0], m13
-    mova                m13, vround
+    movu         [stk+0x90], m6
+    movu         [stk+0xa0], m7
+    movu         [stk+0xb0], m8
+    movu         [stk+0xc0], m13
+    movu                m13, vround
 %else
     mov                 r0m, r0
     mov                  r3, r3m
@@ -5356,7 +5356,7 @@ INIT_XMM ssse3
     mov                  r4, [stk+ 8]
     mov                  r5, [stk+12]
     MC_8TAP_SCALED_H 0xa0, 0xe0, 0 ; 8
-    mova                 m7, [base+unpckw]
+    movu                 m7, [base+unpckw]
     pshufd               m4, m7, q1032
     pshufb               m0, [stk+0x20], m7 ; 0a 1a
     pshufb               m1, [stk+0x30], m7 ; 0b 1b
@@ -5369,24 +5369,24 @@ INIT_XMM ssse3
     punpckhwd            m1, m3 ; 12b
     punpcklwd            m2, m5 ; 34a
     punpcklwd            m3, m6 ; 34b
-    mova         [stk+0x20], m0
-    mova         [stk+0x30], m1
-    mova         [stk+0x40], m2
-    mova         [stk+0x50], m3
+    movu         [stk+0x20], m0
+    movu         [stk+0x30], m1
+    movu         [stk+0x40], m2
+    movu         [stk+0x50], m3
     punpckhwd            m5, m7 ; 56a
-    mova         [stk+0x60], m5
+    movu         [stk+0x60], m5
     pshufb               m5, [stk+0x90], m4 ; 7b 6b
     punpcklwd            m7, [stk+0xe0] ; 78a
-    mova                 m4, [stk+0x180]
+    movu                 m4, [stk+0x180]
     punpckhwd            m6, m5 ; 56b
-    mova         [stk+0x70], m6
+    movu         [stk+0x70], m6
     movq                 m6, [stk+0xe8]
-    mova         [stk+0x80], m7
-    mova                 m7, [stk+0x1b0]
+    movu         [stk+0x80], m7
+    movu                 m7, [stk+0x1b0]
     punpcklwd            m5, m6
-    mova                 m6, [stk+0x1a0]
-    mova         [stk+0x90], m5
-    mova                 m5, [stk+0x190]
+    movu                 m6, [stk+0x1a0]
+    movu         [stk+0x90], m5
+    movu                 m5, [stk+0x190]
     mov                  r0, r0m
 %endif
     jmp .dy1_vloop
@@ -5402,7 +5402,7 @@ INIT_XMM ssse3
 .dy2_w2:
  %if ARCH_X86_64
     mov                 myd, mym
-    mova         [rsp+0x10], m13
+    movu         [rsp+0x10], m13
   %define vrnd_mem [rsp+0x10]
     movzx               t0d, t0b
     sub                srcq, 2
@@ -5424,7 +5424,7 @@ INIT_XMM ssse3
     punpckldq            m9, m8
     paddd               m14, m9 ; mx+dx*[0-1]
  %if ARCH_X86_64
-    mova                 m9, [base+pd_0x4000]
+    movu                 m9, [base+pd_0x4000]
  %endif
     pshufd              m15, m15, q0000
     pand                 m8, m14, m10
@@ -5437,8 +5437,8 @@ INIT_XMM ssse3
  %else
     movd                r3d, m15
  %endif
-    mova                 m5, [base+bdct_lb_q]
-    mova                 m6, [base+spel_s_shuf2]
+    movu                 m5, [base+bdct_lb_q]
+    movu                 m6, [base+spel_s_shuf2]
     movd                m15, [base+subpel_filters+r4*8+2]
  %if ARCH_X86_64
     movd                 m7, [base+subpel_filters+r6*8+2]
@@ -5453,7 +5453,7 @@ INIT_XMM ssse3
     mov                  r3, r3m
     pshufb              m14, m5
     paddb               m14, m6
-    mova              [stk], m14
+    movu              [stk], m14
     SWAP                 m5, m0
     SWAP                 m6, m3
   %define m15 m6
@@ -5512,7 +5512,7 @@ INIT_XMM ssse3
     SWAP                 m2, m4
     movq                m10, r4
  %else
-    mova         [stk+0x10], m15
+    movu         [stk+0x10], m15
     phaddd               m0, m1
     phaddd               m1, m2
     movu                 m2, [srcq+ssq*1]
@@ -5544,10 +5544,10 @@ INIT_XMM ssse3
     pshufd               m9, m10, q2222
     pshufd              m10, m10, q3333
  %if ARCH_X86_32
-    mova         [stk+0x50], m7
-    mova         [stk+0x60], m8
-    mova         [stk+0x70], m9
-    mova         [stk+0x80], m10
+    movu         [stk+0x50], m7
+    movu         [stk+0x60], m8
+    movu         [stk+0x70], m9
+    movu         [stk+0x80], m10
   %xdefine m13 m7
   %define m7  [stk+0x50]
   %define m8  [stk+0x60]
@@ -5559,8 +5559,8 @@ INIT_XMM ssse3
  %if ARCH_X86_32
     mov                  r4, r0m
   %define dstq r4
-    mova         [stk+0x20], m3
-    mova         [stk+0x30], m0
+    movu         [stk+0x20], m3
+    movu         [stk+0x30], m0
  %endif
 .dy2_w2_loop:
     movu                 m4, [srcq+ssq*0]
@@ -5584,8 +5584,8 @@ INIT_XMM ssse3
     pshufd               m4, m4, q3311
     palignr              m3, m0, 12 ; 4 6 6 8
     palignr              m4, m2, 12 ; 5 7 7 9
-    mova                 m0, m3
-    mova                 m2, m4
+    movu                 m0, m3
+    movu                 m2, m4
     punpcklwd            m1, m3, m4
     punpckhwd            m3, m4
     pmaddwd              m6, m1, m9
@@ -5611,10 +5611,10 @@ INIT_XMM ssse3
 .dy2_w4:
 %if ARCH_X86_64
     mov                 myd, mym
-    mova         [rsp+0x10], m11
-    mova         [rsp+0x20], m12
+    movu         [rsp+0x10], m11
+    movu         [rsp+0x20], m12
  %if isput
-    mova         [rsp+0x30], m13
+    movu         [rsp+0x30], m13
   %define vrnd_mem [rsp+0x30]
   %define stk rsp+0x40
  %else
@@ -5639,7 +5639,7 @@ INIT_XMM ssse3
 %endif
     pmaddwd              m8, [base+rescale_mul]
 %if ARCH_X86_64
-    mova                 m9, [base+pd_0x4000]
+    movu                 m9, [base+pd_0x4000]
 %endif
     pshufd              m15, m15, q0000
     paddd               m14, m8 ; mx+dx*[0-3]
@@ -5654,8 +5654,8 @@ INIT_XMM ssse3
     pshufd               m7, m7, q0321
     movd                r6d, m15
     movd               r13d, m7
-    mova                m10, [base+bdct_lb_q+ 0]
-    mova                m11, [base+bdct_lb_q+16]
+    movu                m10, [base+bdct_lb_q+ 0]
+    movu                m11, [base+bdct_lb_q+16]
     movd                m13, [base+subpel_filters+ r4*8+2]
     movd                 m2, [base+subpel_filters+ r6*8+2]
     movd                m15, [base+subpel_filters+r11*8+2]
@@ -5667,8 +5667,8 @@ INIT_XMM ssse3
     pshufd               m7, m7, q0321
     movd                 r3, m15
     movd                 r5, m7
-    mova                 m5, [base+bdct_lb_q+ 0]
-    mova                 m6, [base+bdct_lb_q+16]
+    movu                 m5, [base+bdct_lb_q+ 0]
+    movu                 m6, [base+bdct_lb_q+16]
     movd                 m1, [base+subpel_filters+r1*8+2]
     movd                 m2, [base+subpel_filters+r3*8+2]
     movd                 m3, [base+subpel_filters+r4*8+2]
@@ -5710,12 +5710,12 @@ INIT_XMM ssse3
     psraw               m13, 8
     pshufb              m12, m14, m10
     pshufb              m14, m11
-    mova                m10, [base+spel_s_shuf2]
+    movu                m10, [base+spel_s_shuf2]
     movd                r4d, m14
     shr                 r4d, 24
 %if ARCH_X86_32
-    mova         [stk+0x40], m13
-    mova         [stk+0x50], m15
+    movu         [stk+0x40], m13
+    movu         [stk+0x50], m15
     pxor                 m2, m2
 %endif
     pshufb               m7, m14, m2
@@ -5739,7 +5739,7 @@ INIT_XMM ssse3
     REPX   {pmaddwd x, m13}, m1, m9, m8, m10
     REPX    {pshufb x, m14}, m7, m3, m2, m4
     REPX   {pmaddwd x, m15}, m7, m3, m2, m4
-    mova                 m5, [rsp+0x10]
+    movu                 m5, [rsp+0x10]
     movd                xm6, [rsp+0x20]
     phaddd               m1, m7
     phaddd               m8, m2
@@ -5781,17 +5781,17 @@ INIT_XMM ssse3
   %define vrnd_mem [base+pd_m524256]
  %endif
 %else
-    mova         [stk+0x20], m12
-    mova         [stk+0x30], m14
+    movu         [stk+0x20], m12
+    movu         [stk+0x30], m14
     add                  r4, srcq
     MC_4TAP_SCALED_H   0x60 ; 0 1
     MC_4TAP_SCALED_H   0x70 ; 2 3
     MC_4TAP_SCALED_H   0x80 ; 4 5
     mov          [stk+0xe0], r4
-    mova                 m3, [base+spel_s_shuf8]
-    mova                 m0, [stk+0x60]
-    mova                 m1, [stk+0x70]
-    mova                 m2, [stk+0x80]
+    movu                 m3, [base+spel_s_shuf8]
+    movu                 m0, [stk+0x60]
+    movu                 m1, [stk+0x70]
+    movu                 m2, [stk+0x80]
     mov                 myd, mym
     mov                  rX, [esp+0x1f4]
     xor                  r5, r5
@@ -5839,10 +5839,10 @@ INIT_XMM ssse3
  %xdefine m9  m6
  %xdefine m11 m5
  %xdefine m6  m4
-    mova         [stk+0x100], m3
-    mova         [stk+0x110], m4
-    mova         [stk+0x120], m5
-    mova         [stk+0x130], m10
+    movu         [stk+0x100], m3
+    movu         [stk+0x110], m4
+    movu         [stk+0x120], m5
+    movu         [stk+0x130], m10
  %define m3  [stk+0x100]
  %define m4  [stk+0x110]
  %define m5  [stk+0x120]
@@ -5851,7 +5851,7 @@ INIT_XMM ssse3
 .dy2_w4_loop:
     pmaddwd              m8, m0, m3
     pmaddwd              m9, m1, m3
-    mova                 m0, m2
+    movu                 m0, m2
     pmaddwd              m1, m4
     pmaddwd             m11, m2, m4
     paddd                m8, vrnd_mem
@@ -5914,7 +5914,7 @@ INIT_XMM ssse3
     lea                srcq, [srcq+ssq*4]
     punpcklwd            m1, m6, m7 ; 67
     punpckhwd            m6, m7     ; 89
-    mova                 m2, m6
+    movu                 m2, m6
     pmaddwd             m11, m1, m5
     pmaddwd              m7, m1, m10
     pmaddwd              m6, m10
@@ -5938,7 +5938,7 @@ INIT_XMM ssse3
     psrad                m8, 6
     psrad                m9, 6
     packssdw             m8, m9
-    mova             [tmpq], m8
+    movu             [tmpq], m8
     add                tmpq, 16
 %endif
     sub                  hd, 2
@@ -5970,13 +5970,13 @@ INIT_XMM ssse3
  %ifidn %1, put
     movifnidn           dsm, dsq
  %endif
-    mova         [rsp+0x10], m11
-    mova         [rsp+0x20], m12
+    movu         [rsp+0x10], m11
+    movu         [rsp+0x20], m12
  %define hround m11
  %if isput
-    mova         [rsp+0x30], m13
+    movu         [rsp+0x30], m13
  %else
-    mova                m13, [base+pd_m524256]
+    movu                m13, [base+pd_m524256]
  %endif
     shr                 t0d, 16
     shr                 myd, 6
@@ -6025,8 +6025,8 @@ INIT_XMM ssse3
 %endif
     punpcklbw            m3, m3
     psraw                m3, 8
-    mova        [stk+0x100], m7
-    mova        [stk+0x120], m15
+    movu        [stk+0x100], m7
+    movu        [stk+0x120], m15
     mov         [stk+0x0f8], srcq
     mov         [stk+0x130], r0q ; dstq / tmpq
     pshufd               m0, m3, q0000
@@ -6034,18 +6034,18 @@ INIT_XMM ssse3
     pshufd               m2, m3, q2222
     pshufd               m3, m3, q3333
 %if ARCH_X86_64
-    mova        [stk+0x140], m0
-    mova        [stk+0x150], m1
-    mova        [stk+0x160], m2
-    mova        [stk+0x170], m3
+    movu        [stk+0x140], m0
+    movu        [stk+0x150], m1
+    movu        [stk+0x160], m2
+    movu        [stk+0x170], m3
  %if UNIX64
     mov                  hm, hd
  %endif
 %else
-    mova        [stk+0x180], m0
-    mova        [stk+0x190], m1
-    mova        [stk+0x1a0], m2
-    mova        [stk+0x1b0], m3
+    movu        [stk+0x180], m0
+    movu        [stk+0x190], m1
+    movu        [stk+0x1a0], m2
+    movu        [stk+0x1b0], m3
     SWAP                 m5, m3
     mov                  r5, hm
     mov         [stk+0x134], r5
@@ -6062,13 +6062,13 @@ INIT_XMM ssse3
     mov                  r5, [stk+0x134]
     mov                  r0, [stk+0x130]
 %endif
-    mova                 m7, [stk+0x100]
-    mova                m14, [stk+0x110]
+    movu                 m7, [stk+0x100]
+    movu                m14, [stk+0x110]
 %if ARCH_X86_64
-    mova                m10, [base+pd_0x3ff]
-    mova                m11, [rsp+0x10]
+    movu                m10, [base+pd_0x3ff]
+    movu                m11, [rsp+0x10]
 %endif
-    mova                m15, [stk+0x120]
+    movu                m15, [stk+0x120]
     mov                srcq, [stk+0x0f8]
 %if ARCH_X86_64
     mov                 r0q, [stk+0x130] ; dstq / tmpq
@@ -6080,13 +6080,13 @@ INIT_XMM ssse3
     paddd               m14, m7
 .dy2_hloop:
 %if ARCH_X86_64
-    mova                 m9, [base+pq_0x40000000]
+    movu                 m9, [base+pq_0x40000000]
 %else
  %define m9 [base+pq_0x40000000]
 %endif
     pxor                 m1, m1
     psrld                m2, m14, 10
-    mova              [stk], m2
+    movu              [stk], m2
     pand                 m6, m14, m10
     psrld                m6, 6
     paddd                m5, m15, m6
@@ -6121,7 +6121,7 @@ INIT_XMM ssse3
     paddd               m15, m5
     pxor                 m2, m2
     pcmpeqd              m5, m2
-    mova        [stk+0x110], m14
+    movu        [stk+0x110], m14
     pshufd               m4, m15, q1032
 %if ARCH_X86_64
     movd               r10d, m15
@@ -6178,32 +6178,32 @@ INIT_XMM ssse3
     psraw               m15, 8
     psraw                m3, 8
     psraw                m9, 8
-    mova         [stk+0x10], m0
-    mova         [stk+0x20], m7
-    mova         [stk+0x30], m1
-    mova         [stk+0x40], m8
-    mova         [stk+0x50], m2
-    mova         [stk+0x60], m15
-    mova         [stk+0x70], m3
-    mova         [stk+0x80], m9
+    movu         [stk+0x10], m0
+    movu         [stk+0x20], m7
+    movu         [stk+0x30], m1
+    movu         [stk+0x40], m8
+    movu         [stk+0x50], m2
+    movu         [stk+0x60], m15
+    movu         [stk+0x70], m3
+    movu         [stk+0x80], m9
     MC_8TAP_SCALED_H 1, 2, 3, 4, 5, 6, 9, 10 ; 0
-    mova         [stk+0x90], m1
+    movu         [stk+0x90], m1
     MC_8TAP_SCALED_H 2, 3, 4, 5, 6, 1, 9, 10 ; 1
-    mova         [stk+0xa0], m2
+    movu         [stk+0xa0], m2
     MC_8TAP_SCALED_H 3, 4, 5, 6, 1, 2, 9, 10 ; 2
-    mova         [stk+0xb0], m3
+    movu         [stk+0xb0], m3
     MC_8TAP_SCALED_H 4, 5, 6, 1, 2, 3, 9, 10 ; 3
-    mova         [stk+0xc0], m4
+    movu         [stk+0xc0], m4
     MC_8TAP_SCALED_H 5, 6, 1, 2, 3, 4, 9, 10 ; 4
-    mova         [stk+0xd0], m5
+    movu         [stk+0xd0], m5
     MC_8TAP_SCALED_H 6, 1, 2, 3, 4, 5, 9, 10 ; 5
     MC_8TAP_SCALED_H 7, 1, 2, 3, 4, 5, 9, 10 ; 6
     MC_8TAP_SCALED_H 8, 1, 2, 3, 4, 5, 9, 10 ; 7
-    mova                 m5, [stk+0xd0]
-    mova                 m1, [stk+0x90]
-    mova                 m2, [stk+0xa0]
-    mova                 m3, [stk+0xb0]
-    mova                 m9, [stk+0xc0]
+    movu                 m5, [stk+0xd0]
+    movu                 m1, [stk+0x90]
+    movu                 m2, [stk+0xa0]
+    movu                 m3, [stk+0xb0]
+    movu                 m9, [stk+0xc0]
     punpcklwd            m4, m5, m6 ; 45a
     punpckhwd            m5, m6     ; 45b
     punpcklwd            m6, m7, m8 ; 67a
@@ -6212,14 +6212,14 @@ INIT_XMM ssse3
     punpckhwd            m1, m2     ; 01b
     punpcklwd            m2, m3, m9 ; 23a
     punpckhwd            m3, m9     ; 23b
-    mova                m10, [stk+0x140]
-    mova                m11, [stk+0x150]
-    mova                m14, [stk+0x160]
-    mova                m15, [stk+0x170]
-    mova         [stk+0x90], m4
-    mova         [stk+0xa0], m5
-    mova         [stk+0xb0], m6
-    mova         [stk+0xc0], m7
+    movu                m10, [stk+0x140]
+    movu                m11, [stk+0x150]
+    movu                m14, [stk+0x160]
+    movu                m15, [stk+0x170]
+    movu         [stk+0x90], m4
+    movu         [stk+0xa0], m5
+    movu         [stk+0xb0], m6
+    movu         [stk+0xc0], m7
  %define hround [rsp+0x10]
  %define shift  [rsp+0x20]
  %if isput
@@ -6254,21 +6254,21 @@ INIT_XMM ssse3
     pshufd               m4, m4, q0321
     movd                 r4, m15
     movd                 r5, m4
-    mova                m14, [stk+0x110]
+    movu                m14, [stk+0x110]
     movq                 m2, [base+subpel_filters+r0*8]
     movq                 m3, [base+subpel_filters+rX*8]
     movhps               m2, [base+subpel_filters+r4*8]
     movhps               m3, [base+subpel_filters+r5*8]
     psrld               m14, 10
-    mova           [stk+16], m14
+    movu           [stk+16], m14
     mov                  r0, [stk+ 0]
     mov                  rX, [stk+ 4]
     mov                  r4, [stk+ 8]
     mov                  r5, [stk+12]
-    mova         [stk+0x20], m0
-    mova         [stk+0x30], m1
-    mova         [stk+0x40], m2
-    mova         [stk+0x50], m3
+    movu         [stk+0x20], m0
+    movu         [stk+0x30], m1
+    movu         [stk+0x40], m2
+    movu         [stk+0x50], m3
     pshufd               m4, m6, q1100
     pshufd               m6, m6, q3322
     pshufd               m7, m5, q1100
@@ -6301,14 +6301,14 @@ INIT_XMM ssse3
     psraw                m2, 8
     psraw                m7, 8
     psraw                m3, 8
-    mova        [stk+0x0a0], m4
-    mova        [stk+0x0b0], m0
-    mova        [stk+0x0c0], m5
-    mova        [stk+0x0d0], m1
-    mova        [stk+0x140], m6
-    mova        [stk+0x150], m2
-    mova        [stk+0x160], m7
-    mova        [stk+0x170], m3
+    movu        [stk+0x0a0], m4
+    movu        [stk+0x0b0], m0
+    movu        [stk+0x0c0], m5
+    movu        [stk+0x0d0], m1
+    movu        [stk+0x140], m6
+    movu        [stk+0x150], m2
+    movu        [stk+0x160], m7
+    movu        [stk+0x170], m3
     MC_8TAP_SCALED_H   0xa0, 0x20, 0 ; 0
     MC_8TAP_SCALED_H   0xa0, 0x30    ; 1
     MC_8TAP_SCALED_H   0xa0, 0x40    ; 2
@@ -6317,33 +6317,33 @@ INIT_XMM ssse3
     MC_8TAP_SCALED_H   0xa0, 0x70    ; 5
     MC_8TAP_SCALED_H   0xa0, 0x80    ; 6
     MC_8TAP_SCALED_H   0xa0, 0x90    ; 7
-    mova                 m5, [stk+0x60]
-    mova                 m6, [stk+0x70]
-    mova                 m7, [stk+0x80]
-    mova                 m0, [stk+0x90]
+    movu                 m5, [stk+0x60]
+    movu                 m6, [stk+0x70]
+    movu                 m7, [stk+0x80]
+    movu                 m0, [stk+0x90]
     mov                  r0, r0m
     punpcklwd            m4, m5, m6      ; 45a
     punpckhwd            m5, m6          ; 45b
     punpcklwd            m6, m7, m0      ; 67a
     punpckhwd            m7, m0          ; 67b
-    mova         [stk+0x60], m4
-    mova         [stk+0x70], m5
-    mova         [stk+0x80], m6
-    mova         [stk+0x90], m7
-    mova                 m1, [stk+0x20]
-    mova                 m2, [stk+0x30]
-    mova                 m3, [stk+0x40]
-    mova                 m4, [stk+0x50]
+    movu         [stk+0x60], m4
+    movu         [stk+0x70], m5
+    movu         [stk+0x80], m6
+    movu         [stk+0x90], m7
+    movu                 m1, [stk+0x20]
+    movu                 m2, [stk+0x30]
+    movu                 m3, [stk+0x40]
+    movu                 m4, [stk+0x50]
     punpcklwd            m0, m1, m2      ; 01a
     punpckhwd            m1, m2          ; 01b
     punpcklwd            m2, m3, m4      ; 23a
     punpckhwd            m3, m4          ; 23b
-    mova                 m4, [stk+0x180]
-    mova                 m5, [stk+0x190]
-    mova                 m6, [stk+0x1a0]
-    mova                 m7, [stk+0x1b0]
-    mova         [stk+0x40], m2
-    mova         [stk+0x50], m3
+    movu                 m4, [stk+0x180]
+    movu                 m5, [stk+0x190]
+    movu                 m6, [stk+0x1a0]
+    movu                 m7, [stk+0x1b0]
+    movu         [stk+0x40], m2
+    movu         [stk+0x50], m3
 .dy2_vloop:
     pmaddwd              m0, m4
     pmaddwd              m1, m4
@@ -6372,58 +6372,58 @@ INIT_XMM ssse3
     pxor                 m7, m7
     pmaxsw               m4, m7
     pminsw               m4, pxmaxm
-    mova             [dstq], m4
+    movu             [dstq], m4
     add                dstq, dsm
 %else
     psrad                m4, 6
     psrad                m5, 6
     packssdw             m4, m5
-    mova             [tmpq], m4
+    movu             [tmpq], m4
     add                tmpq, tmp_stridem
 %endif
     dec                  hd
     jz .dy2_hloop_prep
 %if ARCH_X86_64
     MC_8TAP_SCALED_H 4, 8, 5, 6, 7, 9, 0, 1
-    mova         [stk+0xd0], m4
+    movu         [stk+0xd0], m4
     MC_8TAP_SCALED_H 8, 5, 6, 7, 9, 4, 0, 1
-    mova                 m4, [stk+0xd0]
-    mova                 m0, m2         ; 01a
-    mova                 m1, m3         ; 01b
-    mova                 m2, [stk+0x90] ; 23a
-    mova                 m3, [stk+0xa0] ; 23b
-    mova                 m5, [stk+0xb0] ; 45a
-    mova                 m6, [stk+0xc0] ; 45b
+    movu                 m4, [stk+0xd0]
+    movu                 m0, m2         ; 01a
+    movu                 m1, m3         ; 01b
+    movu                 m2, [stk+0x90] ; 23a
+    movu                 m3, [stk+0xa0] ; 23b
+    movu                 m5, [stk+0xb0] ; 45a
+    movu                 m6, [stk+0xc0] ; 45b
     punpcklwd            m7, m4, m8     ; 67a
     punpckhwd            m4, m8         ; 67b
-    mova         [stk+0x90], m5
-    mova         [stk+0xa0], m6
-    mova         [stk+0xb0], m7
-    mova         [stk+0xc0], m4
+    movu         [stk+0x90], m5
+    movu         [stk+0xa0], m6
+    movu         [stk+0xb0], m7
+    movu         [stk+0xc0], m4
 %else
     mov                 r0m, r0
     mov                  r3, r3m
     MC_8TAP_SCALED_H 0xa0, 0xe0 ; 8
     MC_8TAP_SCALED_H 0xa0, 0    ; 9
-    mova                 m7, [stk+0xe0]
-    mova                 m2, [stk+0x60] ; 23a
-    mova                 m3, [stk+0x70] ; 23b
-    mova                 m4, [stk+0x80] ; 45a
-    mova                 m5, [stk+0x90] ; 45b
+    movu                 m7, [stk+0xe0]
+    movu                 m2, [stk+0x60] ; 23a
+    movu                 m3, [stk+0x70] ; 23b
+    movu                 m4, [stk+0x80] ; 45a
+    movu                 m5, [stk+0x90] ; 45b
     punpcklwd            m6, m7, m0     ; 67a
     punpckhwd            m7, m0         ; 67b
-    mova                 m0, [stk+0x40] ; 01a
-    mova                 m1, [stk+0x50] ; 01b
-    mova         [stk+0x40], m2
-    mova         [stk+0x50], m3
-    mova         [stk+0x60], m4
-    mova         [stk+0x70], m5
-    mova                 m4, [stk+0x180]
-    mova                 m5, [stk+0x190]
-    mova         [stk+0x80], m6
-    mova         [stk+0x90], m7
-    mova                 m6, [stk+0x1a0]
-    mova                 m7, [stk+0x1b0]
+    movu                 m0, [stk+0x40] ; 01a
+    movu                 m1, [stk+0x50] ; 01b
+    movu         [stk+0x40], m2
+    movu         [stk+0x50], m3
+    movu         [stk+0x60], m4
+    movu         [stk+0x70], m5
+    movu                 m4, [stk+0x180]
+    movu                 m5, [stk+0x190]
+    movu         [stk+0x80], m6
+    movu         [stk+0x90], m7
+    movu                 m6, [stk+0x1a0]
+    movu                 m7, [stk+0x1b0]
     mov                  r0, r0m
 %endif
     jmp .dy2_vloop
@@ -6529,7 +6529,7 @@ cglobal warp_affine_8x8t_16bpc, 0, 7, 8, -16*17, alpha, gamma, src, tmp, \
     movddup              m1, [base+warp8x8t_rnd]
     mov                  r1, r1m
     add                  r1, r1
-    mova                 m8, m1
+    movu                 m8, m1
     mov                 r1m, r1 ; ds *= 2
 %endif
     call mangle(private_prefix %+ _warp_affine_8x8_16bpc_ssse3).main
@@ -6551,7 +6551,7 @@ cglobal warp_affine_8x8t_16bpc, 0, 7, 8, -16*17, alpha, gamma, src, tmp, \
     psrad                m1, 15
     psrad                m2, 15
     packssdw             m1, m2
-    mova       [dstq+dsq*0], m1
+    movu       [dstq+dsq*0], m1
     call mangle(private_prefix %+ _warp_affine_8x8_16bpc_ssse3).main3
 %if ARCH_X86_32
     mov                dstq, dstm
@@ -6562,7 +6562,7 @@ cglobal warp_affine_8x8t_16bpc, 0, 7, 8, -16*17, alpha, gamma, src, tmp, \
     psrad                m1, 15
     psrad                m2, 15
     packssdw             m1, m2
-    mova       [dstq+dsq*2], m1
+    movu       [dstq+dsq*2], m1
     dec                cntd
     jg .loop
     RET
@@ -6587,8 +6587,8 @@ cglobal warp_affine_8x8_16bpc, 0, 7, 8, -16*17, alpha, gamma, src, tmp, \
     movddup              m1, [base+warp8x8_rnd2+t0*8]
     movd                 m2, r7m ; pixel_max
     pshufb               m2, [base+pw_256]
-    mova                 m8, m1
-    mova                 m9, m2
+    movu                 m8, m1
+    movu                 m9, m2
 %endif
     call .main
     jmp .start
@@ -6610,7 +6610,7 @@ cglobal warp_affine_8x8_16bpc, 0, 7, 8, -16*17, alpha, gamma, src, tmp, \
     pmaxsw               m1, m6
     pmulhrsw             m1, m8
     pminsw               m1, m9
-    mova       [dstq+dsq*0], m1
+    movu       [dstq+dsq*0], m1
     call .main3
 %if ARCH_X86_32
     mov                dstq, dstm
@@ -6622,7 +6622,7 @@ cglobal warp_affine_8x8_16bpc, 0, 7, 8, -16*17, alpha, gamma, src, tmp, \
     pmaxsw               m1, m6
     pmulhrsw             m1, m8
     pminsw               m1, m9
-    mova       [dstq+dsq*1], m1
+    movu       [dstq+dsq*1], m1
     dec                cntd
     jg .loop
     RET
@@ -6686,46 +6686,46 @@ ALIGN function_align
     %assign stack_offset stack_offset + gprsize
 %endif
 %endif
-    mova      [rsp+gprsize], m0
+    movu      [rsp+gprsize], m0
     pxor                 m6, m6
     call .h
-    mova                 m5, m0
+    movu                 m5, m0
     call .h
     punpcklwd            m1, m5, m0           ; 01
     punpckhwd            m5, m0
-    mova [rsp+gprsize+16* 1], m1
-    mova [rsp+gprsize+16* 4], m5
-    mova                 m5, m0
+    movu [rsp+gprsize+16* 1], m1
+    movu [rsp+gprsize+16* 4], m5
+    movu                 m5, m0
     call .h
     punpcklwd            m1, m5, m0           ; 12
     punpckhwd            m5, m0
-    mova [rsp+gprsize+16* 7], m1
-    mova [rsp+gprsize+16*10], m5
-    mova                 m5, m0
+    movu [rsp+gprsize+16* 7], m1
+    movu [rsp+gprsize+16*10], m5
+    movu                 m5, m0
     call .h
     punpcklwd            m1, m5, m0           ; 23
     punpckhwd            m5, m0
-    mova [rsp+gprsize+16* 2], m1
-    mova [rsp+gprsize+16* 5], m5
-    mova                 m5, m0
+    movu [rsp+gprsize+16* 2], m1
+    movu [rsp+gprsize+16* 5], m5
+    movu                 m5, m0
     call .h
     punpcklwd            m1, m5, m0           ; 34
     punpckhwd            m5, m0
-    mova [rsp+gprsize+16* 8], m1
-    mova [rsp+gprsize+16*11], m5
-    mova                 m5, m0
+    movu [rsp+gprsize+16* 8], m1
+    movu [rsp+gprsize+16*11], m5
+    movu                 m5, m0
     call .h
     punpcklwd            m1, m5, m0           ; 45
     punpckhwd            m5, m0
-    mova [rsp+gprsize+16* 3], m1
-    mova [rsp+gprsize+16* 6], m5
-    mova                 m5, m0
+    movu [rsp+gprsize+16* 3], m1
+    movu [rsp+gprsize+16* 6], m5
+    movu                 m5, m0
     call .h
     punpcklwd            m1, m5, m0           ; 56
     punpckhwd            m5, m0
-    mova [rsp+gprsize+16* 9], m1
-    mova [rsp+gprsize+16*12], m5
-    mova                 m5, m0
+    movu [rsp+gprsize+16* 9], m1
+    movu [rsp+gprsize+16*12], m5
+    movu                 m5, m0
 .main2:
     call .h
 %macro WARP_V 6 ; 01l, 23l, 45l, 01h, 23h, 45h
@@ -6750,19 +6750,19 @@ ALIGN function_align
     punpcklbw            m1, m6, m2           ; a0 a1 b0 b1 c0 c1 d0 d1 << 8
     pmaddwd              m1, [rsp+gprsize+16*%1]
     punpckhbw            m3, m6, m2           ; a2 a3 b2 b3 c2 c3 d2 d3 << 8
-    mova                 m2, [rsp+gprsize+16*%2]
+    movu                 m2, [rsp+gprsize+16*%2]
     pmaddwd              m3, m2
-    mova [rsp+gprsize+16*%1], m2
+    movu [rsp+gprsize+16*%1], m2
     paddd                m1, m3
     punpcklbw            m3, m6, m4           ; a4 a5 b4 b5 c4 c5 d4 d5 << 8
-    mova                 m2, [rsp+gprsize+16*%3]
+    movu                 m2, [rsp+gprsize+16*%3]
     pmaddwd              m3, m2
-    mova [rsp+gprsize+16*%2], m2
+    movu [rsp+gprsize+16*%2], m2
     paddd                m1, m3
     punpcklwd            m3, m5, m0           ; 67
     punpckhbw            m2, m6, m4           ; a6 a7 b6 b7 c6 c7 d6 d7 << 8
     pmaddwd              m2, m3
-    mova [rsp+gprsize+16*%3], m3
+    movu [rsp+gprsize+16*%3], m3
     paddd                m1, m2
     movq                 m4, [filterq+myq*8]  ; e
     lea                 myd, [tmpq+gammaq]
@@ -6786,22 +6786,22 @@ ALIGN function_align
     punpcklbw            m2, m6, m3           ; e0 e1 f0 f1 g0 g1 h0 h1 << 8
     pmaddwd              m2, [rsp+gprsize+16*%4]
     punpckhbw            m6, m3               ; e2 e3 f2 f3 g2 g3 h2 h3 << 8
-    mova                 m3, [rsp+gprsize+16*%5]
+    movu                 m3, [rsp+gprsize+16*%5]
     pmaddwd              m6, m3
-    mova [rsp+gprsize+16*%4], m3
+    movu [rsp+gprsize+16*%4], m3
     pxor                 m3, m3
     paddd                m2, m6
     punpcklbw            m3, m4               ; e4 e5 f4 f5 g4 g5 h4 h5 << 8
-    mova                 m6, [rsp+gprsize+16*%6]
+    movu                 m6, [rsp+gprsize+16*%6]
     pmaddwd              m3, m6
-    mova [rsp+gprsize+16*%5], m6
+    movu [rsp+gprsize+16*%5], m6
     punpckhwd            m5, m0
     pxor                 m6, m6
     paddd                m2, m3
     punpckhbw            m3, m6, m4           ; e6 e7 f6 f7 g6 g7 h6 h7 << 8
     pmaddwd              m3, m5
-    mova [rsp+gprsize+16*%6], m5
-    mova                 m5, m0
+    movu [rsp+gprsize+16*%6], m5
+    movu                 m5, m0
     paddd                m2, m3
 %endmacro
     WARP_V                1,  2,  3,  4,  5,  6
@@ -6903,8 +6903,8 @@ ALIGN function_align
     call .main
     lea                dstq, [dstq+strideq*2]
 .w8:
-    mova   [dstq+strideq*0], m0
-    mova   [dstq+strideq*1], m1
+    movu   [dstq+strideq*0], m0
+    movu   [dstq+strideq*1], m1
     sub                  hd, 2
     jne .w8_loop
     RET
@@ -6912,8 +6912,8 @@ ALIGN function_align
     call .main
     add                dstq, strideq
 .w16:
-    mova        [dstq+16*0], m0
-    mova        [dstq+16*1], m1
+    movu        [dstq+16*0], m0
+    movu        [dstq+16*1], m1
     dec                  hd
     jg .w16_loop
     RET
@@ -6921,11 +6921,11 @@ ALIGN function_align
     call .main
     add                dstq, strideq
 .w32:
-    mova        [dstq+16*0], m0
-    mova        [dstq+16*1], m1
+    movu        [dstq+16*0], m0
+    movu        [dstq+16*1], m1
     call .main
-    mova        [dstq+16*2], m0
-    mova        [dstq+16*3], m1
+    movu        [dstq+16*2], m0
+    movu        [dstq+16*3], m1
     dec                  hd
     jg .w32_loop
     RET
@@ -6933,17 +6933,17 @@ ALIGN function_align
     call .main
     add                dstq, strideq
 .w64:
-    mova        [dstq+16*0], m0
-    mova        [dstq+16*1], m1
+    movu        [dstq+16*0], m0
+    movu        [dstq+16*1], m1
     call .main
-    mova        [dstq+16*2], m0
-    mova        [dstq+16*3], m1
+    movu        [dstq+16*2], m0
+    movu        [dstq+16*3], m1
     call .main
-    mova        [dstq+16*4], m0
-    mova        [dstq+16*5], m1
+    movu        [dstq+16*4], m0
+    movu        [dstq+16*5], m1
     call .main
-    mova        [dstq+16*6], m0
-    mova        [dstq+16*7], m1
+    movu        [dstq+16*6], m0
+    movu        [dstq+16*7], m1
     dec                  hd
     jg .w64_loop
     RET
@@ -6951,29 +6951,29 @@ ALIGN function_align
     call .main
     add                dstq, strideq
 .w128:
-    mova       [dstq+16* 0], m0
-    mova       [dstq+16* 1], m1
+    movu       [dstq+16* 0], m0
+    movu       [dstq+16* 1], m1
     call .main
-    mova       [dstq+16* 2], m0
-    mova       [dstq+16* 3], m1
+    movu       [dstq+16* 2], m0
+    movu       [dstq+16* 3], m1
     call .main
-    mova       [dstq+16* 4], m0
-    mova       [dstq+16* 5], m1
+    movu       [dstq+16* 4], m0
+    movu       [dstq+16* 5], m1
     call .main
-    mova       [dstq+16* 6], m0
-    mova       [dstq+16* 7], m1
+    movu       [dstq+16* 6], m0
+    movu       [dstq+16* 7], m1
     call .main
-    mova       [dstq+16* 8], m0
-    mova       [dstq+16* 9], m1
+    movu       [dstq+16* 8], m0
+    movu       [dstq+16* 9], m1
     call .main
-    mova       [dstq+16*10], m0
-    mova       [dstq+16*11], m1
+    movu       [dstq+16*10], m0
+    movu       [dstq+16*11], m1
     call .main
-    mova       [dstq+16*12], m0
-    mova       [dstq+16*13], m1
+    movu       [dstq+16*12], m0
+    movu       [dstq+16*13], m1
     call .main
-    mova       [dstq+16*14], m0
-    mova       [dstq+16*15], m1
+    movu       [dstq+16*14], m0
+    movu       [dstq+16*15], m1
     dec                  hd
     jg .w128_loop
     RET
@@ -6999,9 +6999,9 @@ cglobal avg_16bpc, 4, 7, 4, dst, stride, tmp1, tmp2, w, h
     BIDIR_FN
 ALIGN function_align
 .main:
-    mova                 m0, [tmp1q+16*0]
+    movu                 m0, [tmp1q+16*0]
     paddsw               m0, [tmp2q+16*0]
-    mova                 m1, [tmp1q+16*1]
+    movu                 m1, [tmp1q+16*1]
     paddsw               m1, [tmp2q+16*1]
     add               tmp1q, 16*2
     add               tmp2q, 16*2
@@ -7039,12 +7039,12 @@ cglobal w_avg_16bpc, 4, 7, 8, dst, stride, tmp1, tmp2, w, h
     BIDIR_FN
 ALIGN function_align
 .main:
-    mova                 m2, [tmp1q+16*0]
-    mova                 m0, [tmp2q+16*0]
+    movu                 m2, [tmp1q+16*0]
+    movu                 m0, [tmp2q+16*0]
     punpckhwd            m3, m0, m2
     punpcklwd            m0, m2
-    mova                 m2, [tmp1q+16*1]
-    mova                 m1, [tmp2q+16*1]
+    movu                 m2, [tmp1q+16*1]
+    movu                 m1, [tmp2q+16*1]
     add               tmp1q, 16*2
     add               tmp2q, 16*2
     pmaddwd              m3, m4
@@ -7085,7 +7085,7 @@ cglobal mask_16bpc, 4, 7, 8, dst, stride, tmp1, tmp2, w, mask
     movddup              m6, [base+bidir_rnd+t0*8]
     movddup              m7, [base+bidir_mul+t0*8]
 %if ARCH_X86_64
-    mova                 m8, [base+pw_64]
+    movu                 m8, [base+pw_64]
     movifnidn            hd, hm
 %endif
     add                  wq, r6
@@ -7094,8 +7094,8 @@ cglobal mask_16bpc, 4, 7, 8, dst, stride, tmp1, tmp2, w, mask
 ALIGN function_align
 .main:
     movq                 m3, [maskq+8*0]
-    mova                 m0, [tmp1q+16*0]
-    mova                 m4, [tmp2q+16*0]
+    movu                 m0, [tmp1q+16*0]
+    movu                 m4, [tmp2q+16*0]
     pxor                 m5, m5
     punpcklbw            m3, m5
     punpckhwd            m2, m0, m4
@@ -7106,8 +7106,8 @@ ALIGN function_align
     pmaddwd              m2, m4     ; tmp1 * m + tmp2 * (64-m)
     pmaddwd              m0, m3
     movq                 m3, [maskq+8*1]
-    mova                 m1, [tmp1q+16*1]
-    mova                 m4, [tmp2q+16*1]
+    movu                 m1, [tmp1q+16*1]
+    movu                 m4, [tmp2q+16*1]
     add               maskq, 8*2
     add               tmp1q, 16*2
     add               tmp2q, 16*2
@@ -7142,20 +7142,20 @@ cglobal w_mask_420_16bpc, 4, 7, 12, dst, stride, tmp1, tmp2, w, h, mask
     shr                 r6d, 11
     movsxd               wq, [t0+wq*4]
 %if ARCH_X86_64
-    mova                 m8, [base+pw_27615] ; ((64 - 38) << 10) + 1023 - 32
-    mova                 m9, [base+pw_64]
+    movu                 m8, [base+pw_27615] ; ((64 - 38) << 10) + 1023 - 32
+    movu                 m9, [base+pw_64]
     movddup             m10, [base+bidir_rnd+r6*8]
     movddup             m11, [base+bidir_mul+r6*8]
 %else
-    mova                 m1, [base+pw_27615] ; ((64 - 38) << 10) + 1023 - 32
-    mova                 m2, [base+pw_64]
+    movu                 m1, [base+pw_27615] ; ((64 - 38) << 10) + 1023 - 32
+    movu                 m2, [base+pw_64]
     movddup              m3, [base+bidir_rnd+r6*8]
     movddup              m4, [base+bidir_mul+r6*8]
     ALLOC_STACK       -16*4
-    mova         [rsp+16*0], m1
-    mova         [rsp+16*1], m2
-    mova         [rsp+16*2], m3
-    mova         [rsp+16*3], m4
+    movu         [rsp+16*0], m1
+    movu         [rsp+16*1], m2
+    movu         [rsp+16*2], m3
+    movu         [rsp+16*3], m4
     %define              m8  [rsp+gprsize+16*0]
     %define              m9  [rsp+gprsize+16*1]
     %define             m10  [rsp+gprsize+16*2]
@@ -7193,10 +7193,10 @@ cglobal w_mask_420_16bpc, 4, 7, 12, dst, stride, tmp1, tmp2, w, h, mask
     lea                dstq, [dstq+strideq*2]
     add               maskq, 4
 .w8:
-    mova   [dstq+strideq*0], m0
+    movu   [dstq+strideq*0], m0
     paddw                m2, m3
     phaddw               m2, m2
-    mova   [dstq+strideq*1], m1
+    movu   [dstq+strideq*1], m1
     paddw                m2, m7
     psrlw                m2, 2
     packuswb             m2, m2
@@ -7209,16 +7209,16 @@ cglobal w_mask_420_16bpc, 4, 7, 12, dst, stride, tmp1, tmp2, w, h, mask
     lea                dstq, [dstq+strideq*2]
     add               maskq, 8
 .w16:
-    mova [dstq+strideq*1+16*0], m2
-    mova [dstq+strideq*0+16*0], m0
-    mova [dstq+strideq*1+16*1], m3
-    mova [dstq+strideq*0+16*1], m1
+    movu [dstq+strideq*1+16*0], m2
+    movu [dstq+strideq*0+16*0], m0
+    movu [dstq+strideq*1+16*1], m3
+    movu [dstq+strideq*0+16*1], m1
     call .main
     paddw                m2, [dstq+strideq*1+16*0]
     paddw                m3, [dstq+strideq*1+16*1]
-    mova [dstq+strideq*1+16*0], m0
+    movu [dstq+strideq*1+16*0], m0
     phaddw               m2, m3
-    mova [dstq+strideq*1+16*1], m1
+    movu [dstq+strideq*1+16*1], m1
     paddw                m2, m7
     psrlw                m2, 2
     packuswb             m2, m2
@@ -7231,33 +7231,33 @@ cglobal w_mask_420_16bpc, 4, 7, 12, dst, stride, tmp1, tmp2, w, h, mask
     lea                dstq, [dstq+strideq*2]
     add               maskq, 16
 .w32:
-    mova [dstq+strideq*1+16*0], m2
-    mova [dstq+strideq*0+16*0], m0
-    mova [dstq+strideq*1+16*1], m3
-    mova [dstq+strideq*0+16*1], m1
+    movu [dstq+strideq*1+16*0], m2
+    movu [dstq+strideq*0+16*0], m0
+    movu [dstq+strideq*1+16*1], m3
+    movu [dstq+strideq*0+16*1], m1
     call .main
-    mova [dstq+strideq*0+16*2], m0
+    movu [dstq+strideq*0+16*2], m0
     phaddw               m2, m3
-    mova [dstq+strideq*1+16*3], m2
-    mova [dstq+strideq*0+16*3], m1
+    movu [dstq+strideq*1+16*3], m2
+    movu [dstq+strideq*0+16*3], m1
     call .main
     paddw                m2, [dstq+strideq*1+16*0]
     paddw                m3, [dstq+strideq*1+16*1]
-    mova [dstq+strideq*1+16*0], m0
+    movu [dstq+strideq*1+16*0], m0
     phaddw               m2, m3
-    mova [dstq+strideq*1+16*2], m2
-    mova [dstq+strideq*1+16*1], m1
+    movu [dstq+strideq*1+16*2], m2
+    movu [dstq+strideq*1+16*1], m1
     call .main
     phaddw               m2, m3
     paddw                m3, m7, [dstq+strideq*1+16*2]
     paddw                m2, [dstq+strideq*1+16*3]
-    mova [dstq+strideq*1+16*2], m0
+    movu [dstq+strideq*1+16*2], m0
     paddw                m2, m7
     psrlw                m3, 2
     psrlw                m2, 2
-    mova [dstq+strideq*1+16*3], m1
+    movu [dstq+strideq*1+16*3], m1
     packuswb             m3, m2
-    mova            [maskq], m3
+    movu            [maskq], m3
     sub                  hd, 2
     jg .w32_loop
     RET
@@ -7266,62 +7266,62 @@ cglobal w_mask_420_16bpc, 4, 7, 12, dst, stride, tmp1, tmp2, w, h, mask
     lea                dstq, [dstq+strideq*2]
     add               maskq, 16*2
 .w64:
-    mova [dstq+strideq*1+16*1], m2
-    mova [dstq+strideq*0+16*0], m0
-    mova [dstq+strideq*1+16*2], m3
-    mova [dstq+strideq*0+16*1], m1
+    movu [dstq+strideq*1+16*1], m2
+    movu [dstq+strideq*0+16*0], m0
+    movu [dstq+strideq*1+16*2], m3
+    movu [dstq+strideq*0+16*1], m1
     call .main
-    mova [dstq+strideq*1+16*3], m2
-    mova [dstq+strideq*0+16*2], m0
-    mova [dstq+strideq*1+16*4], m3
-    mova [dstq+strideq*0+16*3], m1
+    movu [dstq+strideq*1+16*3], m2
+    movu [dstq+strideq*0+16*2], m0
+    movu [dstq+strideq*1+16*4], m3
+    movu [dstq+strideq*0+16*3], m1
     call .main
-    mova [dstq+strideq*1+16*5], m2
-    mova [dstq+strideq*0+16*4], m0
-    mova [dstq+strideq*1+16*6], m3
-    mova [dstq+strideq*0+16*5], m1
+    movu [dstq+strideq*1+16*5], m2
+    movu [dstq+strideq*0+16*4], m0
+    movu [dstq+strideq*1+16*6], m3
+    movu [dstq+strideq*0+16*5], m1
     call .main
-    mova [dstq+strideq*0+16*6], m0
+    movu [dstq+strideq*0+16*6], m0
     phaddw               m2, m3
-    mova [dstq+strideq*1+16*7], m2
-    mova [dstq+strideq*0+16*7], m1
+    movu [dstq+strideq*1+16*7], m2
+    movu [dstq+strideq*0+16*7], m1
     call .main
     paddw                m2, [dstq+strideq*1+16*1]
     paddw                m3, [dstq+strideq*1+16*2]
-    mova [dstq+strideq*1+16*0], m0
+    movu [dstq+strideq*1+16*0], m0
     phaddw               m2, m3
-    mova [dstq+strideq*1+16*2], m2
-    mova [dstq+strideq*1+16*1], m1
+    movu [dstq+strideq*1+16*2], m2
+    movu [dstq+strideq*1+16*1], m1
     call .main
     paddw                m2, [dstq+strideq*1+16*3]
     paddw                m3, [dstq+strideq*1+16*4]
     phaddw               m2, m3
     paddw                m3, m7, [dstq+strideq*1+16*2]
-    mova [dstq+strideq*1+16*2], m0
+    movu [dstq+strideq*1+16*2], m0
     paddw                m2, m7
     psrlw                m3, 2
     psrlw                m2, 2
-    mova [dstq+strideq*1+16*3], m1
+    movu [dstq+strideq*1+16*3], m1
     packuswb             m3, m2
-    mova       [maskq+16*0], m3
+    movu       [maskq+16*0], m3
     call .main
     paddw                m2, [dstq+strideq*1+16*5]
     paddw                m3, [dstq+strideq*1+16*6]
-    mova [dstq+strideq*1+16*4], m0
+    movu [dstq+strideq*1+16*4], m0
     phaddw               m2, m3
-    mova [dstq+strideq*1+16*6], m2
-    mova [dstq+strideq*1+16*5], m1
+    movu [dstq+strideq*1+16*6], m2
+    movu [dstq+strideq*1+16*5], m1
     call .main
     phaddw               m2, m3
     paddw                m3, m7, [dstq+strideq*1+16*6]
     paddw                m2, [dstq+strideq*1+16*7]
-    mova [dstq+strideq*1+16*6], m0
+    movu [dstq+strideq*1+16*6], m0
     paddw                m2, m7
     psrlw                m3, 2
     psrlw                m2, 2
-    mova [dstq+strideq*1+16*7], m1
+    movu [dstq+strideq*1+16*7], m1
     packuswb             m3, m2
-    mova       [maskq+16*1], m3
+    movu       [maskq+16*1], m3
     sub                  hd, 2
     jg .w64_loop
     RET
@@ -7330,128 +7330,128 @@ cglobal w_mask_420_16bpc, 4, 7, 12, dst, stride, tmp1, tmp2, w, h, mask
     lea                dstq, [dstq+strideq*2]
     add               maskq, 16*4
 .w128:
-    mova [dstq+strideq*1+16* 1], m2
-    mova [dstq+strideq*0+16* 0], m0
-    mova [dstq+strideq*1+16* 2], m3
-    mova [dstq+strideq*0+16* 1], m1
+    movu [dstq+strideq*1+16* 1], m2
+    movu [dstq+strideq*0+16* 0], m0
+    movu [dstq+strideq*1+16* 2], m3
+    movu [dstq+strideq*0+16* 1], m1
     call .main
-    mova [dstq+strideq*1+16* 3], m2
-    mova [dstq+strideq*0+16* 2], m0
-    mova [dstq+strideq*1+16* 4], m3
-    mova [dstq+strideq*0+16* 3], m1
+    movu [dstq+strideq*1+16* 3], m2
+    movu [dstq+strideq*0+16* 2], m0
+    movu [dstq+strideq*1+16* 4], m3
+    movu [dstq+strideq*0+16* 3], m1
     call .main
-    mova [dstq+strideq*1+16* 5], m2
-    mova [dstq+strideq*0+16* 4], m0
-    mova [dstq+strideq*1+16* 6], m3
-    mova [dstq+strideq*0+16* 5], m1
+    movu [dstq+strideq*1+16* 5], m2
+    movu [dstq+strideq*0+16* 4], m0
+    movu [dstq+strideq*1+16* 6], m3
+    movu [dstq+strideq*0+16* 5], m1
     call .main
-    mova [dstq+strideq*1+16* 7], m2
-    mova [dstq+strideq*0+16* 6], m0
-    mova [dstq+strideq*1+16* 8], m3
-    mova [dstq+strideq*0+16* 7], m1
+    movu [dstq+strideq*1+16* 7], m2
+    movu [dstq+strideq*0+16* 6], m0
+    movu [dstq+strideq*1+16* 8], m3
+    movu [dstq+strideq*0+16* 7], m1
     call .main
-    mova [dstq+strideq*1+16* 9], m2
-    mova [dstq+strideq*0+16* 8], m0
-    mova [dstq+strideq*1+16*10], m3
-    mova [dstq+strideq*0+16* 9], m1
+    movu [dstq+strideq*1+16* 9], m2
+    movu [dstq+strideq*0+16* 8], m0
+    movu [dstq+strideq*1+16*10], m3
+    movu [dstq+strideq*0+16* 9], m1
     call .main
-    mova [dstq+strideq*1+16*11], m2
-    mova [dstq+strideq*0+16*10], m0
-    mova [dstq+strideq*1+16*12], m3
-    mova [dstq+strideq*0+16*11], m1
+    movu [dstq+strideq*1+16*11], m2
+    movu [dstq+strideq*0+16*10], m0
+    movu [dstq+strideq*1+16*12], m3
+    movu [dstq+strideq*0+16*11], m1
     call .main
-    mova [dstq+strideq*1+16*13], m2
-    mova [dstq+strideq*0+16*12], m0
-    mova [dstq+strideq*1+16*14], m3
-    mova [dstq+strideq*0+16*13], m1
+    movu [dstq+strideq*1+16*13], m2
+    movu [dstq+strideq*0+16*12], m0
+    movu [dstq+strideq*1+16*14], m3
+    movu [dstq+strideq*0+16*13], m1
     call .main
-    mova [dstq+strideq*0+16*14], m0
+    movu [dstq+strideq*0+16*14], m0
     phaddw               m2, m3
-    mova [dstq+strideq*1+16*15], m2
-    mova [dstq+strideq*0+16*15], m1
+    movu [dstq+strideq*1+16*15], m2
+    movu [dstq+strideq*0+16*15], m1
     call .main
     paddw                m2, [dstq+strideq*1+16* 1]
     paddw                m3, [dstq+strideq*1+16* 2]
-    mova [dstq+strideq*1+16* 0], m0
+    movu [dstq+strideq*1+16* 0], m0
     phaddw               m2, m3
-    mova [dstq+strideq*1+16* 2], m2
-    mova [dstq+strideq*1+16* 1], m1
+    movu [dstq+strideq*1+16* 2], m2
+    movu [dstq+strideq*1+16* 1], m1
     call .main
     paddw                m2, [dstq+strideq*1+16* 3]
     paddw                m3, [dstq+strideq*1+16* 4]
     phaddw               m2, m3
     paddw                m3, m7, [dstq+strideq*1+16* 2]
-    mova [dstq+strideq*1+16* 2], m0
+    movu [dstq+strideq*1+16* 2], m0
     paddw                m2, m7
     psrlw                m3, 2
     psrlw                m2, 2
-    mova [dstq+strideq*1+16* 3], m1
+    movu [dstq+strideq*1+16* 3], m1
     packuswb             m3, m2
-    mova       [maskq+16*0], m3
+    movu       [maskq+16*0], m3
     call .main
     paddw                m2, [dstq+strideq*1+16* 5]
     paddw                m3, [dstq+strideq*1+16* 6]
-    mova [dstq+strideq*1+16* 4], m0
+    movu [dstq+strideq*1+16* 4], m0
     phaddw               m2, m3
-    mova [dstq+strideq*1+16* 6], m2
-    mova [dstq+strideq*1+16* 5], m1
+    movu [dstq+strideq*1+16* 6], m2
+    movu [dstq+strideq*1+16* 5], m1
     call .main
     paddw                m2, [dstq+strideq*1+16* 7]
     paddw                m3, [dstq+strideq*1+16* 8]
     phaddw               m2, m3
     paddw                m3, m7, [dstq+strideq*1+16* 6]
-    mova [dstq+strideq*1+16* 6], m0
+    movu [dstq+strideq*1+16* 6], m0
     paddw                m2, m7
     psrlw                m3, 2
     psrlw                m2, 2
-    mova [dstq+strideq*1+16* 7], m1
+    movu [dstq+strideq*1+16* 7], m1
     packuswb             m3, m2
-    mova       [maskq+16*1], m3
+    movu       [maskq+16*1], m3
     call .main
     paddw                m2, [dstq+strideq*1+16* 9]
     paddw                m3, [dstq+strideq*1+16*10]
-    mova [dstq+strideq*1+16* 8], m0
+    movu [dstq+strideq*1+16* 8], m0
     phaddw               m2, m3
-    mova [dstq+strideq*1+16*10], m2
-    mova [dstq+strideq*1+16* 9], m1
+    movu [dstq+strideq*1+16*10], m2
+    movu [dstq+strideq*1+16* 9], m1
     call .main
     paddw                m2, [dstq+strideq*1+16*11]
     paddw                m3, [dstq+strideq*1+16*12]
     phaddw               m2, m3
     paddw                m3, m7, [dstq+strideq*1+16*10]
-    mova [dstq+strideq*1+16*10], m0
+    movu [dstq+strideq*1+16*10], m0
     paddw                m2, m7
     psrlw                m3, 2
     psrlw                m2, 2
-    mova [dstq+strideq*1+16*11], m1
+    movu [dstq+strideq*1+16*11], m1
     packuswb             m3, m2
-    mova       [maskq+16*2], m3
+    movu       [maskq+16*2], m3
     call .main
     paddw                m2, [dstq+strideq*1+16*13]
     paddw                m3, [dstq+strideq*1+16*14]
-    mova [dstq+strideq*1+16*12], m0
+    movu [dstq+strideq*1+16*12], m0
     phaddw               m2, m3
-    mova [dstq+strideq*1+16*14], m2
-    mova [dstq+strideq*1+16*13], m1
+    movu [dstq+strideq*1+16*14], m2
+    movu [dstq+strideq*1+16*13], m1
     call .main
     phaddw               m2, m3
     paddw                m3, m7, [dstq+strideq*1+16*14]
     paddw                m2, [dstq+strideq*1+16*15]
-    mova [dstq+strideq*1+16*14], m0
+    movu [dstq+strideq*1+16*14], m0
     paddw                m2, m7
     psrlw                m3, 2
     psrlw                m2, 2
-    mova [dstq+strideq*1+16*15], m1
+    movu [dstq+strideq*1+16*15], m1
     packuswb             m3, m2
-    mova       [maskq+16*3], m3
+    movu       [maskq+16*3], m3
     sub                  hd, 2
     jg .w128_loop
     RET
 ALIGN function_align
 .main:
 %macro W_MASK 2 ; dst/tmp_offset, mask
-    mova                m%1, [tmp1q+16*%1]
-    mova                m%2, [tmp2q+16*%1]
+    movu                m%1, [tmp1q+16*%1]
+    movu                m%2, [tmp2q+16*%1]
     punpcklwd            m4, m%2, m%1
     punpckhwd            m5, m%2, m%1
     psubsw              m%1, m%2
@@ -7485,20 +7485,20 @@ cglobal w_mask_422_16bpc, 4, 7, 12, dst, stride, tmp1, tmp2, w, h, mask
     shr                 r6d, 11
     movsxd               wq, [t0+wq*4]
 %if ARCH_X86_64
-    mova                 m8, [base+pw_27615]
-    mova                 m9, [base+pw_64]
+    movu                 m8, [base+pw_27615]
+    movu                 m9, [base+pw_64]
     movddup             m10, [base+bidir_rnd+r6*8]
     movddup             m11, [base+bidir_mul+r6*8]
 %else
-    mova                 m1, [base+pw_27615]
-    mova                 m2, [base+pw_64]
+    movu                 m1, [base+pw_27615]
+    movu                 m2, [base+pw_64]
     movddup              m3, [base+bidir_rnd+r6*8]
     movddup              m4, [base+bidir_mul+r6*8]
     ALLOC_STACK       -16*4
-    mova         [rsp+16*0], m1
-    mova         [rsp+16*1], m2
-    mova         [rsp+16*2], m3
-    mova         [rsp+16*3], m4
+    movu         [rsp+16*0], m1
+    movu         [rsp+16*1], m2
+    movu         [rsp+16*2], m3
+    movu         [rsp+16*3], m4
 %endif
     pxor                 m0, m0
     add                  wq, t0
@@ -7524,8 +7524,8 @@ cglobal w_mask_422_16bpc, 4, 7, 12, dst, stride, tmp1, tmp2, w, h, mask
     call .main
     lea                dstq, [dstq+strideq*2]
 .w8:
-    mova   [dstq+strideq*0], m0
-    mova   [dstq+strideq*1], m1
+    movu   [dstq+strideq*0], m0
+    movu   [dstq+strideq*1], m1
     sub                  hd, 2
     jg .w8_loop
 .w8_end:
@@ -7534,11 +7534,11 @@ cglobal w_mask_422_16bpc, 4, 7, 12, dst, stride, tmp1, tmp2, w, h, mask
     call .main
     lea                dstq, [dstq+strideq*2]
 .w16:
-    mova [dstq+strideq*0+16*0], m0
-    mova [dstq+strideq*0+16*1], m1
+    movu [dstq+strideq*0+16*0], m0
+    movu [dstq+strideq*0+16*1], m1
     call .main
-    mova [dstq+strideq*1+16*0], m0
-    mova [dstq+strideq*1+16*1], m1
+    movu [dstq+strideq*1+16*0], m0
+    movu [dstq+strideq*1+16*1], m1
     sub                  hd, 2
     jg .w16_loop
     RET
@@ -7546,11 +7546,11 @@ cglobal w_mask_422_16bpc, 4, 7, 12, dst, stride, tmp1, tmp2, w, h, mask
     call .main
     add                dstq, strideq
 .w32:
-    mova        [dstq+16*0], m0
-    mova        [dstq+16*1], m1
+    movu        [dstq+16*0], m0
+    movu        [dstq+16*1], m1
     call .main
-    mova        [dstq+16*2], m0
-    mova        [dstq+16*3], m1
+    movu        [dstq+16*2], m0
+    movu        [dstq+16*3], m1
     dec                  hd
     jg .w32_loop
     RET
@@ -7558,17 +7558,17 @@ cglobal w_mask_422_16bpc, 4, 7, 12, dst, stride, tmp1, tmp2, w, h, mask
     call .main
     add                dstq, strideq
 .w64:
-    mova        [dstq+16*0], m0
-    mova        [dstq+16*1], m1
+    movu        [dstq+16*0], m0
+    movu        [dstq+16*1], m1
     call .main
-    mova        [dstq+16*2], m0
-    mova        [dstq+16*3], m1
+    movu        [dstq+16*2], m0
+    movu        [dstq+16*3], m1
     call .main
-    mova        [dstq+16*4], m0
-    mova        [dstq+16*5], m1
+    movu        [dstq+16*4], m0
+    movu        [dstq+16*5], m1
     call .main
-    mova        [dstq+16*6], m0
-    mova        [dstq+16*7], m1
+    movu        [dstq+16*6], m0
+    movu        [dstq+16*7], m1
     dec                  hd
     jg .w64_loop
     RET
@@ -7576,29 +7576,29 @@ cglobal w_mask_422_16bpc, 4, 7, 12, dst, stride, tmp1, tmp2, w, h, mask
     call .main
     add                dstq, strideq
 .w128:
-    mova       [dstq+16* 0], m0
-    mova       [dstq+16* 1], m1
+    movu       [dstq+16* 0], m0
+    movu       [dstq+16* 1], m1
     call .main
-    mova       [dstq+16* 2], m0
-    mova       [dstq+16* 3], m1
+    movu       [dstq+16* 2], m0
+    movu       [dstq+16* 3], m1
     call .main
-    mova       [dstq+16* 4], m0
-    mova       [dstq+16* 5], m1
+    movu       [dstq+16* 4], m0
+    movu       [dstq+16* 5], m1
     call .main
-    mova       [dstq+16* 6], m0
-    mova       [dstq+16* 7], m1
+    movu       [dstq+16* 6], m0
+    movu       [dstq+16* 7], m1
     call .main
-    mova       [dstq+16* 8], m0
-    mova       [dstq+16* 9], m1
+    movu       [dstq+16* 8], m0
+    movu       [dstq+16* 9], m1
     call .main
-    mova       [dstq+16*10], m0
-    mova       [dstq+16*11], m1
+    movu       [dstq+16*10], m0
+    movu       [dstq+16*11], m1
     call .main
-    mova       [dstq+16*12], m0
-    mova       [dstq+16*13], m1
+    movu       [dstq+16*12], m0
+    movu       [dstq+16*13], m1
     call .main
-    mova       [dstq+16*14], m0
-    mova       [dstq+16*15], m1
+    movu       [dstq+16*14], m0
+    movu       [dstq+16*15], m1
     dec                  hd
     jg .w128_loop
     RET
@@ -7625,19 +7625,19 @@ cglobal w_mask_444_16bpc, 4, 7, 12, dst, stride, tmp1, tmp2, w, h, mask
     shr                 r6d, 11
     movsxd               wq, [t0+wq*4]
 %if ARCH_X86_64
-    mova                 m8, [base+pw_27615]
-    mova                 m9, [base+pw_64]
+    movu                 m8, [base+pw_27615]
+    movu                 m9, [base+pw_64]
     movddup             m10, [base+bidir_rnd+r6*8]
     movddup             m11, [base+bidir_mul+r6*8]
 %else
-    mova                 m1, [base+pw_27615]
-    mova                 m2, [base+pw_64]
+    movu                 m1, [base+pw_27615]
+    movu                 m2, [base+pw_64]
     movddup              m3, [base+bidir_rnd+r6*8]
     movddup              m7, [base+bidir_mul+r6*8]
     ALLOC_STACK       -16*3
-    mova         [rsp+16*0], m1
-    mova         [rsp+16*1], m2
-    mova         [rsp+16*2], m3
+    movu         [rsp+16*0], m1
+    movu         [rsp+16*1], m2
+    movu         [rsp+16*2], m3
     %define             m11  m7
 %endif
     add                  wq, t0
@@ -7662,8 +7662,8 @@ cglobal w_mask_444_16bpc, 4, 7, 12, dst, stride, tmp1, tmp2, w, h, mask
     call .main
     lea                dstq, [dstq+strideq*2]
 .w8:
-    mova   [dstq+strideq*0], m0
-    mova   [dstq+strideq*1], m1
+    movu   [dstq+strideq*0], m0
+    movu   [dstq+strideq*1], m1
     sub                  hd, 2
     jg .w8_loop
 .w8_end:
@@ -7672,11 +7672,11 @@ cglobal w_mask_444_16bpc, 4, 7, 12, dst, stride, tmp1, tmp2, w, h, mask
     call .main
     lea                dstq, [dstq+strideq*2]
 .w16:
-    mova [dstq+strideq*0+16*0], m0
-    mova [dstq+strideq*0+16*1], m1
+    movu [dstq+strideq*0+16*0], m0
+    movu [dstq+strideq*0+16*1], m1
     call .main
-    mova [dstq+strideq*1+16*0], m0
-    mova [dstq+strideq*1+16*1], m1
+    movu [dstq+strideq*1+16*0], m0
+    movu [dstq+strideq*1+16*1], m1
     sub                  hd, 2
     jg .w16_loop
     RET
@@ -7684,11 +7684,11 @@ cglobal w_mask_444_16bpc, 4, 7, 12, dst, stride, tmp1, tmp2, w, h, mask
     call .main
     add                dstq, strideq
 .w32:
-    mova        [dstq+16*0], m0
-    mova        [dstq+16*1], m1
+    movu        [dstq+16*0], m0
+    movu        [dstq+16*1], m1
     call .main
-    mova        [dstq+16*2], m0
-    mova        [dstq+16*3], m1
+    movu        [dstq+16*2], m0
+    movu        [dstq+16*3], m1
     dec                  hd
     jg .w32_loop
     RET
@@ -7696,17 +7696,17 @@ cglobal w_mask_444_16bpc, 4, 7, 12, dst, stride, tmp1, tmp2, w, h, mask
     call .main
     add                dstq, strideq
 .w64:
-    mova        [dstq+16*0], m0
-    mova        [dstq+16*1], m1
+    movu        [dstq+16*0], m0
+    movu        [dstq+16*1], m1
     call .main
-    mova        [dstq+16*2], m0
-    mova        [dstq+16*3], m1
+    movu        [dstq+16*2], m0
+    movu        [dstq+16*3], m1
     call .main
-    mova        [dstq+16*4], m0
-    mova        [dstq+16*5], m1
+    movu        [dstq+16*4], m0
+    movu        [dstq+16*5], m1
     call .main
-    mova        [dstq+16*6], m0
-    mova        [dstq+16*7], m1
+    movu        [dstq+16*6], m0
+    movu        [dstq+16*7], m1
     dec                  hd
     jg .w64_loop
     RET
@@ -7714,29 +7714,29 @@ cglobal w_mask_444_16bpc, 4, 7, 12, dst, stride, tmp1, tmp2, w, h, mask
     call .main
     add                dstq, strideq
 .w128:
-    mova       [dstq+16* 0], m0
-    mova       [dstq+16* 1], m1
+    movu       [dstq+16* 0], m0
+    movu       [dstq+16* 1], m1
     call .main
-    mova       [dstq+16* 2], m0
-    mova       [dstq+16* 3], m1
+    movu       [dstq+16* 2], m0
+    movu       [dstq+16* 3], m1
     call .main
-    mova       [dstq+16* 4], m0
-    mova       [dstq+16* 5], m1
+    movu       [dstq+16* 4], m0
+    movu       [dstq+16* 5], m1
     call .main
-    mova       [dstq+16* 6], m0
-    mova       [dstq+16* 7], m1
+    movu       [dstq+16* 6], m0
+    movu       [dstq+16* 7], m1
     call .main
-    mova       [dstq+16* 8], m0
-    mova       [dstq+16* 9], m1
+    movu       [dstq+16* 8], m0
+    movu       [dstq+16* 9], m1
     call .main
-    mova       [dstq+16*10], m0
-    mova       [dstq+16*11], m1
+    movu       [dstq+16*10], m0
+    movu       [dstq+16*11], m1
     call .main
-    mova       [dstq+16*12], m0
-    mova       [dstq+16*13], m1
+    movu       [dstq+16*12], m0
+    movu       [dstq+16*13], m1
     call .main
-    mova       [dstq+16*14], m0
-    mova       [dstq+16*15], m1
+    movu       [dstq+16*14], m0
+    movu       [dstq+16*15], m1
     dec                  hd
     jg .w128_loop
     RET
@@ -7747,7 +7747,7 @@ ALIGN function_align
     packuswb             m2, m3
     add               tmp1q, 16*2
     add               tmp2q, 16*2
-    mova            [maskq], m2
+    movu            [maskq], m2
     add               maskq, 16
     ret
 
@@ -7764,13 +7764,13 @@ cglobal blend_16bpc, 3, 7, 8, dst, stride, tmp, w, h, mask, stride3
     movifnidn            hd, hm
     movsxd               wq, [r6+wq*4]
     movifnidn         maskq, maskmp
-    mova                 m7, [base+pw_m512]
+    movu                 m7, [base+pw_m512]
     add                  wq, r6
     lea            stride3q, [strideq*3]
     pxor                 m6, m6
     jmp                  wq
 .w4:
-    mova                 m5, [maskq]
+    movu                 m5, [maskq]
     movq                 m0, [dstq+strideq*0]
     movhps               m0, [dstq+strideq*1]
     movq                 m1, [dstq+strideq*2]
@@ -7796,9 +7796,9 @@ cglobal blend_16bpc, 3, 7, 8, dst, stride, tmp, w, h, mask, stride3
     jg .w4
     RET
 .w8:
-    mova                 m5, [maskq]
-    mova                 m0, [dstq+strideq*0]
-    mova                 m1, [dstq+strideq*1]
+    movu                 m5, [maskq]
+    movu                 m0, [dstq+strideq*0]
+    movu                 m1, [dstq+strideq*1]
     psubw                m2, m0, [tmpq+16*0]
     psubw                m3, m1, [tmpq+16*1]
     add               maskq, 16
@@ -7811,16 +7811,16 @@ cglobal blend_16bpc, 3, 7, 8, dst, stride, tmp, w, h, mask, stride3
     pmulhrsw             m3, m5
     paddw                m0, m2
     paddw                m1, m3
-    mova   [dstq+strideq*0], m0
-    mova   [dstq+strideq*1], m1
+    movu   [dstq+strideq*0], m0
+    movu   [dstq+strideq*1], m1
     lea                dstq, [dstq+strideq*2]
     sub                  hd, 2
     jg .w8
     RET
 .w16:
-    mova                 m5, [maskq]
-    mova                 m0, [dstq+16*0]
-    mova                 m1, [dstq+16*1]
+    movu                 m5, [maskq]
+    movu                 m0, [dstq+16*0]
+    movu                 m1, [dstq+16*1]
     psubw                m2, m0, [tmpq+16*0]
     psubw                m3, m1, [tmpq+16*1]
     add               maskq, 16
@@ -7833,16 +7833,16 @@ cglobal blend_16bpc, 3, 7, 8, dst, stride, tmp, w, h, mask, stride3
     pmulhrsw             m3, m5
     paddw                m0, m2
     paddw                m1, m3
-    mova        [dstq+16*0], m0
-    mova        [dstq+16*1], m1
+    movu        [dstq+16*0], m0
+    movu        [dstq+16*1], m1
     add                dstq, strideq
     dec                  hd
     jg .w16
     RET
 .w32:
-    mova                 m5, [maskq+16*0]
-    mova                 m0, [dstq+16*0]
-    mova                 m1, [dstq+16*1]
+    movu                 m5, [maskq+16*0]
+    movu                 m0, [dstq+16*0]
+    movu                 m1, [dstq+16*1]
     psubw                m2, m0, [tmpq+16*0]
     psubw                m3, m1, [tmpq+16*1]
     punpcklbw            m4, m5, m6
@@ -7853,11 +7853,11 @@ cglobal blend_16bpc, 3, 7, 8, dst, stride, tmp, w, h, mask, stride3
     pmulhrsw             m3, m5
     paddw                m0, m2
     paddw                m1, m3
-    mova        [dstq+16*0], m0
-    mova        [dstq+16*1], m1
-    mova                 m5, [maskq+16*1]
-    mova                 m0, [dstq+16*2]
-    mova                 m1, [dstq+16*3]
+    movu        [dstq+16*0], m0
+    movu        [dstq+16*1], m1
+    movu                 m5, [maskq+16*1]
+    movu                 m0, [dstq+16*2]
+    movu                 m1, [dstq+16*3]
     psubw                m2, m0, [tmpq+16*2]
     psubw                m3, m1, [tmpq+16*3]
     add               maskq, 32
@@ -7870,8 +7870,8 @@ cglobal blend_16bpc, 3, 7, 8, dst, stride, tmp, w, h, mask, stride3
     pmulhrsw             m3, m5
     paddw                m0, m2
     paddw                m1, m3
-    mova        [dstq+16*2], m0
-    mova        [dstq+16*3], m1
+    movu        [dstq+16*2], m0
+    movu        [dstq+16*3], m1
     add                dstq, strideq
     dec                  hd
     jg .w32
@@ -7910,7 +7910,7 @@ cglobal blend_v_16bpc, 3, 6, 6, dst, stride, tmp, w, h
 .w4_loop:
     movq                 m0, [dstq+strideq*0]
     movhps               m0, [dstq+strideq*1]
-    mova                 m1, [tmpq]
+    movu                 m1, [tmpq]
     add                tmpq, 8*2
     psubw                m1, m0
     pmulhrsw             m1, m2
@@ -7922,12 +7922,12 @@ cglobal blend_v_16bpc, 3, 6, 6, dst, stride, tmp, w, h
     jg .w4_loop
     RET
 .w8:
-    mova                 m4, [base+obmc_masks+8*2]
+    movu                 m4, [base+obmc_masks+8*2]
 .w8_loop:
-    mova                 m0, [dstq+strideq*0]
-    mova                 m2, [tmpq+16*0]
-    mova                 m1, [dstq+strideq*1]
-    mova                 m3, [tmpq+16*1]
+    movu                 m0, [dstq+strideq*0]
+    movu                 m2, [tmpq+16*0]
+    movu                 m1, [dstq+strideq*1]
+    movu                 m3, [tmpq+16*1]
     add                tmpq, 16*2
     psubw                m2, m0
     psubw                m3, m1
@@ -7935,20 +7935,20 @@ cglobal blend_v_16bpc, 3, 6, 6, dst, stride, tmp, w, h
     pmulhrsw             m3, m4
     paddw                m0, m2
     paddw                m1, m3
-    mova   [dstq+strideq*0], m0
-    mova   [dstq+strideq*1], m1
+    movu   [dstq+strideq*0], m0
+    movu   [dstq+strideq*1], m1
     lea                dstq, [dstq+strideq*2]
     sub                  hd, 2
     jg .w8_loop
     RET
 .w16:
-    mova                 m4, [base+obmc_masks+16*2]
+    movu                 m4, [base+obmc_masks+16*2]
     movq                 m5, [base+obmc_masks+16*3]
 .w16_loop:
-    mova                 m0, [dstq+16*0]
-    mova                 m2, [tmpq+16*0]
-    mova                 m1, [dstq+16*1]
-    mova                 m3, [tmpq+16*1]
+    movu                 m0, [dstq+16*0]
+    movu                 m2, [tmpq+16*0]
+    movu                 m1, [dstq+16*1]
+    movu                 m3, [tmpq+16*1]
     add                tmpq, 16*2
     psubw                m2, m0
     psubw                m3, m1
@@ -7956,8 +7956,8 @@ cglobal blend_v_16bpc, 3, 6, 6, dst, stride, tmp, w, h
     pmulhrsw             m3, m5
     paddw                m0, m2
     paddw                m1, m3
-    mova        [dstq+16*0], m0
-    mova        [dstq+16*1], m1
+    movu        [dstq+16*0], m0
+    movu        [dstq+16*1], m1
     add                dstq, strideq
     dec                  hd
     jg .w16_loop
@@ -7966,29 +7966,29 @@ cglobal blend_v_16bpc, 3, 6, 6, dst, stride, tmp, w, h
 %if WIN64
     movaps          [rsp+8], m6
 %endif
-    mova                 m4, [base+obmc_masks+16*4]
-    mova                 m5, [base+obmc_masks+16*5]
-    mova                 m6, [base+obmc_masks+16*6]
+    movu                 m4, [base+obmc_masks+16*4]
+    movu                 m5, [base+obmc_masks+16*5]
+    movu                 m6, [base+obmc_masks+16*6]
 .w32_loop:
-    mova                 m0, [dstq+16*0]
-    mova                 m2, [tmpq+16*0]
-    mova                 m1, [dstq+16*1]
-    mova                 m3, [tmpq+16*1]
+    movu                 m0, [dstq+16*0]
+    movu                 m2, [tmpq+16*0]
+    movu                 m1, [dstq+16*1]
+    movu                 m3, [tmpq+16*1]
     psubw                m2, m0
     psubw                m3, m1
     pmulhrsw             m2, m4
     pmulhrsw             m3, m5
     paddw                m0, m2
-    mova                 m2, [dstq+16*2]
+    movu                 m2, [dstq+16*2]
     paddw                m1, m3
-    mova                 m3, [tmpq+16*2]
+    movu                 m3, [tmpq+16*2]
     add                tmpq, 16*4
     psubw                m3, m2
     pmulhrsw             m3, m6
     paddw                m2, m3
-    mova        [dstq+16*0], m0
-    mova        [dstq+16*1], m1
-    mova        [dstq+16*2], m2
+    movu        [dstq+16*0], m0
+    movu        [dstq+16*1], m1
+    movu        [dstq+16*2], m2
     add                dstq, strideq
     dec                  hd
     jg .w32_loop
@@ -7998,10 +7998,10 @@ cglobal blend_v_16bpc, 3, 6, 6, dst, stride, tmp, w, h
     RET
 
 %macro BLEND_H_ROW 2-3 0; dst_off, tmp_off, inc_tmp
-    mova                 m0, [dstq+16*(%1+0)]
-    mova                 m2, [tmpq+16*(%2+0)]
-    mova                 m1, [dstq+16*(%1+1)]
-    mova                 m3, [tmpq+16*(%2+1)]
+    movu                 m0, [dstq+16*(%1+0)]
+    movu                 m2, [tmpq+16*(%2+0)]
+    movu                 m1, [dstq+16*(%1+1)]
+    movu                 m3, [tmpq+16*(%2+1)]
 %if %3
     add                tmpq, 16*%3
 %endif
@@ -8011,8 +8011,8 @@ cglobal blend_v_16bpc, 3, 6, 6, dst, stride, tmp, w, h
     pmulhrsw             m3, m5
     paddw                m0, m2
     paddw                m1, m3
-    mova   [dstq+16*(%1+0)], m0
-    mova   [dstq+16*(%1+1)], m1
+    movu   [dstq+16*(%1+0)], m0
+    movu   [dstq+16*(%1+1)], m1
 %endmacro
 
 cglobal blend_h_16bpc, 3, 7, 6, dst, ds, tmp, w, h, mask
@@ -8048,12 +8048,12 @@ cglobal blend_h_16bpc, 3, 7, 6, dst, ds, tmp, w, h, mask
     jl .w2
     RET
 .w4:
-    mova                 m3, [base+blend_shuf]
+    movu                 m3, [base+blend_shuf]
 .w4_loop:
     movq                 m0, [dstq+dsq*0]
     movhps               m0, [dstq+dsq*1]
     movd                 m2, [maskq+hq*2]
-    mova                 m1, [tmpq]
+    movu                 m1, [tmpq]
     add                tmpq, 8*2
     psubw                m1, m0
     pshufb               m2, m3
@@ -8073,10 +8073,10 @@ cglobal blend_h_16bpc, 3, 7, 6, dst, ds, tmp, w, h, mask
 %endif
 .w8_loop:
     movd                 m7, [maskq+hq*2]
-    mova                 m0, [dstq+dsq*0]
-    mova                 m2, [tmpq+16*0]
-    mova                 m1, [dstq+dsq*1]
-    mova                 m3, [tmpq+16*1]
+    movu                 m0, [dstq+dsq*0]
+    movu                 m2, [tmpq+16*0]
+    movu                 m1, [dstq+dsq*1]
+    movu                 m3, [tmpq+16*1]
     add                tmpq, 16*2
     pshufb               m6, m7, m4
     psubw                m2, m0
@@ -8086,8 +8086,8 @@ cglobal blend_h_16bpc, 3, 7, 6, dst, ds, tmp, w, h, mask
     pmulhrsw             m3, m7
     paddw                m0, m2
     paddw                m1, m3
-    mova       [dstq+dsq*0], m0
-    mova       [dstq+dsq*1], m1
+    movu       [dstq+dsq*0], m0
+    movu       [dstq+dsq*1], m1
     lea                dstq, [dstq+dsq*2]
     add                  hq, 2
     jl .w8_loop
@@ -8310,7 +8310,7 @@ cglobal emu_edge_16bpc, 10, 13, 1, bw, bh, iw, ih, x, \
     punpcklqdq           m0, m0
     xor                  r3, r3
 .left_loop_%3:
-    mova        [dstq+r3*2], m0
+    movu        [dstq+r3*2], m0
     add                  r3, mmsize/2
     cmp                  r3, leftextq
     jl .left_loop_%3
@@ -8442,18 +8442,18 @@ cglobal emu_edge_16bpc, 10, 13, 1, bw, bh, iw, ih, x, \
     ;
 .bottom_x_loop:
  %if ARCH_X86_64
-    mova                 m0, [srcq+r1*2]
+    movu                 m0, [srcq+r1*2]
     lea                  r3, [dstq+r1*2]
     mov                  r4, bottomextq
  %else
     mov                  r3, srcm
-    mova                 m0, [r3+r1*2]
+    movu                 m0, [r3+r1*2]
     lea                  r3, [dstq+r1*2]
     mov                  r4, r4m
  %endif
     ;
 .bottom_y_loop:
-    mova               [r3], m0
+    movu               [r3], m0
     add                  r3, reg_dstride
     dec                  r4
     jg .bottom_y_loop
@@ -8476,16 +8476,16 @@ cglobal emu_edge_16bpc, 10, 13, 1, bw, bh, iw, ih, x, \
     ;
 .top_x_loop:
 %if ARCH_X86_64
-    mova                 m0, [srcq+r1*2]
+    movu                 m0, [srcq+r1*2]
 %else
     mov                  r3, reg_blkm
-    mova                 m0, [r3+r1*2]
+    movu                 m0, [r3+r1*2]
 %endif
     lea                  r3, [dstq+r1*2]
     mov                  r4, topextq
     ;
 .top_y_loop:
-    mova               [r3], m0
+    movu               [r3], m0
     add                  r3, reg_dstride
     dec                  r4
     jg .top_y_loop
@@ -8502,7 +8502,7 @@ cglobal emu_edge_16bpc, 10, 13, 1, bw, bh, iw, ih, x, \
 
 %macro SCRATCH 3
 %if ARCH_X86_32
-    mova [rsp+%3*mmsize], m%1
+    movu [rsp+%3*mmsize], m%1
 %define m%2 [rsp+%3*mmsize]
 %else
     SWAP             %1, %2
@@ -8538,7 +8538,7 @@ cglobal resize_16bpc, 0, 6, 8, 6*16, dst, dst_stride, src, src_stride, \
     pshufd              m7, m7, q0000
     pshufd              m6, m6, q0000
     pshufd              m5, m5, q0000
-    mova [rsp+16*3*ARCH_X86_32], m4
+    movu [rsp+16*3*ARCH_X86_32], m4
 %if ARCH_X86_64
  DEFINE_ARGS dst, dst_stride, src, src_stride, dst_w, h, x
     LEA                 r7, $$
@@ -8555,8 +8555,8 @@ cglobal resize_16bpc, 0, 6, 8, 6*16, dst, dst_stride, src, src_stride, \
  %endif
 %endif
 %if ARCH_X86_64
-    mova               m12, [base+pd_64]
-    mova               m11, [base+pd_63]
+    movu               m12, [base+pd_64]
+    movu               m11, [base+pd_63]
 %else
  %define m12 [base+pd_64]
  %define m11 [base+pd_63]
@@ -8571,7 +8571,7 @@ cglobal resize_16bpc, 0, 6, 8, 6*16, dst, dst_stride, src, src_stride, \
     pxor                m1, m1
 .loop_y:
     xor                 xd, xd
-    mova                m0, m14            ; per-line working version of mx
+    movu                m0, m14            ; per-line working version of mx
 .loop_x:
     pcmpgtd             m1, m0
     pandn               m1, m0
@@ -8676,8 +8676,8 @@ cglobal resize_16bpc, 0, 6, 8, 6*16, dst, dst_stride, src, src_stride, \
     movu                m1, [base+resize_shuf+8+r1*2]
     pshufb              m7, m1
 .filter:
-    mova        [esp+4*16], m6
-    mova        [esp+5*16], m7
+    movu        [esp+4*16], m6
+    movu        [esp+5*16], m7
     movd                r3, m2
     pshuflw             m2, m2, q3232
     movd                r1, m2
@@ -8697,8 +8697,8 @@ cglobal resize_16bpc, 0, 6, 8, 6*16, dst, dst_stride, src, src_stride, \
     phaddd              m4, m5
     movq                m2, [base+resize_filter+r3*8]
     movq                m5, [base+resize_filter+r1*8]
-    mova                m6, [esp+4*16]
-    mova                m7, [esp+5*16]
+    movu                m6, [esp+4*16]
+    movu                m7, [esp+5*16]
     pxor                m3, m3
     punpcklbw           m1, m3, m2
     punpcklbw           m3, m5

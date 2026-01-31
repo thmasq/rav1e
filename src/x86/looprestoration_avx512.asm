@@ -207,16 +207,16 @@ cglobal wiener_filter7_8bpc, 4, 15, 20, -384*12-16, dst, stride, left, lpf, \
     pop             r0
 .h_have_right:
     pshufb          m4, m16, m6
-    mova            m0, m10
+    movu            m0, m10
     vpdpbusd        m0, m4, m11
     pshufb          m4, m16, m7
-    mova            m2, m10
+    movu            m2, m10
     vpdpbusd        m2, m4, m11
     pshufb          m4, m17, m6
-    mova            m1, m10
+    movu            m1, m10
     vpdpbusd        m1, m4, m11
     pshufb          m4, m17, m7
-    mova            m3, m10
+    movu            m3, m10
     vpdpbusd        m3, m4, m11
     pshufb          m4, m16, m8
     vpdpbusd        m0, m4, m12
@@ -230,8 +230,8 @@ cglobal wiener_filter7_8bpc, 4, 15, 20, -384*12-16, dst, stride, left, lpf, \
     packssdw        m1, m3
     psraw           m0, 3
     psraw           m1, 3
-    mova [t1+r10*2+ 0], m0
-    mova [t1+r10*2+64], m1
+    movu [t1+r10*2+ 0], m0
+    movu [t1+r10*2+64], m1
     add            r10, 64
     jl .h_loop
     ret
@@ -269,16 +269,16 @@ ALIGN function_align
     pop             r0
 .hv_have_right:
     pshufb          m4, m16, m6
-    mova            m0, m10
+    movu            m0, m10
     vpdpbusd        m0, m4, m11
     pshufb          m4, m16, m7
-    mova            m2, m10
+    movu            m2, m10
     vpdpbusd        m2, m4, m11
     pshufb          m4, m17, m6
-    mova            m1, m10
+    movu            m1, m10
     vpdpbusd        m1, m4, m11
     pshufb          m4, m17, m7
-    mova            m3, m10
+    movu            m3, m10
     vpdpbusd        m3, m4, m11
     pshufb          m4, m16, m8
     vpdpbusd        m0, m4, m12
@@ -292,32 +292,32 @@ ALIGN function_align
     packssdw        m1, m3
     psraw           m0, 3
     psraw           m1, 3
-    mova           m16, [t4+r10*2]
+    movu           m16, [t4+r10*2]
     paddw          m16, [t2+r10*2]
-    mova            m3, [t3+r10*2]
-    mova           m17, [t4+r10*2+64]
+    movu            m3, [t3+r10*2]
+    movu           m17, [t4+r10*2+64]
     paddw          m17, [t2+r10*2+64]
-    mova            m5, [t3+r10*2+64]
+    movu            m5, [t3+r10*2+64]
     punpcklwd       m4, m16, m3
-    mova            m2, m13
+    movu            m2, m13
     vpdpwssd        m2, m4, m15
     punpcklwd      m18, m17, m5
-    mova            m4, m13
+    movu            m4, m13
     vpdpwssd        m4, m18, m15
     punpckhwd      m16, m3
-    mova            m3, m13
+    movu            m3, m13
     vpdpwssd        m3, m16, m15
     punpckhwd      m17, m5
-    mova            m5, m13
+    movu            m5, m13
     vpdpwssd        m5, m17, m15
-    mova           m17, [t5+r10*2]
+    movu           m17, [t5+r10*2]
     paddw          m17, [t1+r10*2]
     paddw          m16, m0, [t6+r10*2]
-    mova           m19, [t5+r10*2+64]
+    movu           m19, [t5+r10*2+64]
     paddw          m19, [t1+r10*2+64]
     paddw          m18, m1, [t6+r10*2+64]
-    mova [t0+r10*2+ 0], m0
-    mova [t0+r10*2+64], m1
+    movu [t0+r10*2+ 0], m0
+    movu [t0+r10*2+64], m1
     punpcklwd       m0, m16, m17
     vpdpwssd        m2, m0, m14
     punpcklwd       m1, m18, m19
@@ -344,28 +344,28 @@ ALIGN function_align
 .v:
     mov            r10, wq
 .v_loop:
-    mova            m4, [t4+r10*2+ 0]
+    movu            m4, [t4+r10*2+ 0]
     paddw           m4, [t2+r10*2+ 0]
-    mova            m1, [t3+r10*2+ 0]
-    mova            m5, [t4+r10*2+64]
+    movu            m1, [t3+r10*2+ 0]
+    movu            m5, [t4+r10*2+64]
     paddw           m5, [t2+r10*2+64]
-    mova            m3, [t3+r10*2+64]
+    movu            m3, [t3+r10*2+64]
     punpcklwd       m6, m4, m1
-    mova            m0, m13
+    movu            m0, m13
     vpdpwssd        m0, m6, m15
     punpcklwd       m6, m5, m3
-    mova            m2, m13
+    movu            m2, m13
     vpdpwssd        m2, m6, m15
     punpckhwd       m4, m1
-    mova            m1, m13
+    movu            m1, m13
     vpdpwssd        m1, m4, m15
     punpckhwd       m5, m3
-    mova            m3, m13
+    movu            m3, m13
     vpdpwssd        m3, m5, m15
-    mova            m5, [t1+r10*2+ 0]
+    movu            m5, [t1+r10*2+ 0]
     paddw           m4, m5, [t6+r10*2+ 0]
     paddw           m5, [t5+r10*2+ 0]
-    mova            m7, [t1+r10*2+64]
+    movu            m7, [t1+r10*2+64]
     paddw           m6, m7, [t6+r10*2+64]
     paddw           m7, [t5+r10*2+64]
     punpcklwd       m8, m4, m5
@@ -391,7 +391,7 @@ ALIGN function_align
     ret
 .w32:
     lea            r10, [r_ext_mask+73]
-    mova          ym18, [wiener_perm32]
+    movu          ym18, [wiener_perm32]
     lea             t1, [rsp+16]
     sub            r10, wq
     test         edgeb, 4 ; LR_HAVE_TOP
@@ -501,10 +501,10 @@ ALIGN function_align
     vpternlogd     m16, m0, m17, 0xe4 ; c ? a : b
 .w32_h_have_right:
     pshufb          m2, m16, m6
-    mova            m0, m10
+    movu            m0, m10
     vpdpbusd        m0, m2, m11
     pshufb          m2, m16, m7
-    mova            m1, m10
+    movu            m1, m10
     vpdpbusd        m1, m2, m11
     pshufb          m2, m16, m8
     vpdpbusd        m0, m2, m12
@@ -512,7 +512,7 @@ ALIGN function_align
     vpdpbusd        m1, m16, m12
     packssdw        m0, m1
     psraw           m0, 3
-    mova          [t1], m0
+    movu          [t1], m0
     ret
 .w32_hv:
     add           lpfq, strideq
@@ -539,20 +539,20 @@ ALIGN function_align
     vinserti32x8   m17, [r10+0], 1
     vpternlogd     m16, m0, m17, 0xe4
 .w32_hv_have_right:
-    mova            m3, [t4]
+    movu            m3, [t4]
     paddw           m3, [t2]
-    mova            m2, [t3]
+    movu            m2, [t3]
     pshufb          m4, m16, m6
-    mova            m0, m10
+    movu            m0, m10
     vpdpbusd        m0, m4, m11
     pshufb          m4, m16, m7
-    mova            m5, m10
+    movu            m5, m10
     vpdpbusd        m5, m4, m11
     punpcklwd       m4, m3, m2
-    mova            m1, m13
+    movu            m1, m13
     vpdpwssd        m1, m4, m15
     punpckhwd       m3, m2
-    mova            m2, m13
+    movu            m2, m13
     vpdpwssd        m2, m3, m15
     pshufb          m4, m16, m8
     vpdpbusd        m0, m4, m12
@@ -560,17 +560,17 @@ ALIGN function_align
     vpdpbusd        m5, m16, m12
     packssdw        m0, m5
     psraw           m0, 3
-    mova            m4, [t5]
+    movu            m4, [t5]
     paddw           m4, [t1]
     paddw           m3, m0, [t6]
-    mova          [t0], m0
+    movu          [t0], m0
     punpcklwd       m0, m3, m4
     vpdpwssd        m1, m0, m14
     punpckhwd       m3, m4
     vpdpwssd        m2, m3, m14
     packuswb        m1, m2
     vpermb         m16, m18, m1
-    mova        [dstq], ym16
+    movu        [dstq], ym16
     mov             t6, t5
     mov             t5, t4
     mov             t4, t3
@@ -581,17 +581,17 @@ ALIGN function_align
     add           dstq, strideq
     ret
 .w32_v:
-    mova            m2, [t4]
+    movu            m2, [t4]
     paddw           m2, [t2]
-    mova            m1, [t3]
-    mova            m4, [t1]
+    movu            m1, [t3]
+    movu            m4, [t1]
     paddw           m3, m4, [t6]
     paddw           m4, [t5]
     punpcklwd       m5, m2, m1
-    mova            m0, m13
+    movu            m0, m13
     vpdpwssd        m0, m5, m15
     punpckhwd       m2, m1
-    mova            m1, m13
+    movu            m1, m13
     vpdpwssd        m1, m2, m15
     punpcklwd       m2, m3, m4
     vpdpwssd        m0, m2, m14
@@ -599,7 +599,7 @@ ALIGN function_align
     vpdpwssd        m1, m3, m14
     packuswb        m0, m1
     vpermb         m16, m18, m0
-    mova        [dstq], ym16
+    movu        [dstq], ym16
     mov             t6, t5
     mov             t5, t4
     mov             t4, t3
@@ -634,15 +634,15 @@ cglobal sgr_filter_5x5_8bpc, 4, 13, 23, 416*24+16, dst, stride, left, lpf, \
     kmovb           k1, r10d
     vpbroadcastd   m14, [pd_34816]              ; (1 << 11) + (1 << 15)
     mov            r10, 0x3333333333333333
-    mova           m18, [sgr_x_by_x+64*0]
+    movu           m18, [sgr_x_by_x+64*0]
     kmovq           k2, r10
-    mova           m19, [sgr_x_by_x+64*1]
+    movu           m19, [sgr_x_by_x+64*1]
     lea            r12, [r_ext_mask+75]
-    mova           m20, [sgr_x_by_x+64*2]
+    movu           m20, [sgr_x_by_x+64*2]
     psllw          m15, 4
-    mova           m21, [sgr_x_by_x+64*3]
+    movu           m21, [sgr_x_by_x+64*3]
     lea            r10, [lpfq+strideq*4]
-    mova          ym22, [sgr_shuf]
+    movu          ym22, [sgr_shuf]
     add            r10, strideq
     mov          [rsp], r10 ; below
     test         edgeb, 4 ; LR_HAVE_TOP
@@ -778,24 +778,24 @@ cglobal sgr_filter_5x5_8bpc, 4, 13, 23, 416*24+16, dst, stride, left, lpf, \
     paddd           m1, [t1+r10*2+416*2]
     paddd           m2, [t1+r10*2+416*4]
 .h_loop_end:
-    mova [t1+r10*2+416*0], m0
-    mova [t1+r10*2+416*2], m1
-    mova [t1+r10*2+416*4], m2
+    movu [t1+r10*2+416*0], m0
+    movu [t1+r10*2+416*2], m1
+    movu [t1+r10*2+416*4], m2
     add            r10, 32
     jl .h_loop
     ret
 .top_fixup:
     lea            r10, [wq-2]
 .top_fixup_loop: ; the sums of the first row needs to be doubled
-    mova            m0, [t1+r10*2+416*0]
-    mova            m1, [t1+r10*2+416*2]
-    mova            m2, [t1+r10*2+416*4]
+    movu            m0, [t1+r10*2+416*0]
+    movu            m1, [t1+r10*2+416*2]
+    movu            m2, [t1+r10*2+416*4]
     paddw           m0, m0
     paddd           m1, m1
     paddd           m2, m2
-    mova [t2+r10*2+416*0], m0
-    mova [t2+r10*2+416*2], m1
-    mova [t2+r10*2+416*4], m2
+    movu [t2+r10*2+416*0], m0
+    movu [t2+r10*2+416*2], m1
+    movu [t2+r10*2+416*4], m2
     add            r10, 32
     jl .top_fixup_loop
     ret
@@ -858,9 +858,9 @@ ALIGN function_align
     paddd          m16, [t2+r10*2+416*2] ; hv sumsq
     paddd          m17, [t2+r10*2+416*4]
     paddw           m1, [t2+r10*2+416*0] ; hv sum
-    mova [t0+r10*2+416*2], m2
-    mova [t0+r10*2+416*4], m3
-    mova [t0+r10*2+416*0], m0
+    movu [t0+r10*2+416*2], m2
+    movu [t0+r10*2+416*4], m3
+    movu [t0+r10*2+416*0], m0
     pmulld         m16, m9               ; -a * 25
     pmulld         m17, m9
     punpcklwd       m0, m1, m4           ; b
@@ -872,7 +872,7 @@ ALIGN function_align
     pmulld         m16, m11              ; p * s
     pmulld         m17, m11
     vpalignr   m17{k2}, m16, m16, 2
-    mova           m16, m20
+    movu           m16, m20
     paddusw        m17, m12
     psraw          m17, 4                ; min(z, 255) - 256
     vpermt2b       m16, m17, m21         ; sgr_x_by_x[128..255]
@@ -887,10 +887,10 @@ ALIGN function_align
     paddd           m1, m14
     vpternlogd     m16, m0, m13, 0xd8    ; a | (b << 12)
     vpternlogd     m17, m1, m13, 0xd8
-    mova          [t3+r10*4+  8], m16    ; The neighbor calculations requires
-    mova          [t3+r10*4+ 24], xm17   ; 13 bits for a and 21 bits for b.
+    movu          [t3+r10*4+  8], m16    ; The neighbor calculations requires
+    movu          [t3+r10*4+ 24], xm17   ; 13 bits for a and 21 bits for b.
     vextracti32x4 [t3+r10*4+ 56], m17, 2 ; Packing them allows for 12+20, but
-    mova          [t3+r10*4+ 72], m17    ; that gets us most of the way.
+    movu          [t3+r10*4+ 72], m17    ; that gets us most of the way.
     vextracti128  [t3+r10*4+ 72], ym16, 1
     vextracti32x4 [t3+r10*4+104], m16, 3
     add            r10, 32
@@ -900,19 +900,19 @@ ALIGN function_align
     mov             t0, t2
     ret
 .hv_last_row: ; esoteric edge case for odd heights
-    mova [t1+r10*2+416*0], m1
+    movu [t1+r10*2+416*0], m1
     paddw              m1, m0
-    mova [t1+r10*2+416*2], m16
+    movu [t1+r10*2+416*2], m16
     paddd             m16, m2
-    mova [t1+r10*2+416*4], m17
+    movu [t1+r10*2+416*4], m17
     paddd             m17, m3
     jmp .hv_main2
 .v: ; vertical boxsum + ab
     lea            r10, [wq-2]
 .v_loop:
-    mova            m2, [t1+r10*2+416*2]
+    movu            m2, [t1+r10*2+416*2]
     paddd          m16, m2, [t2+r10*2+416*2]
-    mova            m3, [t1+r10*2+416*4]
+    movu            m3, [t1+r10*2+416*4]
     paddd          m17, m3, [t2+r10*2+416*4]
     paddd           m2, m2
     paddd           m3, m3
@@ -920,7 +920,7 @@ ALIGN function_align
     paddd          m17, m3
     pmulld         m16, m9               ; -a * 25
     pmulld         m17, m9
-    mova            m0, [t1+r10*2+416*0]
+    movu            m0, [t1+r10*2+416*0]
     paddw           m1, m0, [t2+r10*2+416*0]
     paddw           m0, m0
     paddw           m1, m0               ; hv sum
@@ -933,7 +933,7 @@ ALIGN function_align
     pmulld         m16, m11              ; p * s
     pmulld         m17, m11
     vpalignr   m17{k2}, m16, m16, 2
-    mova           m16, m20
+    movu           m16, m20
     paddusw        m17, m12
     psraw          m17, 4                ; min(z, 255) - 256
     vpermt2b       m16, m17, m21         ; sgr_x_by_x[128..255]
@@ -948,10 +948,10 @@ ALIGN function_align
     paddd           m1, m14
     vpternlogd     m16, m0, m13, 0xd8    ; a | (b << 12)
     vpternlogd     m17, m1, m13, 0xd8
-    mova          [t3+r10*4+  8], m16
-    mova          [t3+r10*4+ 24], xm17
+    movu          [t3+r10*4+  8], m16
+    movu          [t3+r10*4+ 24], xm17
     vextracti32x4 [t3+r10*4+ 56], m17, 2
-    mova          [t3+r10*4+ 72], m17
+    movu          [t3+r10*4+ 72], m17
     vextracti128  [t3+r10*4+ 72], ym16, 1
     vextracti32x4 [t3+r10*4+104], m16, 3
     add            r10, 32
@@ -976,10 +976,10 @@ ALIGN function_align
     psrld           m2, 12                ; b
     pandn           m1, m13, m3
     psrld           m3, 12
-    mova [t3+r10*4+416*4+ 0], m0
-    mova [t3+r10*4+416*8+ 0], m2
-    mova [t3+r10*4+416*4+64], m1
-    mova [t3+r10*4+416*8+64], m3
+    movu [t3+r10*4+416*4+ 0], m0
+    movu [t3+r10*4+416*8+ 0], m2
+    movu [t3+r10*4+416*4+64], m1
+    movu [t3+r10*4+416*8+64], m3
     add            r10, 32
     jl .prep_n_loop
     ret
@@ -1005,12 +1005,12 @@ ALIGN function_align
     psrld           m1, 12
     paddd           m2, m16, [t3+r10*4+416*4+ 0] ; a
     paddd           m3, m17, [t3+r10*4+416*4+64]
-    mova [t3+r10*4+416*4+ 0], m16
-    mova [t3+r10*4+416*4+64], m17
+    movu [t3+r10*4+416*4+ 0], m16
+    movu [t3+r10*4+416*4+64], m17
     paddd          m16, m0, [t3+r10*4+416*8+ 0] ; b + (1 << 8)
     paddd          m17, m1, [t3+r10*4+416*8+64]
-    mova [t3+r10*4+416*8+ 0], m0
-    mova [t3+r10*4+416*8+64], m1
+    movu [t3+r10*4+416*8+ 0], m0
+    movu [t3+r10*4+416*8+64], m1
     pmovzxbd        m0, [dstq+r10+ 0]
     pmovzxbd        m1, [dstq+r10+16]
     pmaddwd         m2, m0                      ; a * src
@@ -1025,7 +1025,7 @@ ALIGN function_align
     paddw          m16, m0
     packuswb       m16, m16
     vpermd         m16, m22, m16
-    mova    [dstq+r10], ym16
+    movu    [dstq+r10], ym16
     add            r10, 32
     jl .n0_loop
     add           dstq, strideq
@@ -1038,8 +1038,8 @@ ALIGN function_align
     pmovzxbd        m1, [dstq+r10+16]
     pmaddwd         m2, m0, [t3+r10*4+416*4+ 0] ; a * src
     pmaddwd         m3, m1, [t3+r10*4+416*4+64]
-    mova           m16, [t3+r10*4+416*8+ 0]     ; b + (1 << 7)
-    mova           m17, [t3+r10*4+416*8+64]
+    movu           m16, [t3+r10*4+416*8+ 0]     ; b + (1 << 7)
+    movu           m17, [t3+r10*4+416*8+64]
     packssdw        m0, m1
     psubd          m16, m2                      ; b - a * src + (1 << 7)
     psubd          m17, m3
@@ -1050,7 +1050,7 @@ ALIGN function_align
     paddw          m16, m0
     packuswb       m16, m16
     vpermd         m16, m22, m16
-    mova    [dstq+r10], ym16
+    movu    [dstq+r10], ym16
     add            r10, 32
     jl .n1_loop
     add           dstq, strideq
@@ -1080,15 +1080,15 @@ cglobal sgr_filter_3x3_8bpc, 4, 15, 22, -416*28-16, dst, stride, left, lpf, \
     mov           r10d, 0xfe
     vpbroadcastd   m14, [pd_34816]              ; (1 << 11) + (1 << 15)
     kmovb           k1, r10d
-    mova           m18, [sgr_x_by_x+64*0]
+    movu           m18, [sgr_x_by_x+64*0]
     mov            r10, 0x3333333333333333
-    mova           m19, [sgr_x_by_x+64*1]
+    movu           m19, [sgr_x_by_x+64*1]
     kmovq           k2, r10
-    mova           m20, [sgr_x_by_x+64*2]
+    movu           m20, [sgr_x_by_x+64*2]
     psllw          m15, 4
-    mova           m21, [sgr_x_by_x+64*3]
+    movu           m21, [sgr_x_by_x+64*3]
     lea            r14, [r_ext_mask+75]
-    mova           ym9, [sgr_shuf]
+    movu           ym9, [sgr_shuf]
     test         edgeb, 4 ; LR_HAVE_TOP
     jz .no_top
     call .h_top
@@ -1191,9 +1191,9 @@ cglobal sgr_filter_3x3_8bpc, 4, 15, 22, -416*28-16, dst, stride, left, lpf, \
     punpckhwd      m16, m17
     punpckhwd       m2, m4
     vpdpwssd        m2, m16, m16
-    mova [t1+r10*2+416*0], m0
-    mova [t1+r10*2+416*2], m1
-    mova [t1+r10*2+416*4], m2
+    movu [t1+r10*2+416*0], m0
+    movu [t1+r10*2+416*2], m1
+    movu [t1+r10*2+416*4], m2
     add            r10, 32
     jl .h_loop
     ret
@@ -1245,9 +1245,9 @@ ALIGN function_align
     paddd          m17, m3, [t2+r10*2+416*4]
     paddd          m16, [t1+r10*2+416*2] ; hv sumsq
     paddd          m17, [t1+r10*2+416*4]
-    mova [t0+r10*2+416*0], m0
-    mova [t0+r10*2+416*2], m2
-    mova [t0+r10*2+416*4], m3
+    movu [t0+r10*2+416*0], m0
+    movu [t0+r10*2+416*2], m2
+    movu [t0+r10*2+416*4], m3
     pmulld         m16, m8               ; -a * 9
     pmulld         m17, m8
     punpcklwd       m0, m4, m1           ; b
@@ -1259,7 +1259,7 @@ ALIGN function_align
     pmulld         m16, m11              ; p * s
     pmulld         m17, m11
     vpalignr   m17{k2}, m16, m16, 2
-    mova           m16, m20
+    movu           m16, m20
     paddusw        m17, m12
     psraw          m17, 4                ; min(z, 255) - 256
     vpermt2b       m16, m17, m21         ; sgr_x_by_x[128..255]
@@ -1274,10 +1274,10 @@ ALIGN function_align
     paddd           m1, m14
     vpternlogd     m16, m0, m13, 0xd8    ; a | (b << 12)
     vpternlogd     m17, m1, m13, 0xd8
-    mova          [t3+r10*4+  8], m16
-    mova          [t3+r10*4+ 24], xm17
+    movu          [t3+r10*4+  8], m16
+    movu          [t3+r10*4+ 24], xm17
     vextracti32x4 [t3+r10*4+ 56], m17, 2
-    mova          [t3+r10*4+ 72], m17
+    movu          [t3+r10*4+ 72], m17
     vextracti128  [t3+r10*4+ 72], ym16, 1
     vextracti32x4 [t3+r10*4+104], m16, 3
     add            r10, 32
@@ -1289,15 +1289,15 @@ ALIGN function_align
 .v: ; vertical boxsum + ab
     lea            r10, [wq-2]
 .v_loop:
-    mova           m16, [t1+r10*2+416*2]
-    mova           m17, [t1+r10*2+416*4]
+    movu           m16, [t1+r10*2+416*2]
+    movu           m17, [t1+r10*2+416*4]
     paddd          m16, m16
     paddd          m17, m17
     paddd          m16, [t2+r10*2+416*2] ; hv sumsq
     paddd          m17, [t2+r10*2+416*4]
     pmulld         m16, m8               ; -a * 9
     pmulld         m17, m8
-    mova            m1, [t1+r10*2+416*0]
+    movu            m1, [t1+r10*2+416*0]
     paddw           m1, m1
     paddw           m1, [t2+r10*2+416*0] ; hv sum
     punpcklwd       m0, m4, m1           ; b
@@ -1309,7 +1309,7 @@ ALIGN function_align
     pmulld         m16, m11              ; p * s
     pmulld         m17, m11
     vpalignr   m17{k2}, m16, m16, 2
-    mova           m16, m20
+    movu           m16, m20
     paddusw        m17, m12
     psraw          m17, 4                ; min(z, 255) - 256
     vpermt2b       m16, m17, m21         ; sgr_x_by_x[128..255]
@@ -1324,10 +1324,10 @@ ALIGN function_align
     paddd           m1, m14
     vpternlogd     m16, m0, m13, 0xd8    ; a | (b << 12)
     vpternlogd     m17, m1, m13, 0xd8
-    mova          [t3+r10*4+  8], m16
-    mova          [t3+r10*4+ 24], xm17
+    movu          [t3+r10*4+  8], m16
+    movu          [t3+r10*4+ 24], xm17
     vextracti32x4 [t3+r10*4+ 56], m17, 2
-    mova          [t3+r10*4+ 72], m17
+    movu          [t3+r10*4+ 72], m17
     vextracti128  [t3+r10*4+ 72], ym16, 1
     vextracti32x4 [t3+r10*4+104], m16, 3
     add            r10, 32
@@ -1338,8 +1338,8 @@ ALIGN function_align
     mov             t4, t3
     add             t3, 416*4
 .prep_n_loop:
-    mova            m2, [t5+r10*4+0]
-    mova            m3, [t4+r10*4+0]
+    movu            m2, [t5+r10*4+0]
+    movu            m3, [t4+r10*4+0]
     paddd           m2, [t5+r10*4+8]
     paddd           m3, [t4+r10*4+8]
     paddd           m0, m2, [t5+r10*4+4]
@@ -1347,11 +1347,11 @@ ALIGN function_align
     pslld           m0, 2
     paddd           m1, m1                ; ab[ 0] 222
     psubd           m0, m2                ; ab[-1] 343
-    mova [t3+r10*4+416*4], m1
+    movu [t3+r10*4+416*4], m1
     paddd           m1, m1
-    mova    [t5+r10*4], m0
+    movu    [t5+r10*4], m0
     psubd           m1, m3                ; ab[ 0] 343
-    mova    [t4+r10*4], m1
+    movu    [t4+r10*4], m1
     add            r10, 16
     jl .prep_n_loop
     ret
@@ -1363,27 +1363,27 @@ ALIGN function_align
 .n: ; neighbor + output
     mov            r10, wq
 .n_loop:
-    mova           m16, [t3+r10*4+ 0]
+    movu           m16, [t3+r10*4+ 0]
     paddd          m16, [t3+r10*4+ 8]
     paddd          m17, m16, [t3+r10*4+ 4]
     paddd          m17, m17               ; ab[+1] 222
-    mova            m2, [t3+r10*4+416*4+ 0]
+    movu            m2, [t3+r10*4+416*4+ 0]
     paddd           m0, m2, [t5+r10*4+ 0] ; ab[ 0] 222 + ab[-1] 343
-    mova            m3, [t3+r10*4+416*4+64]
+    movu            m3, [t3+r10*4+416*4+64]
     paddd           m1, m3, [t5+r10*4+64]
-    mova [t3+r10*4+416*4+ 0], m17
+    movu [t3+r10*4+416*4+ 0], m17
     paddd          m17, m17
     psubd          m17, m16               ; ab[+1] 343
-    mova [t5+r10*4+ 0], m17
+    movu [t5+r10*4+ 0], m17
     paddd           m2, m17               ; ab[ 0] 222 + ab[+1] 343
-    mova           m16, [t3+r10*4+64]
+    movu           m16, [t3+r10*4+64]
     paddd          m16, [t3+r10*4+72]
     paddd          m17, m16, [t3+r10*4+68]
     paddd          m17, m17
-    mova [t3+r10*4+416*4+64], m17
+    movu [t3+r10*4+416*4+64], m17
     paddd          m17, m17
     psubd          m17, m16
-    mova [t5+r10*4+64], m17
+    movu [t5+r10*4+64], m17
     pandn          m16, m13, m0
     psrld           m0, 12
     paddd           m3, m17
@@ -1411,7 +1411,7 @@ ALIGN function_align
     paddw           m0, m2
     packuswb        m0, m0
     vpermd         m16, m9, m0
-    mova    [dstq+r10], ym16
+    movu    [dstq+r10], ym16
     add            r10, 32
     jl .n_loop
     mov            r10, t5
@@ -1446,17 +1446,17 @@ cglobal sgr_filter_mix_8bpc, 4, 13, 28, 416*56+8, dst, stride, left, lpf, \
     mov           r10d, 0xfe
     vpbroadcastd   m15, [pd_34816]
     kmovb           k1, r10d
-    mova           m20, [sgr_x_by_x+64*0]
+    movu           m20, [sgr_x_by_x+64*0]
     mov            r10, 0x3333333333333333
-    mova           m21, [sgr_x_by_x+64*1]
+    movu           m21, [sgr_x_by_x+64*1]
     kmovq           k2, r10
-    mova           m22, [sgr_x_by_x+64*2]
+    movu           m22, [sgr_x_by_x+64*2]
     lea            r12, [r_ext_mask+75]
-    mova           m23, [sgr_x_by_x+64*3]
+    movu           m23, [sgr_x_by_x+64*3]
     vpbroadcastd   m24, [pd_m4096]
     vpbroadcastd   m25, [sgr_shuf+28]           ; 0x8000____
     psllw          m26, 5
-    mova          xm27, [sgr_mix_perm]
+    movu          xm27, [sgr_mix_perm]
     test         edgeb, 4 ; LR_HAVE_TOP
     jz .no_top
     call .h_top
@@ -1526,21 +1526,21 @@ cglobal sgr_filter_mix_8bpc, 4, 13, 28, 416*56+8, dst, stride, left, lpf, \
     lea             t2, [t1+416*12]
     lea            r10, [wq-2]
 .top_fixup_loop:
-    mova            m0, [t1+r10*2+416* 0]
-    mova            m1, [t1+r10*2+416* 2]
-    mova            m2, [t1+r10*2+416* 4]
+    movu            m0, [t1+r10*2+416* 0]
+    movu            m1, [t1+r10*2+416* 2]
+    movu            m2, [t1+r10*2+416* 4]
     paddw           m0, m0
-    mova            m3, [t1+r10*2+416* 6]
+    movu            m3, [t1+r10*2+416* 6]
     paddd           m1, m1
-    mova           m16, [t1+r10*2+416* 8]
+    movu           m16, [t1+r10*2+416* 8]
     paddd           m2, m2
-    mova           m17, [t1+r10*2+416*10]
-    mova [t2+r10*2+416* 0], m0
-    mova [t2+r10*2+416* 2], m1
-    mova [t2+r10*2+416* 4], m2
-    mova [t2+r10*2+416* 6], m3
-    mova [t2+r10*2+416* 8], m16
-    mova [t2+r10*2+416*10], m17
+    movu           m17, [t1+r10*2+416*10]
+    movu [t2+r10*2+416* 0], m0
+    movu [t2+r10*2+416* 2], m1
+    movu [t2+r10*2+416* 4], m2
+    movu [t2+r10*2+416* 6], m3
+    movu [t2+r10*2+416* 8], m16
+    movu [t2+r10*2+416*10], m17
     add            r10, 32
     jl .top_fixup_loop
     call .v0
@@ -1588,18 +1588,18 @@ cglobal sgr_filter_mix_8bpc, 4, 13, 28, 416*56+8, dst, stride, left, lpf, \
     punpckhwd      m19, m17
     punpckhwd       m2, m4
     vpdpwssd        m2, m19, m19
-    mova [t1+r10*2+416* 6], m0
-    mova [t1+r10*2+416* 8], m1
-    mova [t1+r10*2+416*10], m2
+    movu [t1+r10*2+416* 6], m0
+    movu [t1+r10*2+416* 8], m1
+    movu [t1+r10*2+416*10], m2
     punpcklwd      m19, m3, m18
     paddw           m0, m3
     vpdpwssd        m1, m19, m19      ; sumsq5
     punpckhwd       m3, m18
     paddw           m0, m18           ; sum5
     vpdpwssd        m2, m3, m3
-    mova [t1+r10*2+416* 0], m0
-    mova [t1+r10*2+416* 2], m1
-    mova [t1+r10*2+416* 4], m2
+    movu [t1+r10*2+416* 0], m0
+    movu [t1+r10*2+416* 2], m1
+    movu [t1+r10*2+416* 4], m2
     add            r10, 32
     jl .h_loop
     ret
@@ -1650,30 +1650,30 @@ ALIGN function_align
     paddw           m0, m1, [t1+r10*2+416* 6]
     paddd          m16, m2, [t1+r10*2+416* 8]
     paddd          m17, m3, [t1+r10*2+416*10]
-    mova [t1+r10*2+416* 6], m1
-    mova [t1+r10*2+416* 8], m2
-    mova [t1+r10*2+416*10], m3
+    movu [t1+r10*2+416* 6], m1
+    movu [t1+r10*2+416* 8], m2
+    movu [t1+r10*2+416*10], m3
     paddw           m1, m18
     paddw           m1, m19           ; sum5
-    mova [t3+r10*4+416*8+ 8], m1
+    movu [t3+r10*4+416*8+ 8], m1
     paddw           m1, [t1+r10*2+416* 0]
-    mova [t1+r10*2+416* 0], m1
+    movu [t1+r10*2+416* 0], m1
     punpcklwd       m1, m18, m19
     vpdpwssd        m2, m1, m1        ; sumsq5
     punpckhwd      m18, m19
     vpdpwssd        m3, m18, m18
-    mova [t3+r10*4+416*0+ 8], m2      ; we need a clean copy of the last row
-    mova [t3+r10*4+416*0+72], m3      ; in case height is odd
+    movu [t3+r10*4+416*0+ 8], m2      ; we need a clean copy of the last row
+    movu [t3+r10*4+416*0+72], m3      ; in case height is odd
     paddd           m2, [t1+r10*2+416* 2]
     paddd           m3, [t1+r10*2+416* 4]
-    mova [t1+r10*2+416* 2], m2
-    mova [t1+r10*2+416* 4], m3
+    movu [t1+r10*2+416* 2], m2
+    movu [t1+r10*2+416* 4], m3
     paddw           m1, m0, [t2+r10*2+416* 6]
     paddd           m2, m16, [t2+r10*2+416* 8]
     paddd           m3, m17, [t2+r10*2+416*10]
-    mova [t2+r10*2+416* 6], m0
-    mova [t2+r10*2+416* 8], m16
-    mova [t2+r10*2+416*10], m17
+    movu [t2+r10*2+416* 6], m0
+    movu [t2+r10*2+416* 8], m16
+    movu [t2+r10*2+416*10], m17
     pmulld         m16, m2, m9        ; -a3 * 9
     pmulld         m17, m3, m9
     punpcklwd       m0, m4, m1        ; b3
@@ -1685,7 +1685,7 @@ ALIGN function_align
     pmaddwd         m0, m13           ; b3 * 455
     pmaddwd         m1, m13
     vpalignr   m17{k2}, m16, m16, 2
-    mova           m16, m22
+    movu           m16, m22
     paddusw        m17, m14
     psraw          m17, 4             ; min(z3, 255) - 256
     vpermt2b       m16, m17, m23      ; sgr_x_by_x[128..255]
@@ -1700,10 +1700,10 @@ ALIGN function_align
     paddd           m1, m15
     vpternlogd     m16, m0, m24, 0xd8 ; a3 | (b3 << 12)
     vpternlogd     m17, m1, m24, 0xd8
-    mova          [t3+r10*4+416*4+  8], m16
-    mova          [t3+r10*4+416*4+ 24], xm17
+    movu          [t3+r10*4+416*4+  8], m16
+    movu          [t3+r10*4+416*4+ 24], xm17
     vextracti32x4 [t3+r10*4+416*4+ 56], m17, 2
-    mova          [t3+r10*4+416*4+ 72], m17
+    movu          [t3+r10*4+416*4+ 72], m17
     vextracti128  [t3+r10*4+416*4+ 72], ym16, 1
     vextracti32x4 [t3+r10*4+416*4+104], m16, 3
     add            r10, 32
@@ -1755,8 +1755,8 @@ ALIGN function_align
     vpdpwssd        m1, m17, m17
     paddd          m16, m0, [t2+r10*2+416* 8]
     paddd          m17, m1, [t2+r10*2+416*10]
-    mova [t2+r10*2+416* 8], m0
-    mova [t2+r10*2+416*10], m1
+    movu [t2+r10*2+416* 8], m0
+    movu [t2+r10*2+416*10], m1
     punpcklwd      m18, m3, m19
     vpdpwssd        m0, m18, m18      ; sumsq5
     punpckhwd      m18, m3, m19
@@ -1768,16 +1768,16 @@ ALIGN function_align
     paddd          m19, m1, [t2+r10*2+416*4]
     paddd          m18, [t1+r10*2+416*2]
     paddd          m19, [t1+r10*2+416*4]
-    mova [t2+r10*2+416*2], m0
-    mova [t2+r10*2+416*4], m1
+    movu [t2+r10*2+416*2], m0
+    movu [t2+r10*2+416*4], m1
     pmulld         m18, m10           ; -a5 * 25
     pmulld         m19, m10
     paddw           m1, m2, [t2+r10*2+416* 6]
-    mova [t2+r10*2+416* 6], m2
+    movu [t2+r10*2+416* 6], m2
     paddw           m2, m3            ; sum5
     paddw           m3, m2, [t2+r10*2+416*0]
     paddw           m3, [t1+r10*2+416*0]
-    mova [t2+r10*2+416*0], m2
+    movu [t2+r10*2+416*0], m2
     punpcklwd       m0, m4, m1        ; b3
     vpdpwssd       m16, m0, m0        ; -p3
     punpckhwd       m1, m4, m1
@@ -1797,13 +1797,13 @@ ALIGN function_align
     vpalignr   m17{k2}, m16, m16, 2
     vpalignr   m19{k2}, m18, m18, 2
     paddusw        m17, m14
-    mova           m16, m22
+    movu           m16, m22
     psraw          m17, 4             ; min(z3, 255) - 256
     vpermt2b       m16, m17, m23      ; sgr_x_by_x[128..255]
     vpmovb2m        k3, m17
     vpermi2b       m17, m20, m21      ; sgr_x_by_x[  0..127]
     paddusw        m19, m14
-    mova           m18, m22
+    movu           m18, m22
     psraw          m19, 4             ; min(z5, 255) - 256
     vpermt2b       m18, m19, m23      ; sgr_x_by_x[128..255]
     vpmovb2m        k4, m19
@@ -1822,20 +1822,20 @@ ALIGN function_align
     paddd           m1, m15
     vpternlogd     m16, m0, m24, 0xd8 ; a3 | (b3 << 12)
     vpternlogd     m17, m1, m24, 0xd8
-    mova          [t3+r10*4+416*8+  8], m16
-    mova          [t3+r10*4+416*8+ 24], xm17
+    movu          [t3+r10*4+416*8+  8], m16
+    movu          [t3+r10*4+416*8+ 24], xm17
     vextracti32x4 [t3+r10*4+416*8+ 56], m17, 2
     paddd           m2, m15           ; x5 * b5 * 164 + (1 << 11) + (1 << 15)
     paddd           m3, m15
-    mova          [t3+r10*4+416*8+ 72], m17
+    movu          [t3+r10*4+416*8+ 72], m17
     vextracti128  [t3+r10*4+416*8+ 72], ym16, 1
     vextracti32x4 [t3+r10*4+416*8+104], m16, 3
     vpternlogd     m18, m2, m24, 0xd8 ; a5 | (b5 << 12)
     vpternlogd     m19, m3, m24, 0xd8
-    mova          [t3+r10*4+416*0+  8], m18
-    mova          [t3+r10*4+416*0+ 24], xm19
+    movu          [t3+r10*4+416*0+  8], m18
+    movu          [t3+r10*4+416*0+ 24], xm19
     vextracti32x4 [t3+r10*4+416*0+ 56], m19, 2
-    mova          [t3+r10*4+416*0+ 72], m19
+    movu          [t3+r10*4+416*0+ 72], m19
     vextracti128  [t3+r10*4+416*0+ 72], ym18, 1
     vextracti32x4 [t3+r10*4+416*0+104], m18, 3
     add            r10, 32
@@ -1847,23 +1847,23 @@ ALIGN function_align
 .v0: ; vertical boxsums + ab3 (even rows)
     lea            r10, [wq-2]
 .v0_loop:
-    mova            m2, [t1+r10*2+416* 8]
-    mova            m3, [t1+r10*2+416*10]
+    movu            m2, [t1+r10*2+416* 8]
+    movu            m3, [t1+r10*2+416*10]
     paddd           m2, m2
     paddd           m3, m3
     paddd          m16, m2, [t2+r10*2+416* 8]
     paddd          m17, m3, [t2+r10*2+416*10]
-    mova            m0, [t1+r10*2+416* 6]
+    movu            m0, [t1+r10*2+416* 6]
     paddw           m0, m0
     paddw           m1, m0, [t2+r10*2+416* 6]
     pmulld         m16, m9            ; -a3 * 9
     pmulld         m17, m9
-    mova [t2+r10*2+416* 6], m0
-    mova [t2+r10*2+416* 8], m2
-    mova [t2+r10*2+416*10], m3
-    mova            m2, [t1+r10*2+416*0]
-    mova            m3, [t1+r10*2+416*2]
-    mova           m18, [t1+r10*2+416*4]
+    movu [t2+r10*2+416* 6], m0
+    movu [t2+r10*2+416* 8], m2
+    movu [t2+r10*2+416*10], m3
+    movu            m2, [t1+r10*2+416*0]
+    movu            m3, [t1+r10*2+416*2]
+    movu           m18, [t1+r10*2+416*4]
     punpcklwd       m0, m4, m1        ; b3
     vpdpwssd       m16, m0, m0        ; -p3
     punpckhwd       m1, m4, m1
@@ -1872,11 +1872,11 @@ ALIGN function_align
     pmulld         m17, m12
     pmaddwd         m0, m13           ; b3 * 455
     pmaddwd         m1, m13
-    mova [t3+r10*4+416*8+ 8], m2
-    mova [t3+r10*4+416*0+ 8], m3
-    mova [t3+r10*4+416*0+72], m18
+    movu [t3+r10*4+416*8+ 8], m2
+    movu [t3+r10*4+416*0+ 8], m3
+    movu [t3+r10*4+416*0+72], m18
     vpalignr   m17{k2}, m16, m16, 2
-    mova           m16, m22
+    movu           m16, m22
     paddusw        m17, m14
     psraw          m17, 4             ; min(z3, 255) - 256
     vpermt2b       m16, m17, m23      ; sgr_x_by_x[128..255]
@@ -1890,17 +1890,17 @@ ALIGN function_align
     paddw           m2, m2            ; cc5
     paddd           m3, m3
     paddd          m18, m18
-    mova [t1+r10*2+416*0], m2
-    mova [t1+r10*2+416*2], m3
-    mova [t1+r10*2+416*4], m18
+    movu [t1+r10*2+416*0], m2
+    movu [t1+r10*2+416*2], m3
+    movu [t1+r10*2+416*4], m18
     paddd           m0, m15           ; x3 * b3 * 455 + (1 << 11) + (1 << 15)
     paddd           m1, m15
     vpternlogd     m16, m0, m24, 0xd8 ; a3 | (b3 << 12)
     vpternlogd     m17, m1, m24, 0xd8
-    mova          [t3+r10*4+416*4+  8], m16
-    mova          [t3+r10*4+416*4+ 24], xm17
+    movu          [t3+r10*4+416*4+  8], m16
+    movu          [t3+r10*4+416*4+ 24], xm17
     vextracti32x4 [t3+r10*4+416*4+ 56], m17, 2
-    mova          [t3+r10*4+416*4+ 72], m17
+    movu          [t3+r10*4+416*4+ 72], m17
     vextracti128  [t3+r10*4+416*4+ 72], ym16, 1
     vextracti32x4 [t3+r10*4+416*4+104], m16, 3
     add            r10, 32
@@ -1909,31 +1909,31 @@ ALIGN function_align
 .v1: ; vertical boxsums + ab (odd rows)
     lea            r10, [wq-2]
 .v1_loop:
-    mova            m0, [t1+r10*2+416* 8]
+    movu            m0, [t1+r10*2+416* 8]
     paddd          m16, m0, [t2+r10*2+416* 8]
-    mova            m1, [t1+r10*2+416*10]
+    movu            m1, [t1+r10*2+416*10]
     paddd          m17, m1, [t2+r10*2+416*10]
-    mova            m2, [t3+r10*4+416*0+ 8]
+    movu            m2, [t3+r10*4+416*0+ 8]
     paddd          m18, m2, [t2+r10*2+416* 2]
-    mova            m3, [t3+r10*4+416*0+72]
+    movu            m3, [t3+r10*4+416*0+72]
     paddd          m19, m3, [t2+r10*2+416* 4]
     paddd          m18, [t1+r10*2+416* 2]
     paddd          m19, [t1+r10*2+416* 4]
-    mova [t2+r10*2+416* 8], m0
-    mova [t2+r10*2+416*10], m1
-    mova [t2+r10*2+416* 2], m2
-    mova [t2+r10*2+416* 4], m3
+    movu [t2+r10*2+416* 8], m0
+    movu [t2+r10*2+416*10], m1
+    movu [t2+r10*2+416* 2], m2
+    movu [t2+r10*2+416* 4], m3
     pmulld         m16, m9            ; -a3 * 9
     pmulld         m17, m9
     pmulld         m18, m10           ; -a5 * 25
     pmulld         m19, m10
-    mova            m0, [t1+r10*2+416* 6]
+    movu            m0, [t1+r10*2+416* 6]
     paddw           m1, m0, [t2+r10*2+416* 6]
-    mova            m2, [t3+r10*4+416*8+ 8]
+    movu            m2, [t3+r10*4+416*8+ 8]
     paddw           m3, m2, [t2+r10*2+416*0]
     paddw           m3, [t1+r10*2+416*0]
-    mova [t2+r10*2+416* 6], m0
-    mova [t2+r10*2+416*0], m2
+    movu [t2+r10*2+416* 6], m0
+    movu [t2+r10*2+416*0], m2
     punpcklwd       m0, m4, m1        ; b3
     vpdpwssd       m16, m0, m0        ; -p3
     punpckhwd       m1, m4, m1
@@ -1953,13 +1953,13 @@ ALIGN function_align
     vpalignr   m17{k2}, m16, m16, 2
     vpalignr   m19{k2}, m18, m18, 2
     paddusw        m17, m14
-    mova           m16, m22
+    movu           m16, m22
     psraw          m17, 4             ; min(z3, 255) - 256
     vpermt2b       m16, m17, m23      ; sgr_x_by_x[128..255]
     vpmovb2m        k3, m17
     vpermi2b       m17, m20, m21      ; sgr_x_by_x[  0..127]
     paddusw        m19, m14
-    mova           m18, m22
+    movu           m18, m22
     psraw          m19, 4             ; min(z5, 255) - 256
     vpermt2b       m18, m19, m23      ; sgr_x_by_x[128..255]
     vpmovb2m        k4, m19
@@ -1978,20 +1978,20 @@ ALIGN function_align
     paddd           m1, m15
     vpternlogd     m16, m0, m24, 0xd8 ; a3 | (b3 << 12)
     vpternlogd     m17, m1, m24, 0xd8
-    mova          [t3+r10*4+416*8+  8], m16
-    mova          [t3+r10*4+416*8+ 24], xm17
+    movu          [t3+r10*4+416*8+  8], m16
+    movu          [t3+r10*4+416*8+ 24], xm17
     vextracti32x4 [t3+r10*4+416*8+ 56], m17, 2
     paddd           m2, m15           ; x5 * b5 * 164 + (1 << 11) + (1 << 15)
     paddd           m3, m15
-    mova          [t3+r10*4+416*8+ 72], m17
+    movu          [t3+r10*4+416*8+ 72], m17
     vextracti128  [t3+r10*4+416*8+ 72], ym16, 1
     vextracti32x4 [t3+r10*4+416*8+104], m16, 3
     vpternlogd     m18, m2, m24, 0xd8 ; a5 | (b5 << 12)
     vpternlogd     m19, m3, m24, 0xd8
-    mova          [t3+r10*4+416*0+  8], m18
-    mova          [t3+r10*4+416*0+ 24], xm19
+    movu          [t3+r10*4+416*0+  8], m18
+    movu          [t3+r10*4+416*0+ 24], xm19
     vextracti32x4 [t3+r10*4+416*0+ 56], m19, 2
-    mova          [t3+r10*4+416*0+ 72], m19
+    movu          [t3+r10*4+416*0+ 72], m19
     vextracti128  [t3+r10*4+416*0+ 72], ym18, 1
     vextracti32x4 [t3+r10*4+416*0+104], m18, 3
     add            r10, 32
@@ -2005,9 +2005,9 @@ ALIGN function_align
 .prep_n_loop:
     movu            m0, [t3+r10*4+416*0+4]
     paddd           m1, m0, [t3+r10*4+416*0+0]
-    mova           m16, [t3+r10*4+416*4+0]
+    movu           m16, [t3+r10*4+416*4+0]
     paddd           m1, [t3+r10*4+416*0+8]
-    mova           m17, [t3+r10*4+416*8+0]
+    movu           m17, [t3+r10*4+416*8+0]
     paddd          m16, [t3+r10*4+416*4+8]
     paddd          m17, [t3+r10*4+416*8+8]
     paddd           m2, m16, [t3+r10*4+416*4+4]
@@ -2018,15 +2018,15 @@ ALIGN function_align
     paddd           m1, m0            ; ab5 565
     paddd           m3, m3            ; ab3[ 0] 222
     psubd           m2, m16           ; ab3[-1] 343
-    mova [t3+r10*4+416*20], m3
+    movu [t3+r10*4+416*20], m3
     pandn           m0, m24, m1       ; a5 565
-    mova [t3+r10*4+416*24], m2
+    movu [t3+r10*4+416*24], m2
     psrld           m1, 12            ; b5 565
-    mova [t3+r10*4+416*12], m0
+    movu [t3+r10*4+416*12], m0
     paddd           m3, m3
-    mova [t3+r10*4+416*16], m1
+    movu [t3+r10*4+416*16], m1
     psubd           m3, m17           ; ab3[ 0] 343
-    mova [t3+r10*4+416*28], m3
+    movu [t3+r10*4+416*28], m3
     add            r10, 16
     jl .prep_n_loop
     ret
@@ -2037,7 +2037,7 @@ ALIGN function_align
     movu            m2, [t3+r10*4+4]
     paddd           m3, m2, [t3+r10*4+0]
     paddd           m3, [t3+r10*4+8]
-    mova            m1, [t3+r10*4+416*4+0]
+    movu            m1, [t3+r10*4+416*4+0]
     paddd           m2, m3
     pslld           m3, 2
     paddd           m1, [t3+r10*4+416*4+8]
@@ -2046,16 +2046,16 @@ ALIGN function_align
     psrld           m3, 12
     paddd           m0, m2, [t3+r10*4+416*12] ; a5
     paddd          m16, m3, [t3+r10*4+416*16] ; b5 + (1 << 8)
-    mova [t3+r10*4+416*12], m2
-    mova [t3+r10*4+416*16], m3
+    movu [t3+r10*4+416*12], m2
+    movu [t3+r10*4+416*16], m3
     paddd           m2, m1, [t3+r10*4+416*4+4]
     paddd           m2, m2                    ; ab3[ 1] 222
-    mova            m3, [t3+r10*4+416*20]
+    movu            m3, [t3+r10*4+416*20]
     paddd          m17, m3, [t3+r10*4+416*24] ; ab3[ 0] 222 + ab3[-1] 343
-    mova [t3+r10*4+416*20], m2
+    movu [t3+r10*4+416*20], m2
     paddd           m2, m2
     psubd           m2, m1                    ; ab3[ 1] 343
-    mova [t3+r10*4+416*24], m2
+    movu [t3+r10*4+416*24], m2
     paddd           m2, m3                    ; ab3[ 0] 222 + ab3[ 1] 343
     pandn           m1, m24, m17
     psrld          m17, 12
@@ -2075,7 +2075,7 @@ ALIGN function_align
     vpdpwssd        m3, m17, m26
     packuswb        m3, m2
     vpermb         m16, m27, m3
-    mova    [dstq+r10], xm16
+    movu    [dstq+r10], xm16
     add            r10, 16
     jl .n0_loop
     add           dstq, strideq
@@ -2084,17 +2084,17 @@ ALIGN function_align
 .n1: ; neighbor + output (odd rows)
     mov            r10, wq
 .n1_loop:
-    mova            m1, [t3+r10*4+416*8+0]
+    movu            m1, [t3+r10*4+416*8+0]
     paddd           m1, [t3+r10*4+416*8+8]
     paddd           m2, m1, [t3+r10*4+416*8+4]
     paddd           m2, m2                    ; ab3[ 1] 222
-    mova            m0, [t3+r10*4+416*20]
+    movu            m0, [t3+r10*4+416*20]
     paddd          m17, m0, [t3+r10*4+416*28] ; ab3[ 0] 222 + ab3[-1] 343
     pmovzxbd        m3, [dstq+r10]
-    mova [t3+r10*4+416*20], m2
+    movu [t3+r10*4+416*20], m2
     paddd           m2, m2
     psubd           m2, m1                    ; ab3[ 1] 343
-    mova [t3+r10*4+416*28], m2
+    movu [t3+r10*4+416*28], m2
     paddd           m0, m2                    ; ab3[ 0] 222 + ab3[ 1] 343
     pandn           m1, m24, m17
     psrld          m17, 12
@@ -2102,7 +2102,7 @@ ALIGN function_align
     psrld           m0, 12
     paddd           m1, m2                    ; a3
     paddd          m17, m0                    ; b3 + (1 << 8)
-    mova           m16, [t3+r10*4+416*16]     ; b5 + (1 << 7)
+    movu           m16, [t3+r10*4+416*16]     ; b5 + (1 << 7)
     pmaddwd         m1, m3                    ; a3 * src
     pmaddwd         m0, m3, [t3+r10*4+416*12] ; a5 * src
     vpshldd         m3, m25, 16               ; (dst << 16) + (1 << 15)
@@ -2113,7 +2113,7 @@ ALIGN function_align
     vpdpwssd        m3, m17, m26
     packuswb        m3, m3
     vpermb         m16, m27, m3
-    mova    [dstq+r10], xm16
+    movu    [dstq+r10], xm16
     add            r10, 16
     jl .n1_loop
     add           dstq, strideq

@@ -69,10 +69,10 @@ cglobal fgy_32x32xn_8bpc, 6, 13, 22, dst, src, stride, fg_data, w, scaling, \
     mov            sbyd, sbym
     mov        overlapd, [fg_dataq+FGData.overlap_flag]
     mov             r12, 0x0000000f0000000f ; h_overlap mask
-    mova             m0, [scalingq+64*0]
-    mova             m1, [scalingq+64*1]
-    mova             m2, [scalingq+64*2]
-    mova             m3, [scalingq+64*3]
+    movu             m0, [scalingq+64*0]
+    movu             m1, [scalingq+64*1]
+    movu             m2, [scalingq+64*2]
+    movu             m3, [scalingq+64*3]
     kmovq            k1, r12
     vbroadcasti32x4  m4, [base+interleave_hl]
     vpbroadcastd   ym16, [base+pb_27_17]
@@ -312,9 +312,9 @@ ALIGN function_align
     punpcklbw       m20, m5, m21
     punpckhbw       m21, m5
 .add_noise_h:
-    mova           ym18, [srcq+strideq*0]
+    movu           ym18, [srcq+strideq*0]
     vinserti32x8    m18, [srcq+strideq*1], 1
-    mova            m19, m0
+    movu            m19, m0
     punpcklbw       m16, m18, m5
     vpermt2b        m19, m18, m1 ; scaling[  0..127]
     vpmovb2m         k2, m18
@@ -332,7 +332,7 @@ ALIGN function_align
     packuswb        m16, m17
     pmaxub          m16, m7
     pminub          m16, m8
-    mova    [dstq+srcq], ym16
+    movu    [dstq+srcq], ym16
     add            srcq, strideq
     vextracti32x8 [dstq+srcq], m16, 1
     add            srcq, strideq
@@ -356,10 +356,10 @@ cglobal fguv_32x32xn_i%1_8bpc, 6, 14+%2, 22, dst, src, stride, fg_data, w, \
     mov             r12, 0x0000000f0000000f
     vpbroadcastq    m10, [base+pb_27_17_17_27]
 %endif
-    mova             m0, [scalingq+64*0]
-    mova             m1, [scalingq+64*1]
-    mova             m2, [scalingq+64*2]
-    mova             m3, [scalingq+64*3]
+    movu             m0, [scalingq+64*0]
+    movu             m1, [scalingq+64*1]
+    movu             m2, [scalingq+64*2]
+    movu             m3, [scalingq+64*3]
     kmovq            k1, r12
     vbroadcasti32x4  m4, [base+interleave_hl]
     vpbroadcastd     m6, [base+noise_rnd+r6*4-32]
@@ -369,8 +369,8 @@ cglobal fguv_32x32xn_i%1_8bpc, 6, 14+%2, 22, dst, src, stride, fg_data, w, \
     test           sbyd, sbyd
     setnz           r7b
     vpbroadcastd     m9, [base+pw_1024]
-    mova            m11, [base+pb_even]
-    mova            m12, [base+pb_odd]
+    movu            m11, [base+pb_even]
+    movu            m12, [base+pb_odd]
     pxor             m5, m5
     mov              r5, r10mp      ; lstride
     cmp byte [fg_dataq+FGData.chroma_scaling_from_luma], 0
@@ -734,14 +734,14 @@ ALIGN function_align
     punpcklbw       m20, m5, m21
     punpckhbw       m21, m5
 %%add_noise_h:
-    mova           ym18, [lumaq+lstrideq*(0<<%3)]
+    movu           ym18, [lumaq+lstrideq*(0<<%3)]
     vinserti32x8    m18, [lumaq+lstrideq*(1<<%3)], 1
 %if %2
     lea           lumaq, [lumaq+lstrideq*(2<<%3)]
-    mova           ym16, [lumaq+lstrideq*(0<<%3)]
+    movu           ym16, [lumaq+lstrideq*(0<<%3)]
     vinserti32x8    m16, [lumaq+lstrideq*(1<<%3)], 1
-    mova           xm17, [srcq+strideq*0]
-    mova            m19, m11
+    movu           xm17, [srcq+strideq*0]
+    movu            m19, m11
     vpermi2b        m19, m18, m16
     vinserti128    ym17, [srcq+strideq*1], 1
     vpermt2b        m18, m12, m16
@@ -749,7 +749,7 @@ ALIGN function_align
     pavgb           m18, m19
     vinserti32x4    m17, [srcq+stride3q ], 3
 %else
-    mova           ym17, [srcq+strideq*0]
+    movu           ym17, [srcq+strideq*0]
     vinserti32x8    m17, [srcq+strideq*1], 1
 %endif
 %if %1
@@ -763,7 +763,7 @@ ALIGN function_align
     paddw           m18, m15
     packuswb        m18, m19
 .add_noise_main:
-    mova            m19, m0
+    movu            m19, m0
     vpermt2b        m19, m18, m1 ; scaling[  0..127]
     vpmovb2m         k2, m18
     vpermi2b        m18, m2, m3  ; scaling[128..255]
@@ -784,12 +784,12 @@ ALIGN function_align
     pmaxub          m16, m7
     pminub          m16, m8
 %if %2
-    mova          [dstq+strideq*0], xm16
+    movu          [dstq+strideq*0], xm16
     vextracti128  [dstq+strideq*1], ym16, 1
     vextracti32x4 [dstq+strideq*2], m16, 2
     vextracti32x4 [dstq+stride3q ], m16, 3
 %else
-    mova          [dstq+strideq*0], ym16
+    movu          [dstq+strideq*0], ym16
     vextracti32x8 [dstq+strideq*1], m16, 1
 %endif
     lea            dstq, [dstq+strideq*(2<<%2)]

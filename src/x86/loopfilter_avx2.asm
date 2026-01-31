@@ -125,7 +125,7 @@ SECTION .text
 
 %macro TRANSPOSE_16X16B 3 ; in_load_15_from_mem, out_store_0_in_mem, mem
 %if %1 == 0
-    mova          %3, m15
+    movu          %3, m15
 %endif
 
     ; input in m0-15
@@ -143,8 +143,8 @@ SECTION .text
     punpckhbw    m10, m11
     punpcklbw    m11, m12, m13
     punpckhbw    m12, m13
-    mova         m13, %3
-    mova          %3, m12
+    movu         m13, %3
+    movu          %3, m12
     punpcklbw    m12, m14, m13
     punpckhbw    m13, m14, m13
 
@@ -163,8 +163,8 @@ SECTION .text
     punpckhwd     m8, m10
     punpcklwd    m10, m11, m12
     punpckhwd    m11, m12
-    mova         m12, %3
-    mova          %3, m11
+    movu         m12, %3
+    movu          %3, m11
     punpcklwd    m11, m12, m13
     punpckhwd    m12, m13
 
@@ -183,8 +183,8 @@ SECTION .text
     punpckhdq     m9, m11
     punpckldq    m11, m8, m12
     punpckhdq     m8, m12
-    mova         m12, %3
-    mova          %3, m8
+    movu         m12, %3
+    movu          %3, m8
     punpckldq     m8, m7, m12
     punpckhdq     m7, m12
 
@@ -203,12 +203,12 @@ SECTION .text
     punpckhqdq    m1, m9
     punpcklqdq    m9, m5, m11
     punpckhqdq    m5, m11
-    mova         m11, %3
-    mova          %3, m12
+    movu         m11, %3
+    movu          %3, m12
     punpcklqdq   m12, m0, m11
     punpckhqdq    m0, m11
 %if %2 == 0
-    mova         m11, %3
+    movu         m11, %3
 %endif
 
     ; interleaved m11,13,4,14,6,2,8,15,7,3,10,1,9,5,12,0
@@ -221,24 +221,24 @@ SECTION .text
 %ifidn %2, v
 %if %1 == 4
     lea         tmpq, [dstq+mstrideq*2]
-    mova          m3, [tmpq+strideq*0]          ; p1
-    mova          m4, [tmpq+strideq*1]          ; p0
-    mova          m5, [tmpq+strideq*2]          ; q0
-    mova          m6, [tmpq+stride3q]           ; q1
+    movu          m3, [tmpq+strideq*0]          ; p1
+    movu          m4, [tmpq+strideq*1]          ; p0
+    movu          m5, [tmpq+strideq*2]          ; q0
+    movu          m6, [tmpq+stride3q]           ; q1
 %else
     ; load 6-8 pixels, remainder (for wd=16) will be read inline
     lea         tmpq, [dstq+mstrideq*4]
 %if %1 != 6
-    mova         m12, [tmpq+strideq*0]
+    movu         m12, [tmpq+strideq*0]
 %endif
-    mova         m13, [tmpq+strideq*1]
-    mova          m3, [tmpq+strideq*2]
-    mova          m4, [tmpq+stride3q]
-    mova          m5, [dstq+strideq*0]
-    mova          m6, [dstq+strideq*1]
-    mova         m14, [dstq+strideq*2]
+    movu         m13, [tmpq+strideq*1]
+    movu          m3, [tmpq+strideq*2]
+    movu          m4, [tmpq+stride3q]
+    movu          m5, [dstq+strideq*0]
+    movu          m6, [dstq+strideq*1]
+    movu         m14, [dstq+strideq*2]
 %if %1 != 6
-    mova         m15, [dstq+stride3q]
+    movu         m15, [dstq+stride3q]
 %endif
 %endif
 %else
@@ -504,13 +504,13 @@ SECTION .text
     vinserti128  m15, [tmpq+stride3q -8], 1
 
     TRANSPOSE_16X16B 0, 1, [rsp+11*32]
-    mova  [rsp+12*32], m1
-    mova  [rsp+13*32], m2
-    mova  [rsp+14*32], m3
-    mova  [rsp+15*32], m12
-    mova  [rsp+16*32], m13
-    mova  [rsp+17*32], m14
-    mova  [rsp+18*32], m15
+    movu  [rsp+12*32], m1
+    movu  [rsp+13*32], m2
+    movu  [rsp+14*32], m3
+    movu  [rsp+15*32], m12
+    movu  [rsp+16*32], m13
+    movu  [rsp+17*32], m14
+    movu  [rsp+18*32], m15
     ; 4,5,6,7,8,9,10,11 -> 12,13,3,4,5,6,14,15
     SWAP           12, 4, 7
     SWAP           13, 5, 8
@@ -632,44 +632,44 @@ SECTION .text
 %if %1 == 16
 %ifidn %2, v
     lea         tmpq, [dstq+mstrideq*8]
-    mova          m0, [tmpq+strideq*1]
+    movu          m0, [tmpq+strideq*1]
 %else
-    mova          m0, [rsp+12*32]
+    movu          m0, [rsp+12*32]
 %endif
     ABSSUB        m1, m0, m4, m2
 %ifidn %2, v
-    mova          m0, [tmpq+strideq*2]
+    movu          m0, [tmpq+strideq*2]
 %else
-    mova          m0, [rsp+13*32]
+    movu          m0, [rsp+13*32]
 %endif
     ABSSUB        m2, m0, m4, m10
     pmaxub        m1, m2
 %ifidn %2, v
-    mova          m0, [tmpq+stride3q]
+    movu          m0, [tmpq+stride3q]
 %else
-    mova          m0, [rsp+14*32]
+    movu          m0, [rsp+14*32]
 %endif
     ABSSUB        m2, m0, m4, m10
     pmaxub        m1, m2
 %ifidn %2, v
     lea         tmpq, [dstq+strideq*4]
-    mova          m0, [tmpq+strideq*0]
+    movu          m0, [tmpq+strideq*0]
 %else
-    mova          m0, [rsp+15*32]
+    movu          m0, [rsp+15*32]
 %endif
     ABSSUB        m2, m0, m5, m10
     pmaxub        m1, m2
 %ifidn %2, v
-    mova          m0, [tmpq+strideq*1]
+    movu          m0, [tmpq+strideq*1]
 %else
-    mova          m0, [rsp+16*32]
+    movu          m0, [rsp+16*32]
 %endif
     ABSSUB        m2, m0, m5, m10
     pmaxub        m1, m2
 %ifidn %2, v
-    mova          m0, [tmpq+strideq*2]
+    movu          m0, [tmpq+strideq*2]
 %else
-    mova          m0, [rsp+17*32]
+    movu          m0, [rsp+17*32]
 %endif
     ABSSUB        m2, m0, m5, m10
     pmaxub        m1, m2
@@ -756,18 +756,18 @@ SECTION .text
     ; flat16 filter
 %ifidn %2, v
     lea         tmpq, [dstq+mstrideq*8]
-    mova          m0, [tmpq+strideq*1]          ; p6
-    mova          m2, [tmpq+strideq*2]          ; p5
-    mova          m7, [tmpq+stride3q]           ; p4
+    movu          m0, [tmpq+strideq*1]          ; p6
+    movu          m2, [tmpq+strideq*2]          ; p5
+    movu          m7, [tmpq+stride3q]           ; p4
 %else
-    mova          m0, [rsp+12*32]
-    mova          m2, [rsp+13*32]
-    mova          m7, [rsp+14*32]
+    movu          m0, [rsp+12*32]
+    movu          m2, [rsp+13*32]
+    movu          m7, [rsp+14*32]
 %endif
 
-    mova  [rsp+0*32], m9
-    mova  [rsp+1*32], m14
-    mova  [rsp+2*32], m15
+    movu  [rsp+0*32], m9
+    movu  [rsp+1*32], m14
+    movu  [rsp+2*32], m15
 
     ; p6*7+p5*2+p4*2+p3+p2+p1+p0+q0 [p5/p4/p2/p1/p0/q0][p6/p3] A
     ; write -6
@@ -800,9 +800,9 @@ SECTION .text
     pandn         m9, m1, m2
     por           m8, m9
 %ifidn %2, v
-    mova [tmpq+strideq*2], m8                   ; p5
+    movu [tmpq+strideq*2], m8                   ; p5
 %else
-    mova [rsp+13*32], m8
+    movu [rsp+13*32], m8
 %endif
 
     ; sub p6*2, add p3/q1 [reuse p6/p3 from A][-p6,+q1|save] B
@@ -815,8 +815,8 @@ SECTION .text
     punpckhbw     m9, m0, m6
     pmaddubsw     m8, [pb_m1_1]
     pmaddubsw     m9, [pb_m1_1]
-    mova  [rsp+3*32], m8
-    mova  [rsp+4*32], m9
+    movu  [rsp+3*32], m8
+    movu  [rsp+4*32], m9
     paddw        m10, m8
     paddw        m11, m9                        ; p6*5+p5*2+p4*2+p3*2+p2+p1+p0+q0+q1
     pmulhrsw      m8, m10, [pw_2048]
@@ -824,14 +824,14 @@ SECTION .text
     packuswb      m8, m9
     vpblendvb     m8, m7, m8, m1
 %ifidn %2, v
-    mova [tmpq+stride3q], m8                    ; p4
+    movu [tmpq+stride3q], m8                    ; p4
 %else
-    mova [rsp+14*32], m8
+    movu [rsp+14*32], m8
 %endif
 
     ; sub p6/p5, add p2/q2 [-p6,+p2][-p5,+q2|save] C
     ; write -4
-    mova         m14, [rsp+1*32]
+    movu         m14, [rsp+1*32]
     punpcklbw     m8, m0, m13
     punpckhbw     m9, m0, m13
     pmaddubsw     m8, [pb_m1_1]
@@ -842,7 +842,7 @@ SECTION .text
     punpckhbw     m2, m14
     pmaddubsw     m8, [pb_m1_1]
     pmaddubsw     m2, [pb_m1_1]
-    mova  [rsp+1*32], m8
+    movu  [rsp+1*32], m8
     paddw        m10, m8
     paddw        m11, m2                        ; p6*4+p5+p4*2+p3*2+p2*2+p1+p0+q0+q1+q2
     pmulhrsw      m8, m10, [pw_2048]
@@ -850,14 +850,14 @@ SECTION .text
     packuswb      m8, m9
     vpblendvb     m8, m12, m8, m1
 %ifidn %2, v
-    mova [tmpq+strideq*4], m8                   ; p3
+    movu [tmpq+strideq*4], m8                   ; p3
 %else
-    mova [rsp+19*32], m8
+    movu [rsp+19*32], m8
 %endif
 
     ; sub p6/p4, add p1/q3 [-p6,+p1][-p4,+q3|save] D
     ; write -3
-    mova         m15, [rsp+2*32]
+    movu         m15, [rsp+2*32]
     punpcklbw     m8, m0, m3
     punpckhbw     m9, m0, m3
     pmaddubsw     m8, [pb_m1_1]
@@ -868,14 +868,14 @@ SECTION .text
     punpckhbw     m7, m15
     pmaddubsw     m8, [pb_m1_1]
     pmaddubsw     m7, [pb_m1_1]
-    mova  [rsp+2*32], m8
+    movu  [rsp+2*32], m8
     paddw        m10, m8
     paddw        m11, m7                        ; p6*3+p5+p4+p3*2+p2*2+p1*2+p0+q0+q1+q2+q3
     pmulhrsw      m8, m10, [pw_2048]
     pmulhrsw      m9, m11, [pw_2048]
     packuswb      m8, m9
     vpblendvb     m8, m13, m8, m1
-    mova  [rsp+6*32], m8                        ; don't clobber p2/m13 since we need it in F
+    movu  [rsp+6*32], m8                        ; don't clobber p2/m13 since we need it in F
 
     ; sub p6/p3, add p0/q4 [-p6,+p0][-p3,+q4|save] E
     ; write -2
@@ -889,30 +889,30 @@ SECTION .text
     paddw        m10, m8
     paddw        m11, m9                        ; p6*2+p5+p4+p3*2+p2*2+p1*2+p0*2+q0+q1+q2+q3
 %ifidn %2, v
-    mova          m9, [tmpq+strideq*0]          ; q4
+    movu          m9, [tmpq+strideq*0]          ; q4
 %else
-    mova          m9, [rsp+15*32]
+    movu          m9, [rsp+15*32]
 %endif
     punpcklbw     m8, m12, m9
     punpckhbw     m9, m12, m9
     pmaddubsw     m8, [pb_m1_1]
     pmaddubsw     m9, [pb_m1_1]
-    mova  [rsp+7*32], m8
-    mova  [rsp+5*32], m9
+    movu  [rsp+7*32], m8
+    movu  [rsp+5*32], m9
     paddw        m10, m8
     paddw        m11, m9                        ; p6*2+p5+p4+p3+p2*2+p1*2+p0*2+q0+q1+q2+q3+q4
     pmulhrsw      m8, m10, [pw_2048]
     pmulhrsw      m9, m11, [pw_2048]
     packuswb      m8, m9
     vpblendvb     m8, m3, m8, m1
-    mova  [rsp+8*32], m8                        ; don't clobber p1/m3 since we need it in G
+    movu  [rsp+8*32], m8                        ; don't clobber p1/m3 since we need it in G
 
     ; sub p6/p2, add q0/q5 [-p6,+q0][-p2,+q5|save] F
     ; write -1
 %ifidn %2, v
-    mova          m9, [tmpq+strideq*1]          ; q5
+    movu          m9, [tmpq+strideq*1]          ; q5
 %else
-    mova          m9, [rsp+16*32]
+    movu          m9, [rsp+16*32]
 %endif
     punpcklbw     m8, m0, m5
     punpckhbw     m0, m5
@@ -922,42 +922,42 @@ SECTION .text
     paddw        m11, m0                        ; p6+p5+p4+p3+p2*2+p1*2+p0*2+q0*2+q1+q2+q3+q4
     punpcklbw     m0, m13, m9
     punpckhbw     m9, m13, m9
-    mova         m13, [rsp+6*32]
+    movu         m13, [rsp+6*32]
     pmaddubsw     m0, [pb_m1_1]
     pmaddubsw     m9, [pb_m1_1]
-    mova [rsp+ 9*32], m0
-    mova [rsp+10*32], m9
+    movu [rsp+ 9*32], m0
+    movu [rsp+10*32], m9
     paddw        m10, m0
     paddw        m11, m9                        ; p6+p5+p4+p3+p2+p1*2+p0*2+q0*2+q1+q2+q3+q4+q5
     pmulhrsw      m0, m10, [pw_2048]
     pmulhrsw      m8, m11, [pw_2048]
     packuswb      m0, m8
     vpblendvb     m0, m4, m0, m1
-    mova  [rsp+6*32], m0                        ; don't clobber p0/m4 since we need it in H
+    movu  [rsp+6*32], m0                        ; don't clobber p0/m4 since we need it in H
 
     ; sub p6/p1, add q1/q6 [reuse -p6,+q1 from B][-p1,+q6|save] G
     ; write +0
 %ifidn %2, v
-    mova          m0, [tmpq+strideq*2]          ; q6
+    movu          m0, [tmpq+strideq*2]          ; q6
 %else
-    mova          m0, [rsp+17*32]
+    movu          m0, [rsp+17*32]
 %endif
     paddw        m10, [rsp+3*32]
     paddw        m11, [rsp+4*32]                ; p5+p4+p3+p2+p1*2+p0*2+q0*2+q1*2+q2+q3+q4+q5
     punpcklbw     m8, m3, m0
     punpckhbw     m9, m3, m0
-    mova          m3, [rsp+8*32]
+    movu          m3, [rsp+8*32]
     pmaddubsw     m8, [pb_m1_1]
     pmaddubsw     m9, [pb_m1_1]
-    mova  [rsp+3*32], m8
-    mova  [rsp+4*32], m9
+    movu  [rsp+3*32], m8
+    movu  [rsp+4*32], m9
     paddw        m10, m8
     paddw        m11, m9                        ; p5+p4+p3+p2+p1+p0*2+q0*2+q1*2+q2+q3+q4+q5+q6
     pmulhrsw      m8, m10, [pw_2048]
     pmulhrsw      m9, m11, [pw_2048]
     packuswb      m8, m9
     vpblendvb     m8, m5, m8, m1
-    mova  [rsp+8*32], m8                        ; don't clobber q0/m5 since we need it in I
+    movu  [rsp+8*32], m8                        ; don't clobber q0/m5 since we need it in I
 
     ; sub p5/p0, add q2/q6 [reuse -p5,+q2 from C][-p0,+q6] H
     ; write +1
@@ -965,7 +965,7 @@ SECTION .text
     paddw        m11, m2                        ; p4+p3+p2+p1+p0*2+q0*2+q1*2+q2*2+q3+q4+q5+q6
     punpcklbw     m8, m4, m0
     punpckhbw     m2, m4, m0
-    mova          m4, [rsp+6*32]
+    movu          m4, [rsp+6*32]
     pmaddubsw     m8, [pb_m1_1]
     pmaddubsw     m2, [pb_m1_1]
     paddw        m10, m8
@@ -981,7 +981,7 @@ SECTION .text
     paddw        m11, m7                        ; p3+p2+p1+p0+q0*2+q1*2+q2*2+q3*2+q4+q5+q6*2
     punpcklbw     m8, m5, m0
     punpckhbw     m9, m5, m0
-    mova          m5, [rsp+8*32]
+    movu          m5, [rsp+8*32]
     pmaddubsw     m8, [pb_m1_1]
     pmaddubsw     m9, [pb_m1_1]
     paddw        m10, m8
@@ -1007,9 +1007,9 @@ SECTION .text
     packuswb      m8, m9
     vpblendvb     m8, m15, m8, m1
 %ifidn %2, v
-    mova [tmpq+mstrideq], m8                    ; q3
+    movu [tmpq+mstrideq], m8                    ; q3
 %else
-    mova [rsp+20*32], m8
+    movu [rsp+20*32], m8
 %endif
 
     ; sub p2/q2, add q5/q6 [reuse -p2,+q5 from F][-q2,+q6] K
@@ -1027,15 +1027,15 @@ SECTION .text
     pmulhrsw      m9, m11, [pw_2048]
     packuswb      m8, m9
 %ifidn %2, v
-    mova          m9, [tmpq+strideq*0]
+    movu          m9, [tmpq+strideq*0]
 %else
-    mova          m9, [rsp+15*32]
+    movu          m9, [rsp+15*32]
 %endif
     vpblendvb     m8, m9, m8, m1
 %ifidn %2, v
-    mova [tmpq+strideq*0], m8                    ; q4
+    movu [tmpq+strideq*0], m8                    ; q4
 %else
-    mova [rsp+15*32], m8
+    movu [rsp+15*32], m8
 %endif
 
     ; sub p1/q3, add q6*2 [reuse -p1,+q6 from G][-q3,+q6] L
@@ -1052,18 +1052,18 @@ SECTION .text
     pmulhrsw     m11, [pw_2048]
     packuswb     m10, m11
 %ifidn %2, v
-    mova         m11, [tmpq+strideq*1]
+    movu         m11, [tmpq+strideq*1]
 %else
-    mova         m11, [rsp+16*32]
+    movu         m11, [rsp+16*32]
 %endif
     vpblendvb    m10, m11, m10, m1
 %ifidn %2, v
-    mova [tmpq+strideq*1], m10                  ; q5
+    movu [tmpq+strideq*1], m10                  ; q5
 %else
-    mova [rsp+16*32], m10
+    movu [rsp+16*32], m10
 %endif
 
-    mova          m9, [rsp+0*32]
+    movu          m9, [rsp+0*32]
 %ifidn %2, v
     lea         tmpq, [dstq+mstrideq*4]
 %endif
@@ -1091,7 +1091,7 @@ SECTION .text
     packuswb      m8, m11
     vpblendvb    m10, m13, m8, m9              ; p2
 %ifidn %2, v
-    mova [tmpq+strideq*1], m10                 ; p2
+    movu [tmpq+strideq*1], m10                 ; p2
 %endif
 
     pmaddubsw     m8, m0, [pb_m1_1]
@@ -1109,9 +1109,9 @@ SECTION .text
     packuswb      m8, m11
     vpblendvb     m8, m3, m8, m9                ; p1
 %ifidn %2, v
-    mova [tmpq+strideq*2], m8                   ; p1
+    movu [tmpq+strideq*2], m8                   ; p1
 %else
-    mova  [rsp+0*32], m8
+    movu  [rsp+0*32], m8
 %endif
 
     pmaddubsw     m0, [pb_1]
@@ -1129,9 +1129,9 @@ SECTION .text
     packuswb      m8, m11
     vpblendvb     m8, m4, m8, m9                ; p0
 %ifidn %2, v
-    mova [tmpq+stride3q ], m8                   ; p0
+    movu [tmpq+stride3q ], m8                   ; p0
 %else
-    mova  [rsp+1*32], m8
+    movu  [rsp+1*32], m8
 %endif
 
     punpcklbw     m0, m5, m15
@@ -1151,7 +1151,7 @@ SECTION .text
     packuswb      m8, m11
     vpblendvb    m11, m5, m8, m9                ; q0
 %ifidn %2, v
-    mova [dstq+strideq*0], m11                  ; q0
+    movu [dstq+strideq*0], m11                  ; q0
 %endif
 
     pmaddubsw     m0, [pb_m1_1]
@@ -1169,7 +1169,7 @@ SECTION .text
     packuswb      m8, m13
     vpblendvb    m13, m6, m8, m9                ; q1
 %ifidn %2, v
-    mova [dstq+strideq*1], m13                  ; q1
+    movu [dstq+strideq*1], m13                  ; q1
 %endif
 
     punpcklbw     m0, m3, m6
@@ -1189,10 +1189,10 @@ SECTION .text
     packuswb      m2, m7
     vpblendvb     m2, m14, m2, m9               ; q2
 %ifidn %2, v
-    mova [dstq+strideq*2], m2                   ; q2
+    movu [dstq+strideq*2], m2                   ; q2
 %else
-    mova          m0, [rsp+0*32]
-    mova          m1, [rsp+1*32]
+    movu          m0, [rsp+0*32]
+    movu          m1, [rsp+1*32]
 %if %1 == 8
     ; 16x8 transpose
     punpcklbw     m3, m12, m10
@@ -1280,15 +1280,15 @@ SECTION .text
     SWAP           7, 1
     SWAP           8, 11
     SWAP           9, 13
-    mova          m0, [rsp+11*32]
-    mova          m1, [rsp+12*32]
-    mova          m2, [rsp+13*32]
-    mova          m3, [rsp+14*32]
-    mova          m4, [rsp+19*32]
-    mova         m11, [rsp+20*32]
-    mova         m12, [rsp+15*32]
-    mova         m13, [rsp+16*32]
-    mova         m14, [rsp+17*32]
+    movu          m0, [rsp+11*32]
+    movu          m1, [rsp+12*32]
+    movu          m2, [rsp+13*32]
+    movu          m3, [rsp+14*32]
+    movu          m4, [rsp+19*32]
+    movu         m11, [rsp+20*32]
+    movu         m12, [rsp+15*32]
+    movu         m13, [rsp+16*32]
+    movu         m14, [rsp+17*32]
     TRANSPOSE_16X16B 1, 0, [rsp+18*32]
     movu [dstq+strideq*0-8], xm0
     movu [dstq+strideq*1-8], xm1
@@ -1350,7 +1350,7 @@ SECTION .text
     packuswb      m2, m12
     vpblendvb     m2, m3, m2, m9
 %ifidn %2, v
-    mova [tmpq+strideq*2], m2                   ; p1
+    movu [tmpq+strideq*2], m2                   ; p1
 %endif
 
     pmaddubsw     m8, [pb_m1_1]
@@ -1368,7 +1368,7 @@ SECTION .text
     packuswb     m12, m13
     vpblendvb    m12, m4, m12, m9
 %ifidn %2, v
-    mova [tmpq+stride3q], m12                   ; p0
+    movu [tmpq+stride3q], m12                   ; p0
 %endif
 
     paddw         m0, m8
@@ -1384,7 +1384,7 @@ SECTION .text
     packuswb     m14, m13
     vpblendvb    m14, m5, m14, m9
 %ifidn %2, v
-    mova [dstq+strideq*0], m14                  ; q0
+    movu [dstq+strideq*0], m14                  ; q0
 %endif
 
     pmaddubsw     m8, [pb_m1_2]
@@ -1400,16 +1400,16 @@ SECTION .text
     packuswb      m0, m1
     vpblendvb     m0, m6, m0, m9
 %ifidn %2, v
-    mova [dstq+strideq*1], m0                   ; q1
+    movu [dstq+strideq*1], m0                   ; q1
 %else
     TRANSPOSE_16x4_AND_WRITE_4x32 2, 12, 14, 0, 1
 %endif
 %else
 %ifidn %2, v
-    mova [tmpq+strideq*0], m3                   ; p1
-    mova [tmpq+strideq*1], m4                   ; p0
-    mova [tmpq+strideq*2], m5                   ; q0
-    mova [tmpq+stride3q ], m6                   ; q1
+    movu [tmpq+strideq*0], m3                   ; p1
+    movu [tmpq+strideq*1], m4                   ; p0
+    movu [tmpq+strideq*2], m5                   ; q0
+    movu [tmpq+stride3q ], m6                   ; q1
 %else
     TRANSPOSE_16x4_AND_WRITE_4x32 3, 4, 5, 6, 7
 %endif

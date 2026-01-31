@@ -78,10 +78,10 @@ cglobal cdef_filter_4x4_16bpc, 5, 7, 16, dst, stride, left, top, bot, \
     lea             r6, [cdef_dirs4]
     movu           xm3, [dstq+strideq*0]
     vinserti32x4   ym3, [dstq+strideq*1], 1
-    mova           xm2, [leftq]
+    movu           xm2, [leftq]
     lea             r2, [dstq+strideq*2]
     vinserti32x4    m3, [r2+strideq*0], 2
-    mova            m5, [base+cdef_perm]
+    movu            m5, [base+cdef_perm]
     vinserti32x4    m3, [r2+strideq*1], 3
     vpermt2d        m2, m5, m3
     vinserti32x4    m1, m2, [topq+strideq*0-4], 0
@@ -157,7 +157,7 @@ cglobal cdef_filter_4x4_16bpc, 5, 7, 16, dst, stride, left, top, bot, \
     vpbroadcastd    m9, [base+cdef_dirs4+(r4+0)*4]
     call .constrain
 .end_no_clip:
-    mova           ym1, [base+end_perm4]
+    movu           ym1, [base+end_perm4]
     vpshldd         m3, m0, 8  ; (px << 8) + ((sum > -8) << 4)
     paddd           m0, m3     ; (px << 8) + ((sum + (sum > -8) + 7) << 4)
     vpermb          m0, m1, m0
@@ -209,11 +209,11 @@ cglobal cdef_filter_4x8_16bpc, 5, 7, 22, dst, stride, left, top, bot, \
     lea             r6, [cdef_dirs4]
     movu          xm18, [dstq+strideq*0]
     vinserti128   ym18, [dstq+strideq*1], 1
-    mova           xm1, [leftq+16*0]
-    mova           xm2, [leftq+16*1]
+    movu           xm1, [leftq+16*0]
+    movu           xm2, [leftq+16*1]
     lea             r2, [strideq*3]
     vinserti32x4   m18, [dstq+strideq*2], 2
-    mova            m5, [base+cdef_perm]
+    movu            m5, [base+cdef_perm]
     vinserti32x4   m18, [dstq+r2       ], 3
     vpermt2d        m1, m5, m18
     vinserti32x4    m0, m1, [topq+strideq*0-4], 0
@@ -231,7 +231,7 @@ cglobal cdef_filter_4x8_16bpc, 5, 7, 22, dst, stride, left, top, bot, \
     punpcklwd      m18, m18    ; px (top)
     psrlw           m5, 8
     punpcklwd      m19, m19    ; px (bottom)
-    mova           m17, m16
+    movu           m17, m16
     vshufi32x4      m1, m2, q3210
     cmp            r3d, 0x0f
     jne .mask_edges
@@ -330,7 +330,7 @@ cglobal cdef_filter_4x8_16bpc, 5, 7, 22, dst, stride, left, top, bot, \
     vpbroadcastd    m9, [base+cdef_dirs4+(r4+0)*4]
     call .constrain
 .end_no_clip:
-    mova          ym20, [base+end_perm4]
+    movu          ym20, [base+end_perm4]
     vpshldd        m18, m16, 8 ; (px << 8) + ((sum > -8) << 4)
     vpshldd        m19, m17, 8
     paddd          m16, m18    ; (px << 8) + ((sum + (sum > -8) + 7) << 4)
@@ -375,10 +375,10 @@ cglobal cdef_filter_4x8_16bpc, 5, 7, 22, dst, stride, left, top, bot, \
     vpbroadcastd   m15, [base+sec_taps4]
 .constrain:
     paddw           m7, m5, m9
-    mova            m6, m0
+    movu            m6, m0
     vpermt2w        m6, m7, m1 ; k0p0 k1p0 (top)
     psubw           m9, m5, m9
-    mova            m8, m0
+    movu            m8, m0
     vpermi2w        m7, m1, m2 ; k0p0 k1p0 (bottom)
     CONSTRAIN      m10, m6, m18, m12, m13, m14, m11
     vpermt2w        m8, m9, m1 ; k0p1 k1p1 (top)
@@ -427,12 +427,12 @@ cglobal cdef_filter_8x8_16bpc, 5, 7, 22, 64*6, dst, stride, left, top, bot, \
     movu          ym21, [botq+strideq*0-4]
     vinserti32x8   m21, [botq+strideq*1-4], 1
 .main:
-    mova    [rsp+64*0], m16    ; top
-    mova    [rsp+64*1], m17    ; 0 1
-    mova    [rsp+64*2], m18    ; 2 3
-    mova    [rsp+64*3], m19    ; 4 5
-    mova    [rsp+64*4], m20    ; 6 7
-    mova    [rsp+64*5], m21    ; bottom
+    movu    [rsp+64*0], m16    ; top
+    movu    [rsp+64*1], m17    ; 0 1
+    movu    [rsp+64*2], m18    ; 2 3
+    movu    [rsp+64*3], m19    ; 4 5
+    movu    [rsp+64*4], m20    ; 6 7
+    movu    [rsp+64*5], m21    ; bottom
     test          prid, prid
     jz .sec_only
     lzcnt          r4d, prid
@@ -479,8 +479,8 @@ cglobal cdef_filter_8x8_16bpc, 5, 7, 22, 64*6, dst, stride, left, top, bot, \
     paddw          m17, m9
     call .min_max_constrain
     movsx           r5, byte [base+cdef_dirs8+(r4+4)*2+0] ; k0off3
-    mova            m2, m8
-    mova            m3, m9
+    movu            m2, m8
+    movu            m3, m9
     call .min_max_constrain
     movsx           r5, byte [base+cdef_dirs8+(r4+0)*2+1] ; k1off2
     paddw           m2, m8
@@ -528,8 +528,8 @@ cglobal cdef_filter_8x8_16bpc, 5, 7, 22, 64*6, dst, stride, left, top, bot, \
     vpbroadcastw   m14, r3d
     call .constrain
     movsx           r5, byte [base+cdef_dirs8+(r4+4)*2+0]
-    mova           m16, m8
-    mova           m17, m9
+    movu           m16, m8
+    movu           m17, m9
     call .constrain
     movsx           r5, byte [base+cdef_dirs8+(r4+0)*2+1]
     paddw          m16, m8
@@ -554,12 +554,12 @@ cglobal cdef_filter_8x8_16bpc, 5, 7, 22, 64*6, dst, stride, left, top, bot, \
     paddw          m16, m0
     paddw          m17, m1
 .end:
-    mova          [dstq+strideq*0], xm16
+    movu          [dstq+strideq*0], xm16
     vextracti128  [dstq+strideq*1], ym16, 1
     vextracti32x4 [dstq+strideq*2], m16, 2
     vextracti32x4 [dstq+r2       ], m16, 3
     lea           dstq, [dstq+strideq*4]
-    mova          [dstq+strideq*0], xm17
+    movu          [dstq+strideq*0], xm17
     vextracti128  [dstq+strideq*1], ym17, 1
     vextracti32x4 [dstq+strideq*2], m17, 2
     vextracti32x4 [dstq+r2       ], m17, 3
@@ -572,11 +572,11 @@ cglobal cdef_filter_8x8_16bpc, 5, 7, 22, 64*6, dst, stride, left, top, bot, \
     vinserti32x8   m21, [botq+strideq*1-4], 1
     jmp .mask_edges_top
 .mask_edges_no_bottom:
-    mova           m21, m2
+    movu           m21, m2
 .mask_edges_top:
     test           r3b, 0x04
     jnz .mask_edges_main
-    mova           m16, m2
+    movu           m16, m2
 .mask_edges_main:
     and            r3d, 0x03
     cmp            r3d, 0x03

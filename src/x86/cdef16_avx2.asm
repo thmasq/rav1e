@@ -149,7 +149,7 @@ ALIGN function_align
 .pri:
     movsx         offq, byte [dirq+4]    ; off_k0
 %if %1 == 4
-    mova            m1, [tmpq+32*0]
+    movu            m1, [tmpq+32*0]
     punpcklqdq      m1, [tmpq+32*1]      ; 0 2 1 3
     movu            m2, [tmpq+offq+32*0]
     punpcklqdq      m2, [tmpq+offq+32*1] ; k0p0
@@ -157,7 +157,7 @@ ALIGN function_align
     movu            m3, [tmpq+offq+32*0]
     punpcklqdq      m3, [tmpq+offq+32*1] ; k0p1
 %else
-    mova           xm1, [tmpq+32*0]
+    movu           xm1, [tmpq+32*0]
     vinserti128     m1, [tmpq+32*1], 1
     movu           xm2, [tmpq+offq+32*0]
     vinserti128     m2, [tmpq+offq+32*1], 1
@@ -221,7 +221,7 @@ ALIGN function_align
     movhps [dstq+r9       ], xm1
     lea           dstq, [dstq+strideq*4]
 %else
-    mova         [dstq+strideq*0], xm0
+    movu         [dstq+strideq*0], xm0
     vextracti128 [dstq+strideq*1], m0, 1
     lea           dstq, [dstq+strideq*2]
 %endif
@@ -230,7 +230,7 @@ ALIGN function_align
 .sec:
     movsx         offq, byte [dirq+8]    ; off1_k0
 %if %1 == 4
-    mova            m1, [tmpq+32*0]
+    movu            m1, [tmpq+32*0]
     punpcklqdq      m1, [tmpq+32*1]
     movu            m2, [tmpq+offq+32*0]
     punpcklqdq      m2, [tmpq+offq+32*1] ; k0s0
@@ -238,7 +238,7 @@ ALIGN function_align
     movu            m3, [tmpq+offq+32*0]
     punpcklqdq      m3, [tmpq+offq+32*1] ; k0s1
 %else
-    mova           xm1, [tmpq+32*0]
+    movu           xm1, [tmpq+32*0]
     vinserti128     m1, [tmpq+32*1], 1
     movu           xm2, [tmpq+offq+32*0]
     vinserti128     m2, [tmpq+offq+32*1], 1
@@ -357,7 +357,7 @@ ALIGN function_align
     movhps [dstq+r9       ], xm1
     lea           dstq, [dstq+strideq*4]
 %else
-    mova         [dstq+strideq*0], xm0
+    movu         [dstq+strideq*0], xm0
     vextracti128 [dstq+strideq*1], m0, 1
     lea           dstq, [dstq+strideq*2]
 %endif
@@ -366,7 +366,7 @@ ALIGN function_align
 .pri_sec:
     movsx         offq, byte [dirq+8]    ; off2_k0
 %if %1 == 4
-    mova            m1, [tmpq+32*0]
+    movu            m1, [tmpq+32*0]
     punpcklqdq      m1, [tmpq+32*1]
     movu            m2, [tmpq+offq+32*0]
     punpcklqdq      m2, [tmpq+offq+32*1] ; k0s0
@@ -374,7 +374,7 @@ ALIGN function_align
     movu            m3, [tmpq+offq+32*0]
     punpcklqdq      m3, [tmpq+offq+32*1] ; k0s1
 %else
-    mova           xm1, [dstq+strideq*0]
+    movu           xm1, [dstq+strideq*0]
     vinserti128     m1, [dstq+strideq*1], 1
     movu           xm2, [tmpq+offq+32*0]
     vinserti128     m2, [tmpq+offq+32*1], 1
@@ -577,7 +577,7 @@ ALIGN function_align
     movhps [dstq+r9       ], xm1
     lea           dstq, [dstq+strideq*4]
 %else
-    mova         [dstq+strideq*0], xm0
+    movu         [dstq+strideq*0], xm0
     vextracti128 [dstq+strideq*1], m0, 1
     lea           dstq, [dstq+strideq*2]
 %endif
@@ -608,16 +608,16 @@ cglobal cdef_filter_4x4_16bpc, 5, 10, 9, 16*10, dst, stride, left, top, bot, \
     movu           xm2, [dstq+strideq*2]
     movu           xm3, [dstq+r9       ]
     vpbroadcastd    m7, [base+pw_m16384]
-    mova   [px+16*0+0], xm0
-    mova   [px+16*1+0], xm1
-    mova   [px+16*2+0], xm2
-    mova   [px+16*3+0], xm3
+    movu   [px+16*0+0], xm0
+    movu   [px+16*1+0], xm1
+    movu   [px+16*2+0], xm2
+    movu   [px+16*3+0], xm3
     test         edgeb, 4 ; HAVE_TOP
     jz .no_top
     movu           xm0, [topq+strideq*0]
     movu           xm1, [topq+strideq*1]
-    mova   [px-16*2+0], xm0
-    mova   [px-16*1+0], xm1
+    movu   [px-16*2+0], xm0
+    movu   [px-16*1+0], xm1
     test         edgeb, 1 ; HAVE_LEFT
     jz .top_no_left
     movd           xm0, [topq+strideq*0-4]
@@ -626,7 +626,7 @@ cglobal cdef_filter_4x4_16bpc, 5, 10, 9, 16*10, dst, stride, left, top, bot, \
     movd   [px-16*1-4], xm1
     jmp .top_done
 .no_top:
-    mova   [px-16*2+0], m7
+    movu   [px-16*2+0], m7
 .top_no_left:
     movd   [px-16*2-4], xm7
     movd   [px-16*1-4], xm7
@@ -635,8 +635,8 @@ cglobal cdef_filter_4x4_16bpc, 5, 10, 9, 16*10, dst, stride, left, top, bot, \
     jz .no_bottom
     movu           xm0, [botq+strideq*0]
     movu           xm1, [botq+strideq*1]
-    mova   [px+16*4+0], xm0
-    mova   [px+16*5+0], xm1
+    movu   [px+16*4+0], xm0
+    movu   [px+16*5+0], xm1
     test         edgeb, 1 ; HAVE_LEFT
     jz .bottom_no_left
     movd           xm0, [botq+strideq*0-4]
@@ -645,7 +645,7 @@ cglobal cdef_filter_4x4_16bpc, 5, 10, 9, 16*10, dst, stride, left, top, bot, \
     movd   [px+16*5-4], xm1
     jmp .bottom_done
 .no_bottom:
-    mova   [px+16*4+0], m7
+    movu   [px+16*4+0], m7
 .bottom_no_left:
     movd   [px+16*4-4], xm7
     movd   [px+16*5-4], xm7
@@ -684,21 +684,21 @@ cglobal cdef_filter_4x8_16bpc, 5, 10, 9, 16*14, dst, stride, left, top, bot, \
     movu           xm6, [r6  +strideq*2]
     movu           xm7, [r6  +r9       ]
     lea             r8, [dir_table4]
-    mova   [px+16*0+0], xm0
-    mova   [px+16*1+0], xm1
-    mova   [px+16*2+0], xm2
-    mova   [px+16*3+0], xm3
-    mova   [px+16*4+0], xm4
-    mova   [px+16*5+0], xm5
-    mova   [px+16*6+0], xm6
-    mova   [px+16*7+0], xm7
+    movu   [px+16*0+0], xm0
+    movu   [px+16*1+0], xm1
+    movu   [px+16*2+0], xm2
+    movu   [px+16*3+0], xm3
+    movu   [px+16*4+0], xm4
+    movu   [px+16*5+0], xm5
+    movu   [px+16*6+0], xm6
+    movu   [px+16*7+0], xm7
     vpbroadcastd    m7, [base+pw_m16384]
     test         edgeb, 4 ; HAVE_TOP
     jz .no_top
     movu           xm0, [topq+strideq*0]
     movu           xm1, [topq+strideq*1]
-    mova   [px-16*2+0], xm0
-    mova   [px-16*1+0], xm1
+    movu   [px-16*2+0], xm0
+    movu   [px-16*1+0], xm1
     test         edgeb, 1 ; HAVE_LEFT
     jz .top_no_left
     movd           xm0, [topq+strideq*0-4]
@@ -707,7 +707,7 @@ cglobal cdef_filter_4x8_16bpc, 5, 10, 9, 16*14, dst, stride, left, top, bot, \
     movd   [px-16*1-4], xm1
     jmp .top_done
 .no_top:
-    mova   [px-16*2+0], m7
+    movu   [px-16*2+0], m7
 .top_no_left:
     movd   [px-16*2-4], xm7
     movd   [px-16*1-4], xm7
@@ -716,8 +716,8 @@ cglobal cdef_filter_4x8_16bpc, 5, 10, 9, 16*14, dst, stride, left, top, bot, \
     jz .no_bottom
     movu           xm0, [botq+strideq*0]
     movu           xm1, [botq+strideq*1]
-    mova   [px+16*8+0], xm0
-    mova   [px+16*9+0], xm1
+    movu   [px+16*8+0], xm0
+    movu   [px+16*9+0], xm1
     test         edgeb, 1 ; HAVE_LEFT
     jz .bottom_no_left
     movd           xm0, [botq+strideq*0-4]
@@ -726,7 +726,7 @@ cglobal cdef_filter_4x8_16bpc, 5, 10, 9, 16*14, dst, stride, left, top, bot, \
     movd   [px+16*9-4], xm1
     jmp .bottom_done
 .no_bottom:
-    mova   [px+16*8+0], m7
+    movu   [px+16*8+0], m7
 .bottom_no_left:
     movd   [px+16*8-4], xm7
     movd   [px+16*9-4], xm7
@@ -780,21 +780,21 @@ cglobal cdef_filter_8x8_16bpc, 5, 9, 9, 32*13, dst, stride, left, top, bot, \
     movu            m6, [r6  +strideq*0]
     movu            m7, [r6  +strideq*1]
     lea             r8, [dir_table8]
-    mova   [px+32*0+0], m0
-    mova   [px+32*1+0], m1
-    mova   [px+32*2+0], m2
-    mova   [px+32*3+0], m3
-    mova   [px+32*4+0], m4
-    mova   [px+32*5+0], m5
-    mova   [px+32*6+0], m6
-    mova   [px+32*7+0], m7
+    movu   [px+32*0+0], m0
+    movu   [px+32*1+0], m1
+    movu   [px+32*2+0], m2
+    movu   [px+32*3+0], m3
+    movu   [px+32*4+0], m4
+    movu   [px+32*5+0], m5
+    movu   [px+32*6+0], m6
+    movu   [px+32*7+0], m7
     vpbroadcastd    m7, [base+pw_m16384]
     test         edgeb, 4 ; HAVE_TOP
     jz .no_top
     movu            m0, [topq+strideq*0]
     movu            m1, [topq+strideq*1]
-    mova   [px-32*2+0], m0
-    mova   [px-32*1+0], m1
+    movu   [px-32*2+0], m0
+    movu   [px-32*1+0], m1
     test         edgeb, 1 ; HAVE_LEFT
     jz .top_no_left
     movd           xm0, [topq+strideq*0-4]
@@ -803,8 +803,8 @@ cglobal cdef_filter_8x8_16bpc, 5, 9, 9, 32*13, dst, stride, left, top, bot, \
     movd   [px-32*1-4], xm1
     jmp .top_done
 .no_top:
-    mova   [px-32*2+0], m7
-    mova   [px-32*1+0], m7
+    movu   [px-32*2+0], m7
+    movu   [px-32*1+0], m7
 .top_no_left:
     movd   [px-32*2-4], xm7
     movd   [px-32*1-4], xm7
@@ -813,8 +813,8 @@ cglobal cdef_filter_8x8_16bpc, 5, 9, 9, 32*13, dst, stride, left, top, bot, \
     jz .no_bottom
     movu            m0, [botq+strideq*0]
     movu            m1, [botq+strideq*1]
-    mova   [px+32*8+0], m0
-    mova   [px+32*9+0], m1
+    movu   [px+32*8+0], m0
+    movu   [px+32*9+0], m1
     test         edgeb, 1 ; HAVE_LEFT
     jz .bottom_no_left
     movd           xm0, [botq+strideq*0-4]
@@ -823,8 +823,8 @@ cglobal cdef_filter_8x8_16bpc, 5, 9, 9, 32*13, dst, stride, left, top, bot, \
     movd   [px+32*9-4], xm1
     jmp .bottom_done
 .no_bottom:
-    mova   [px+32*8+0], m7
-    mova   [px+32*9+0], m7
+    movu   [px+32*8+0], m7
+    movu   [px+32*9+0], m7
 .bottom_no_left:
     movd   [px+32*8-4], xm7
     movd   [px+32*9-4], xm7
@@ -862,10 +862,10 @@ cglobal cdef_dir_16bpc, 4, 7, 6, src, stride, var, bdmax
     shr         bdmaxd, 11 ; 0 for 10bpc, 1 for 12bpc
     vpbroadcastd    m4, [r6+bdmaxq*4]
     lea             r6, [strideq*3]
-    mova           xm0, [srcq+strideq*0]
-    mova           xm1, [srcq+strideq*1]
-    mova           xm2, [srcq+strideq*2]
-    mova           xm3, [srcq+r6       ]
+    movu           xm0, [srcq+strideq*0]
+    movu           xm1, [srcq+strideq*1]
+    movu           xm2, [srcq+strideq*2]
+    movu           xm3, [srcq+r6       ]
     lea           srcq, [srcq+strideq*4]
     vinserti128     m0, [srcq+r6       ], 1
     vinserti128     m1, [srcq+strideq*2], 1

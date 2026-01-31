@@ -187,9 +187,9 @@ ASSERT ARCH_X86_32
 %ifnidn %9, ""
     mov%12           m%8, %9
 %else
-    mova             m%8, %10
+    movu             m%8, %10
 %endif
-    mova             %10, m%4
+    movu             %10, m%4
     TRANSPOSE4X4W     %5, %6, %7, %8, %4
     punpckhqdq       m%4, m%1, m%5
     punpcklqdq       m%1, m%5
@@ -197,11 +197,11 @@ ASSERT ARCH_X86_32
     punpcklqdq       m%2, m%6
     punpckhqdq       m%6, m%3, m%7
     punpcklqdq       m%3, m%7
-    mova             m%7, %10
+    movu             m%7, %10
 %ifnidn %11, ""
     mov%13           %11, m%6
 %else
-    mova             %10, m%6
+    movu             %10, m%6
 %endif
     punpckhqdq       m%6, m%7, m%8
     punpcklqdq       m%7, m%8
@@ -246,10 +246,10 @@ ASSERT ARCH_X86_32
 %define P0 m9
 %define Q0 m10
 %define Q1 m11
-    mova          P1, [dstq+mstrideq*2]         ; p1
-    mova          P0, [dstq+mstrideq*1]         ; p0
-    mova          Q0, [dstq+strideq*0]          ; q0
-    mova          Q1, [dstq+strideq*1]          ; q1
+    movu          P1, [dstq+mstrideq*2]         ; p1
+    movu          P0, [dstq+mstrideq*1]         ; p0
+    movu          Q0, [dstq+strideq*0]          ; q0
+    movu          Q1, [dstq+strideq*1]          ; q1
 %else ; x86-32
 %define P1 [dstq+mstrideq*2]
 %define P0 [dstq+mstrideq*1]
@@ -267,16 +267,16 @@ ASSERT ARCH_X86_32
 %define Q0 m10
 %define Q1 m11
 %define Q2 m14
-    mova          P2, [tmpq+strideq*1]
-    mova          P1, [tmpq+strideq*2]
-    mova          P0, [tmpq+stride3q]
-    mova          Q0, [dstq+strideq*0]
-    mova          Q1, [dstq+strideq*1]
-    mova          Q2, [dstq+strideq*2]
+    movu          P2, [tmpq+strideq*1]
+    movu          P1, [tmpq+strideq*2]
+    movu          P0, [tmpq+stride3q]
+    movu          Q0, [dstq+strideq*0]
+    movu          Q1, [dstq+strideq*1]
+    movu          Q2, [dstq+strideq*2]
 %if %1 != 6
 %define P3 [tmpq+strideq*0]
 %define Q3 m15
-    mova          Q3, [dstq+stride3q]
+    movu          Q3, [dstq+stride3q]
 %endif ; %1 != 6
 %else ; x86-32
 %define P2 [tmpq+strideq*1]
@@ -351,10 +351,10 @@ ASSERT ARCH_X86_32
 %define P0 [esp+4*mmsize]
 %define Q0 [esp+5*mmsize]
 %define Q1 [esp+6*mmsize]
-    mova          P1, m0
-    mova          P0, m1
-    mova          Q0, m2
-    mova          Q1, m3
+    movu          P1, m0
+    movu          P0, m1
+    movu          Q0, m2
+    movu          Q1, m3
 %endif
 %elif %1 == 6 || %1 == 8
     movu          m0, [dstq+strideq*0-8]
@@ -392,7 +392,7 @@ ASSERT ARCH_X86_32
     punpcklwd     m5, m6, m7
     punpckhwd     m6, m7
 %else
-    mova  [rsp+3*16], m4
+    movu  [rsp+3*16], m4
     movu          m4, [tmpq+stride3q -8]
     punpcklwd     m5, m6, m4
     punpckhwd     m6, m4
@@ -420,8 +420,8 @@ ASSERT ARCH_X86_32
     punpckldq     m5, m4, m6
     punpckhdq     m4, m6
 %else
-    mova  [rsp+4*16], m3
-    mova          m3, [rsp+3*16]
+    movu  [rsp+4*16], m3
+    movu          m3, [rsp+3*16]
     punpckldq     m5, m3, m6
     punpckhdq     m3, m6
 %endif
@@ -447,7 +447,7 @@ ASSERT ARCH_X86_32
 %endif
     punpcklqdq    m0, m4
 %if %1 == 8
-    mova  [rsp+1*16], m6
+    movu  [rsp+1*16], m6
 %define P3 [rsp+1*16]
 %endif
     ; 7,2,8,3,1,0,5 -> 13,8,9,10,11,14,15
@@ -470,9 +470,9 @@ ASSERT ARCH_X86_32
 %if %1 == 8
 %define P3 [rsp+ 6*16]
     punpcklqdq    m6, m4, m2
-    mova          P3, m6
+    movu          P3, m6
 %endif
-    mova          m6, [rsp+4*16]
+    movu          m6, [rsp+4*16]
     punpckhqdq    m4, m2
     punpcklqdq    m2, m7, m6
     punpckhqdq    m7, m6
@@ -481,7 +481,7 @@ ASSERT ARCH_X86_32
 %if %1 == 8
 %define Q3 [rsp+24*16]
     punpckhqdq    m5, m0, m3
-    mova          Q3, m5
+    movu          Q3, m5
 %endif
     punpcklqdq    m0, m3
 %if %1 == 8
@@ -499,26 +499,26 @@ ASSERT ARCH_X86_32
 %define Q1 [rsp+7*16]
 %define Q2 [rsp+8*16]
 %endif
-    mova          P2, m4
-    mova          P1, m2
-    mova          P0, m7
-    mova          Q0, m6
-    mova          Q1, m1
-    mova          Q2, m0
+    movu          P2, m4
+    movu          P1, m2
+    movu          P0, m7
+    movu          Q0, m6
+    movu          Q1, m1
+    movu          Q2, m0
 %endif ; x86-32/64
 %else ; %1 == 16
     ; We only use 14 pixels but we'll need the remainder at the end for
     ; the second transpose
-    mova          m0, [dstq+strideq*0-16]
-    mova          m1, [dstq+strideq*1-16]
-    mova          m2, [dstq+strideq*2-16]
-    mova          m3, [dstq+stride3q -16]
+    movu          m0, [dstq+strideq*0-16]
+    movu          m1, [dstq+strideq*1-16]
+    movu          m2, [dstq+strideq*2-16]
+    movu          m3, [dstq+stride3q -16]
     lea         tmpq, [dstq+strideq*4]
-    mova          m4, [tmpq+strideq*0-16]
-    mova          m5, [tmpq+strideq*1-16]
-    mova          m6, [tmpq+strideq*2-16]
+    movu          m4, [tmpq+strideq*0-16]
+    movu          m5, [tmpq+strideq*1-16]
+    movu          m6, [tmpq+strideq*2-16]
 %if ARCH_X86_64
-    mova          m7, [tmpq+stride3q -16]
+    movu          m7, [tmpq+stride3q -16]
 
     TRANSPOSE8X8W 0, 1, 2, 3, 4, 5, 6, 7, 8
     SWAP           5, 13
@@ -533,26 +533,26 @@ ASSERT ARCH_X86_32
 %define P0 [esp+20*16]
     TRANSPOSE8X8W 0, 1, 2, 3, 4, 5, 6, 7, \
                      [tmpq+stride3q -16], P2, "", a, a
-    mova          P1, m6
-    mova          P0, m7
+    movu          P1, m6
+    movu          P0, m7
 %endif ; x86-32/64
-    mova [rsp+ 7*16], m0
-    mova [rsp+ 8*16], m1
-    mova [rsp+ 9*16], m2
-    mova [rsp+10*16], m3
+    movu [rsp+ 7*16], m0
+    movu [rsp+ 8*16], m1
+    movu [rsp+ 9*16], m2
+    movu [rsp+10*16], m3
 %define P3 [rsp+6*16]
-    mova          P3, m4
+    movu          P3, m4
 
-    mova          m0, [dstq+strideq*0]
-    mova          m1, [dstq+strideq*1]
-    mova          m2, [dstq+strideq*2]
-    mova          m3, [dstq+stride3q ]
+    movu          m0, [dstq+strideq*0]
+    movu          m1, [dstq+strideq*1]
+    movu          m2, [dstq+strideq*2]
+    movu          m3, [dstq+stride3q ]
     lea         tmpq, [dstq+strideq*4]
-    mova          m4, [tmpq+strideq*0]
-    mova          m5, [tmpq+strideq*1]
-    mova          m6, [tmpq+strideq*2]
+    movu          m4, [tmpq+strideq*0]
+    movu          m5, [tmpq+strideq*1]
+    movu          m6, [tmpq+strideq*2]
 %if ARCH_X86_64
-    mova          m7, [tmpq+stride3q ]
+    movu          m7, [tmpq+stride3q ]
 
     TRANSPOSE8X8W 0, 1, 2, 3, 4, 5, 6, 7, 10
     SWAP          0, 10
@@ -570,18 +570,18 @@ ASSERT ARCH_X86_32
 %define Q1 [esp+22*16]
 %define Q2 [esp+23*16]
 %define Q3 [esp+24*16]
-    mova         Q0, m0
-    mova         Q1, m1
-    mova         Q2, m2
-    mova         Q3, m3
+    movu         Q0, m0
+    movu         Q1, m1
+    movu         Q2, m2
+    movu         Q3, m3
 %endif ; x86-32/64
 
-    mova [rsp+11*16], m4
+    movu [rsp+11*16], m4
 %if ARCH_X86_64
-    mova [rsp+12*16], m5
+    movu [rsp+12*16], m5
 %endif
-    mova [rsp+13*16], m6
-    mova [rsp+14*16], m7
+    movu [rsp+13*16], m6
+    movu [rsp+14*16], m7
 %endif ; %1 == 4/6/8/16
 %endif ; %2 ==/!= v
 
@@ -656,7 +656,7 @@ ASSERT ARCH_X86_32
     pabsw         m4, m4
     pmaxsw        m4, m3
 %if %1 != 6
-    mova          m6, P3                        ; p3
+    movu          m6, P3                        ; p3
     psubw         m5, m6, P0                    ; p3-p0
     pabsw         m5, m5
     pmaxsw        m4, m5
@@ -715,13 +715,13 @@ ASSERT ARCH_X86_32
 
 %ifidn %2, v
     lea         tmpq, [dstq+mstrideq*8]
-    mova          m0, [tmpq+strideq*1]
-    mova          m1, [tmpq+strideq*2]
-    mova          m2, [tmpq+stride3q]
+    movu          m0, [tmpq+strideq*1]
+    movu          m1, [tmpq+strideq*2]
+    movu          m2, [tmpq+stride3q]
 %else ; %2 != v
-    mova          m0, [rsp+ 8*16]
-    mova          m1, [rsp+ 9*16]
-    mova          m2, [rsp+10*16]
+    movu          m0, [rsp+ 8*16]
+    movu          m1, [rsp+ 9*16]
+    movu          m2, [rsp+10*16]
 %endif ; %2==/!=v
     REPX {psubw x, P0}, m0, m1, m2
     REPX {pabsw x, x}, m0, m1, m2
@@ -729,13 +729,13 @@ ASSERT ARCH_X86_32
     pmaxsw        m1, m2
 %ifidn %2, v
     lea         tmpq, [dstq+strideq*4]
-    mova          m0, [tmpq+strideq*0]
-    mova          m2, [tmpq+strideq*1]
-    mova          m5, [tmpq+strideq*2]
+    movu          m0, [tmpq+strideq*0]
+    movu          m2, [tmpq+strideq*1]
+    movu          m5, [tmpq+strideq*2]
 %else ; %2 != v
-    mova          m0, [rsp+11*16]
-    mova          m2, [rsp+12*16]
-    mova          m5, [rsp+13*16]
+    movu          m0, [rsp+11*16]
+    movu          m2, [rsp+12*16]
+    movu          m5, [rsp+13*16]
 %endif ; %2==/!=v
     REPX {psubw x, Q0}, m0, m2, m5
     REPX {pabsw x, x}, m0, m2, m5
@@ -841,10 +841,10 @@ ASSERT ARCH_X86_32
     REPX {pminsw x, m0}, m7, m3
     REPX {pmaxsw x, m2}, m7, m3
 %if %1 > 4
-    mova          P1, m3
-    mova          P0, m5
-    mova          Q0, m6
-    mova          Q1, m7
+    movu          P1, m3
+    movu          P0, m5
+    movu          Q0, m6
+    movu          Q1, m7
 %endif
 %endif
 
@@ -858,19 +858,19 @@ ASSERT ARCH_X86_32
     ; flat16 filter
 %ifidn %2, v
     lea         tmpq, [dstq+mstrideq*8]
-    mova          m0, [tmpq+strideq*1]          ; p6
-    mova          m2, [tmpq+strideq*2]          ; p5
-    mova          m7, [tmpq+stride3q]           ; p4
-    mova          m6, [tmpq+strideq*4]          ; p3
+    movu          m0, [tmpq+strideq*1]          ; p6
+    movu          m2, [tmpq+strideq*2]          ; p5
+    movu          m7, [tmpq+stride3q]           ; p4
+    movu          m6, [tmpq+strideq*4]          ; p3
     lea         tmpq, [dstq+mstrideq*4]
 %else ; %2 != v
-    mova          m0, [rsp+ 8*16]
-    mova          m2, [rsp+ 9*16]
-    mova          m7, [rsp+10*16]
-    mova          m6, [rsp+ 6*16]
+    movu          m0, [rsp+ 8*16]
+    movu          m2, [rsp+ 9*16]
+    movu          m7, [rsp+10*16]
+    movu          m6, [rsp+ 6*16]
 %endif ; %2==/!=v
 
-    mova [rsp+ 0*16], m4
+    movu [rsp+ 0*16], m4
 
     ; p6*7+p5*2+p4*2+p3+p2+p1+p0+q0
     psllw         m3, m0, 3                     ; p6*8
@@ -889,9 +889,9 @@ ASSERT ARCH_X86_32
     pandn         m4, m1, m2
     por           m5, m4
 %ifidn %2, v
-    mova [tmpq+mstrideq*2], m5                   ; p5
+    movu [tmpq+mstrideq*2], m5                   ; p5
 %else ; %2 != v
-    mova  [rsp+9*16], m5
+    movu  [rsp+9*16], m5
 %endif ; %2==/!=v
 
     ; sub p6*2, add p3/q1
@@ -904,9 +904,9 @@ ASSERT ARCH_X86_32
     pandn         m4, m1, m7
     por           m5, m4
 %ifidn %2, v
-    mova [tmpq+mstrideq*1], m5                   ; p4
+    movu [tmpq+mstrideq*1], m5                   ; p4
 %else ; %2 != v
-    mova [rsp+10*16], m5
+    movu [rsp+10*16], m5
 %endif ; %2==/!=v
 
     ; sub p6/p5, add p2/q2
@@ -919,9 +919,9 @@ ASSERT ARCH_X86_32
     pandn         m4, m1, m6
     por           m5, m4
 %ifidn %2, v
-    mova [tmpq+strideq*0], m5                  ; p3
+    movu [tmpq+strideq*0], m5                  ; p3
 %else ; %2 != v
-    mova  [rsp+6*16], m5
+    movu  [rsp+6*16], m5
 %endif ; %2==/!=v
 
 %define WRITE_IN_PLACE 0
@@ -941,9 +941,9 @@ ASSERT ARCH_X86_32
     pandn         m4, m1, P2
     por           m5, m4
 %if WRITE_IN_PLACE
-    mova [tmpq+strideq*1], m5
+    movu [tmpq+strideq*1], m5
 %else
-    mova  [rsp+1*16], m5                        ; don't clobber p2/m13
+    movu  [rsp+1*16], m5                        ; don't clobber p2/m13
 %endif
 
     ; sub p6/p3, add p0/q4
@@ -960,9 +960,9 @@ ASSERT ARCH_X86_32
     pandn         m4, m1, P1
     por           m5, m4
 %if WRITE_IN_PLACE
-    mova [dstq+mstrideq*2], m5
+    movu [dstq+mstrideq*2], m5
 %else
-    mova  [rsp+2*16], m5                        ; don't clobber p1/m3
+    movu  [rsp+2*16], m5                        ; don't clobber p1/m3
 %endif
 
     ; sub p6/p2, add q0/q5
@@ -983,18 +983,18 @@ ASSERT ARCH_X86_32
     pandn         m4, m1, P0
     por           m5, m4
 %if WRITE_IN_PLACE
-    mova [dstq+mstrideq*1], m5
+    movu [dstq+mstrideq*1], m5
 %else
-    mova  [rsp+3*16], m5                        ; don't clobber p0/m4
+    movu  [rsp+3*16], m5                        ; don't clobber p0/m4
 %endif
 
     ; sub p6/p1, add q1/q6
     paddw         m3, Q1
     paddw         m5, m0, P1
 %ifidn %2, v
-    mova          m0, [tmpq+strideq*2]          ; q6
+    movu          m0, [tmpq+strideq*2]          ; q6
 %else ; %2 != v
-    mova          m0, [rsp+13*16]               ; q6
+    movu          m0, [rsp+13*16]               ; q6
 %endif ; %2==/!=v
     paddw         m3, m0
     psubw         m3, m5
@@ -1003,9 +1003,9 @@ ASSERT ARCH_X86_32
     pandn         m4, m1, Q0
     por           m5, m4
 %if WRITE_IN_PLACE
-    mova      [dstq], m5
+    movu      [dstq], m5
 %else
-    mova  [rsp+4*16], m5                        ; don't clobber q0/m5
+    movu  [rsp+4*16], m5                        ; don't clobber q0/m5
 %endif
 
     ; sub p5/p0, add q2/q6
@@ -1042,9 +1042,9 @@ ASSERT ARCH_X86_32
     pandn         m4, m1, Q3
     por           m6, m4
 %if WRITE_IN_PLACE
-    mova [tmpq+mstrideq], m6                    ; q3
+    movu [tmpq+mstrideq], m6                    ; q3
 %else ; %2 != v
-    mova  [rsp+5*16], m6
+    movu  [rsp+5*16], m6
 %endif ; %2==/!=v
 
     ; sub p2/q2, add q5/q6
@@ -1072,9 +1072,9 @@ ASSERT ARCH_X86_32
 %endif ; %2==/!=v
     por           m5, m4
 %ifidn %2, v
-    mova [tmpq+strideq*0], m5                   ; q4
+    movu [tmpq+strideq*0], m5                   ; q4
 %else ; %2 != v
-    mova [rsp+11*16], m5
+    movu [rsp+11*16], m5
 %endif ; %2==/!=v
 
     ; sub p1/q3, add q6*2
@@ -1091,12 +1091,12 @@ ASSERT ARCH_X86_32
 %endif ; %2==/!=v
     por           m5, m4
 %ifidn %2, v
-    mova [tmpq+strideq*1], m5                   ; q5
+    movu [tmpq+strideq*1], m5                   ; q5
 %else ; %2 != v
-    mova [rsp+12*16], m5
+    movu [rsp+12*16], m5
 %endif ; %2==/!=v
 
-    mova          m4, [rsp+0*16]
+    movu          m4, [rsp+0*16]
 %ifidn %2, v
     lea         tmpq, [dstq+mstrideq*4]
 %endif
@@ -1105,30 +1105,30 @@ ASSERT ARCH_X86_32
     SWAP           7, 14
     SWAP           6, 15
 %else ; x86-32
-    mova          Q1, m2
-    mova          Q2, m7
+    movu          Q1, m2
+    movu          Q2, m7
 %endif ; x86-32/64
 %if WRITE_IN_PLACE
-    mova          P2, [tmpq+strideq*1]
-    mova          P1, [tmpq+strideq*2]
-    mova          P0, [tmpq+stride3q]
-    mova          Q0, [dstq]
+    movu          P2, [tmpq+strideq*1]
+    movu          P1, [tmpq+strideq*2]
+    movu          P0, [tmpq+stride3q]
+    movu          Q0, [dstq]
 %elif ARCH_X86_64
-    mova          P2, [rsp+1*16]
-    mova          P1, [rsp+2*16]
-    mova          P0, [rsp+3*16]
-    mova          Q0, [rsp+4*16]
+    movu          P2, [rsp+1*16]
+    movu          P1, [rsp+2*16]
+    movu          P0, [rsp+3*16]
+    movu          Q0, [rsp+4*16]
 %else ; !WRITE_IN_PLACE & x86-32
-    mova          m0, [rsp+1*16]
-    mova          m1, [rsp+2*16]
-    mova          m2, [rsp+3*16]
-    mova          m3, [rsp+4*16]
-    mova          m7, [rsp+5*16]
-    mova          P2, m0
-    mova          P1, m1
-    mova          P0, m2
-    mova          Q0, m3
-    mova          Q3, m7
+    movu          m0, [rsp+1*16]
+    movu          m1, [rsp+2*16]
+    movu          m2, [rsp+3*16]
+    movu          m3, [rsp+4*16]
+    movu          m7, [rsp+5*16]
+    movu          P2, m0
+    movu          P1, m1
+    movu          P0, m2
+    movu          Q0, m3
+    movu          Q3, m7
 %endif ; WRITE_IN_PLACE / x86-32/64
 %undef WRITE_IN_PLACE
 %endif ; %1 == 16
@@ -1136,7 +1136,7 @@ ASSERT ARCH_X86_32
 %if %1 >= 8
 
     ; flat8 filter
-    mova          m0, P3                        ; p3
+    movu          m0, P3                        ; p3
     paddw         m1, m0, P2                    ; p3+p2
     paddw         m2, P1, P0                    ; p1+p0
     paddw         m3, m1, m1                    ; 2*(p3+p2)
@@ -1194,14 +1194,14 @@ ASSERT ARCH_X86_32
     paddw         m2, Q2
 
 %ifidn %2, v
-    mova [tmpq+strideq*1], m7                   ; p2
-    mova [tmpq+strideq*2], m3                   ; p1
-    mova [tmpq+stride3q ], m5                   ; p0
-    mova [dstq+strideq*0], m6                   ; q0
-    mova [dstq+strideq*1], m1                   ; q1
-    mova [dstq+strideq*2], m2                   ; q2
+    movu [tmpq+strideq*1], m7                   ; p2
+    movu [tmpq+strideq*2], m3                   ; p1
+    movu [tmpq+stride3q ], m5                   ; p0
+    movu [dstq+strideq*0], m6                   ; q0
+    movu [dstq+strideq*1], m1                   ; q1
+    movu [dstq+strideq*2], m2                   ; q2
 %else ; %2 != v
-    mova          m0, P3
+    movu          m0, P3
 
 %if %1 == 8
     lea         tmpq, [dstq+strideq*4]
@@ -1231,34 +1231,34 @@ ASSERT ARCH_X86_32
     SWAP           1, 9
     SWAP           2, 10
 %else
-    mova  [rsp+1*16], m6
-    mova  [rsp+2*16], m1
-    mova  [rsp+3*16], m2
+    movu  [rsp+1*16], m6
+    movu  [rsp+2*16], m1
+    movu  [rsp+3*16], m2
 %endif
 
-    mova          m1, [rsp+ 7*16]
-    mova          m2, [rsp+ 8*16]
-    mova          m4, [rsp+ 9*16]
-    mova          m6, [rsp+10*16]
+    movu          m1, [rsp+ 7*16]
+    movu          m2, [rsp+ 8*16]
+    movu          m4, [rsp+ 9*16]
+    movu          m6, [rsp+10*16]
     lea         tmpq, [dstq+strideq*4]
 %if ARCH_X86_64
     TRANSPOSE8X8W  1, 2, 4, 6, 0, 7, 3, 5, 11
 %else
-    mova  [rsp+7*16],  m5
+    movu  [rsp+7*16],  m5
     TRANSPOSE8X8W  1, 2, 4, 6, 0, 7, 3, 5, "", \
                       [rsp+7*16], [tmpq+strideq*1-16], a, a
 %endif
 
-    mova [dstq+strideq*0-16], m1
-    mova [dstq+strideq*1-16], m2
-    mova [dstq+strideq*2-16], m4
-    mova [dstq+stride3q -16], m6
-    mova [tmpq+strideq*0-16], m0
+    movu [dstq+strideq*0-16], m1
+    movu [dstq+strideq*1-16], m2
+    movu [dstq+strideq*2-16], m4
+    movu [dstq+stride3q -16], m6
+    movu [tmpq+strideq*0-16], m0
 %if ARCH_X86_64
-    mova [tmpq+strideq*1-16], m7
+    movu [tmpq+strideq*1-16], m7
 %endif
-    mova [tmpq+strideq*2-16], m3
-    mova [tmpq+stride3q -16], m5
+    movu [tmpq+strideq*2-16], m3
+    movu [tmpq+stride3q -16], m5
 
 %if ARCH_X86_64
     SWAP           6, 8
@@ -1266,31 +1266,31 @@ ASSERT ARCH_X86_32
     SWAP           2, 10
     SWAP           4, 15
 %else
-    mova          m6, [rsp+1*16]
-    mova          m1, [rsp+2*16]
-    mova          m2, [rsp+3*16]
-    mova          m4, Q3
+    movu          m6, [rsp+1*16]
+    movu          m1, [rsp+2*16]
+    movu          m2, [rsp+3*16]
+    movu          m4, Q3
 %endif
-    mova          m0, [rsp+11*16]
-    mova          m3, [rsp+12*16]
-    mova          m5, [rsp+13*16]
+    movu          m0, [rsp+11*16]
+    movu          m3, [rsp+12*16]
+    movu          m5, [rsp+13*16]
 %if ARCH_X86_64
-    mova          m7, [rsp+14*16]
+    movu          m7, [rsp+14*16]
     TRANSPOSE8X8W  6, 1, 2, 4, 0, 3, 5, 7, 8
 %else
     TRANSPOSE8X8W  6, 1, 2, 4, 0, 3, 5, 7, "", \
                       [rsp+14*16], [tmpq+strideq*1], a, a
 %endif
-    mova [dstq+strideq*0], m6
-    mova [dstq+strideq*1], m1
-    mova [dstq+strideq*2], m2
-    mova [dstq+stride3q ], m4
-    mova [tmpq+strideq*0], m0
+    movu [dstq+strideq*0], m6
+    movu [dstq+strideq*1], m1
+    movu [dstq+strideq*2], m2
+    movu [dstq+stride3q ], m4
+    movu [tmpq+strideq*0], m0
 %if ARCH_X86_64
-    mova [tmpq+strideq*1], m3
+    movu [tmpq+strideq*1], m3
 %endif
-    mova [tmpq+strideq*2], m5
-    mova [tmpq+stride3q ], m7
+    movu [tmpq+strideq*2], m5
+    movu [tmpq+stride3q ], m7
     lea         dstq, [dstq+strideq*8]
 %endif ; %1==/!=8
 %endif ; %2==/!=v
@@ -1325,7 +1325,7 @@ ASSERT ARCH_X86_32
 %if ARCH_X86_64
     paddw         Q2, Q2                        ; q2*2
 %else
-    mova          m0, Q2
+    movu          m0, Q2
     paddw         m0, m0
 %endif
     psubw         m3, P0                        ; p0+2*(q0+q1)+q2
@@ -1344,29 +1344,29 @@ ASSERT ARCH_X86_32
     paddw         m3, Q1
 
 %ifidn %2, v
-    mova [dstq+mstrideq*2], m2                   ; p1
-    mova [dstq+mstrideq*1], m5                   ; p0
-    mova [dstq+strideq*0], m6                   ; q0
-    mova [dstq+strideq*1], m3                   ; q1
+    movu [dstq+mstrideq*2], m2                   ; p1
+    movu [dstq+mstrideq*1], m5                   ; p0
+    movu [dstq+strideq*0], m6                   ; q0
+    movu [dstq+strideq*1], m3                   ; q1
 %else ; %2 != v
     TRANSPOSE_8x4_AND_WRITE_4x8 m2, m5, m6, m3, m0
 %endif ; %2==/!=v
 %else ; %1 == 4
 %if ARCH_X86_64
 %ifidn %2, v
-    mova [dstq+mstrideq*2], P1                   ; p1
-    mova [dstq+mstrideq*1], P0                   ; p0
-    mova [dstq+strideq*0], Q0                   ; q0
-    mova [dstq+strideq*1], Q1                   ; q1
+    movu [dstq+mstrideq*2], P1                   ; p1
+    movu [dstq+mstrideq*1], P0                   ; p0
+    movu [dstq+strideq*0], Q0                   ; q0
+    movu [dstq+strideq*1], Q1                   ; q1
 %else ; %2 != v
     TRANSPOSE_8x4_AND_WRITE_4x8 P1, P0, Q0, Q1, m0
 %endif ; %2==/!=v
 %else ; x86-32
 %ifidn %2, v
-    mova [dstq+mstrideq*2], m3
-    mova [dstq+mstrideq*1], m5
-    mova [dstq+strideq*0], m6
-    mova [dstq+strideq*1], m7
+    movu [dstq+mstrideq*2], m3
+    movu [dstq+mstrideq*1], m5
+    movu [dstq+strideq*0], m6
+    movu [dstq+strideq*1], m7
 %else ; %2 != v
     TRANSPOSE_8x4_AND_WRITE_4x8 m3, m5, m6, m7, m0
 %endif ; %2==/!=v
@@ -1416,9 +1416,9 @@ cglobal lpf_v_sb_y_16bpc, 4, 7, 8, -16 * (10 + extra_stack), \
     LEA     pic_regq, PIC_base
 %define pic_regm dword [esp+7*16+2*gprsize]
     mov     pic_regm, pic_regq
-    mova          m0, [PIC_sym(pw_4)+r5]
+    movu          m0, [PIC_sym(pw_4)+r5]
 %define bdmulq esp+9*16
-    mova    [bdmulq], m0
+    movu    [bdmulq], m0
     shl dword lstridem, 2
     sub           r3, dword lstridem
     mov     dword lm, r3
@@ -1428,15 +1428,15 @@ cglobal lpf_v_sb_y_16bpc, 4, 7, 8, -16 * (10 + extra_stack), \
     lea     stride3q, [strideq*3]
 %if ARCH_X86_64
     mov   mask_bitsd, 0x3
-    mova         m12, [pb_mask]
+    movu         m12, [pb_mask]
 %else
 %define mstridem dword [esp+7*16+1*gprsize]
     mov     mstridem, mstrideq
 %define mask_bitsm dword [esp+7*16+0*gprsize]
     mov   mask_bitsm, 0x3
-    mova          m0, [PIC_sym(pb_mask)]
+    movu          m0, [PIC_sym(pb_mask)]
 %define m12 [esp+8*16]
-    mova         m12, m0
+    movu         m12, m0
 %endif
 
 .loop:
@@ -1477,9 +1477,9 @@ cglobal lpf_v_sb_y_16bpc, 4, 7, 8, -16 * (10 + extra_stack), \
     pslld        m12, 2
     add           lq, 8
 %else
-    mova          m0, m12
+    movu          m0, m12
     pslld         m0, 2
-    mova         m12, m0
+    movu         m12, m0
     add     dword lm, 8
 %endif
     add         dstq, 16
@@ -1530,22 +1530,22 @@ cglobal lpf_h_sb_y_16bpc, 4, 7, 8, -16 * (25 + extra_stack), \
     sar          r5d, 7
     and          r5d, 16                      ; 0 for 10bpc, 16 for 12bpc
     LEA     pic_regq, PIC_base
-    mova          m0, [PIC_sym(pw_4)+r5]
+    movu          m0, [PIC_sym(pw_4)+r5]
 %define bdmulq esp+17*16
-    mova    [bdmulq], m0
+    movu    [bdmulq], m0
     shl dword lstridem, 2
 %endif
     sub           lq, 4
     lea     stride3q, [strideq*3]
 %if ARCH_X86_64
     mov   mask_bitsd, 0x3
-    mova         m12, [pb_mask]
+    movu         m12, [pb_mask]
 %else
 %define mask_bitsm dword [esp+15*16+0*gprsize]
     mov   mask_bitsm, 0x3
-    mova          m0, [PIC_sym(pb_mask)]
+    movu          m0, [PIC_sym(pb_mask)]
 %define m12 [esp+16*16]
-    mova         m12, m0
+    movu         m12, m0
 %endif
 
 .loop:
@@ -1591,9 +1591,9 @@ cglobal lpf_h_sb_y_16bpc, 4, 7, 8, -16 * (25 + extra_stack), \
     shl   mask_bitsd, 2
     sub           hd, 2
 %else
-    mova          m0, m12
+    movu          m0, m12
     pslld         m0, 2
-    mova         m12, m0
+    movu         m12, m0
     add           lq, dword lstridem
     add           lq, dword lstridem
     shl   mask_bitsm, 2
@@ -1632,9 +1632,9 @@ cglobal lpf_v_sb_uv_16bpc, 4, 7, 8, -16 * (3 + extra_stack), \
     sar          r5d, 7
     and          r5d, 16                      ; 0 for 10bpc, 16 for 12bpc
     LEA     pic_regq, PIC_base
-    mova          m0, [PIC_sym(pw_4)+r5]
+    movu          m0, [PIC_sym(pw_4)+r5]
 %define bdmulq esp+2*16
-    mova    [bdmulq], m0
+    movu    [bdmulq], m0
     shl dword lstridem, 2
     sub           r3, dword lstridem
     mov     dword lm, r3
@@ -1644,15 +1644,15 @@ cglobal lpf_v_sb_uv_16bpc, 4, 7, 8, -16 * (3 + extra_stack), \
     lea     stride3q, [strideq*3]
 %if ARCH_X86_64
     mov   mask_bitsd, 0x3
-    mova         m12, [pb_mask]
+    movu         m12, [pb_mask]
 %else
 %define mask_bitsm dword [esp+0*gprsize]
 %define mstridem dword [esp+1*gprsize]
     mov   mask_bitsm, 0x3
     mov     mstridem, mstrideq
-    mova          m0, [PIC_sym(pb_mask)]
+    movu          m0, [PIC_sym(pb_mask)]
 %define m12 [esp+1*16]
-    mova         m12, m0
+    movu         m12, m0
 %endif
 
 .loop:
@@ -1682,9 +1682,9 @@ cglobal lpf_v_sb_uv_16bpc, 4, 7, 8, -16 * (3 + extra_stack), \
     pslld        m12, 2
     add           lq, 8
 %else
-    mova          m0, m12
+    movu          m0, m12
     pslld         m0, 2
-    mova         m12, m0
+    movu         m12, m0
     add     dword lm, 8
 %endif
     add         dstq, 16
@@ -1728,22 +1728,22 @@ cglobal lpf_h_sb_uv_16bpc, 4, 7, 8, -16 * (9 + extra_stack), \
     sar          r5d, 7
     and          r5d, 16                      ; 0 for 10bpc, 16 for 12bpc
     LEA     pic_regq, PIC_base
-    mova          m0, [PIC_sym(pw_4)+r5]
+    movu          m0, [PIC_sym(pw_4)+r5]
 %define bdmulq esp+2*16
-    mova    [bdmulq], m0
+    movu    [bdmulq], m0
     shl dword lstridem, 2
 %endif
     sub           lq, 4
     lea     stride3q, [strideq*3]
 %if ARCH_X86_64
     mov   mask_bitsd, 0x3
-    mova         m12, [pb_mask]
+    movu         m12, [pb_mask]
 %else
 %define mask_bitsm dword [esp+0*gprsize]
     mov   mask_bitsm, 0x3
-    mova          m0, [PIC_sym(pb_mask)]
+    movu          m0, [PIC_sym(pb_mask)]
 %define m12 [esp+1*16]
-    mova         m12, m0
+    movu         m12, m0
 %endif
 
 .loop:
@@ -1778,9 +1778,9 @@ cglobal lpf_h_sb_uv_16bpc, 4, 7, 8, -16 * (9 + extra_stack), \
     shl   mask_bitsd, 2
     sub           hd, 2
 %else
-    mova          m0, m12
+    movu          m0, m12
     pslld         m0, 2
-    mova         m12, m0
+    movu         m12, m0
     add           lq, dword lstridem
     add           lq, dword lstridem
     shl   mask_bitsm, 2

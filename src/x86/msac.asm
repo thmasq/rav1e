@@ -96,14 +96,14 @@ cglobal msac_decode_symbol_adapt4, 0, 6, 6
     pshuflw        m2, m2, q0000
     movd     [buf+12], m2
     pand           m2, [rax]
-    mova           m0, m1
+    movu           m0, m1
     psrlw          m1, 6
     psllw          m1, 7
     pmulhuw        m1, m2
     movq           m2, [rax+t2*2]
     pshuflw        m3, m3, c_shuf
     paddw          m1, m2
-    mova     [buf+16], m1
+    movu     [buf+16], m1
     psubusw        m1, m3
     pxor           m2, m2
     pcmpeqw        m1, m2 ; c >= v
@@ -219,7 +219,7 @@ cglobal msac_decode_symbol_adapt8, 0, 6, 6
     DECODE_SYMBOL_ADAPT_INIT
     LEA           rax, pw_0xff00
     movd           m2, [t0+msac.rng]
-    mova           m1, [t1]
+    movu           m1, [t1]
     movp           m3, [t0+msac.dif]
     mov           t3d, [t0+msac.update_cdf]
     mov           t4d, t2d
@@ -227,7 +227,7 @@ cglobal msac_decode_symbol_adapt8, 0, 6, 6
     pshuflw        m2, m2, q0000
     movd     [buf+12], m2
     punpcklqdq     m2, m2
-    mova           m0, m1
+    movu           m0, m1
     psrlw          m1, 6
     pand           m2, [rax]
     psllw          m1, 7
@@ -236,7 +236,7 @@ cglobal msac_decode_symbol_adapt8, 0, 6, 6
     pshuflw        m3, m3, c_shuf
     paddw          m1, m2
     punpcklqdq     m3, m3
-    mova     [buf+16], m1
+    movu     [buf+16], m1
     psubusw        m1, m3
     pxor           m2, m2
     pcmpeqw        m1, m2
@@ -257,7 +257,7 @@ cglobal msac_decode_symbol_adapt8, 0, 6, 6
     psubw          m0, m1
     psraw          m2, m3
     paddw          m0, m2
-    mova         [t1], m0
+    movu         [t1], m0
     mov     [t1+t4*2], t2w
     jmp m(msac_decode_symbol_adapt4, SUFFIX).renorm
 
@@ -265,8 +265,8 @@ cglobal msac_decode_symbol_adapt16, 0, 6, 6
     DECODE_SYMBOL_ADAPT_INIT
     LEA           rax, pw_0xff00
     movd           m4, [t0+msac.rng]
-    mova           m2, [t1]
-    mova           m3, [t1+16]
+    movu           m2, [t1]
+    movu           m3, [t1+16]
     movp           m5, [t0+msac.dif]
     mov           t3d, [t0+msac.update_cdf]
     mov           t4d, t2d
@@ -277,9 +277,9 @@ cglobal msac_decode_symbol_adapt16, 0, 6, 6
     pshuflw        m4, m4, q0000
     movd      [buf-4], m4
     punpcklqdq     m4, m4
-    mova           m0, m2
+    movu           m0, m2
     psrlw          m2, 6
-    mova           m1, m3
+    movu           m1, m3
     psrlw          m3, 6
     pand           m4, [rax]
     psllw          m2, 7
@@ -292,9 +292,9 @@ cglobal msac_decode_symbol_adapt16, 0, 6, 6
     psubw          m4, [rax-pw_0xff00+pw_32]
     punpcklqdq     m5, m5
     paddw          m3, m4
-    mova        [buf], m2
+    movu        [buf], m2
     psubusw        m2, m5
-    mova     [buf+16], m3
+    movu     [buf+16], m3
     psubusw        m3, m5
     pxor           m4, m4
     pcmpeqw        m2, m4
@@ -305,7 +305,7 @@ cglobal msac_decode_symbol_adapt16, 0, 6, 6
     jz .renorm
     movzx         t3d, word [t1+t4*2]
     pcmpeqw        m4, m4
-    mova           m5, m4
+    movu           m5, m4
     lea           t2d, [t3+80] ; only support n_symbols > 2
     shr           t2d, 4
     cmp           t3d, 32
@@ -321,8 +321,8 @@ cglobal msac_decode_symbol_adapt16, 0, 6, 6
     psraw          m5, m2
     paddw          m0, m4
     paddw          m1, m5
-    mova         [t1], m0
-    mova      [t1+16], m1
+    movu         [t1], m0
+    movu      [t1+16], m1
     mov     [t1+t4*2], t3w
 .renorm:
     tzcnt         eax, eax
@@ -461,7 +461,7 @@ cglobal msac_decode_bool, 0, 6, 0
 %if %1
     movzx         t2d, word [t1+3*2]
 %endif
-    mova           m1, m0
+    movu           m1, m0
     pshuflw        m2, m2, q0000
     psrlw          m1, 6
     movd     [buf+12], m2
@@ -613,7 +613,7 @@ INIT_YMM avx2
 cglobal msac_decode_symbol_adapt16, 3, 6, 6
     lea           rax, [pw_0xff00]
     vpbroadcastw   m2, [t0+msac.rng]
-    mova           m0, [t1]
+    movu           m0, [t1]
     vpbroadcastw   m3, [t0+msac.dif+6]
     vbroadcasti128 m4, [rax]
     mov           t3d, [t0+msac.update_cdf]
@@ -633,7 +633,7 @@ cglobal msac_decode_symbol_adapt16, 3, 6, 6
     psllw          m1, 7
     pmulhuw        m1, m2
     paddw          m1, [rax+t2*2]
-    mova        [buf], m1
+    movu        [buf], m1
     pmaxuw         m1, m3
     pcmpeqw        m1, m3
     pmovmskb      eax, m1
@@ -651,7 +651,7 @@ cglobal msac_decode_symbol_adapt16, 3, 6, 6
     psubw          m0, m1
     psraw          m2, xm3
     paddw          m0, m2
-    mova         [t1], m0
+    movu         [t1], m0
     mov     [t1+t4*2], t3w
 .renorm:
     tzcnt         eax, eax

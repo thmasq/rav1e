@@ -43,7 +43,7 @@ SECTION .text
 
     ; Multiply and shift with rounding.
     pmuludq            m%1, m%2
-    mova               m%2, [rounding]
+    movu               m%2, [rounding]
     paddq              m%1, m%2
     psrlq              m%1, get_weighted_sse_shift
 %endmacro
@@ -83,13 +83,13 @@ SECTION .text
     ; raw load:    0, 1, 2, 3 | 4, 5, 6, 7
     ; unpack low:  0,    1    | 4,    5
     ; unpack high: 2,    3,   | 6,    7
-    mova               m%4, [scaleq]
+    movu               m%4, [scaleq]
     punpckldq          m%3, m%4, m%4
     punpckhdq          m%4, m%4
 
     pmuludq            m%1, m%3
     pmuludq            m%2, m%4
-    mova               m%3, [rounding]
+    movu               m%3, [rounding]
     paddq              m%1, m%3
     paddq              m%2, m%3
     psrlq              m%1, get_weighted_sse_shift
@@ -191,7 +191,7 @@ cglobal weighted_sse_4x4, 6, 7, 5, \
 INIT_XMM ssse3
 cglobal weighted_sse_4x8, 6, 6, 6, \
         src, src_stride, dst, dst_stride, scale, scale_stride
-    mova                m0, [addsub]
+    movu                m0, [addsub]
     WEIGHTED_SSE_4X8_KERNEL
 
     pshufd              m0, m1, q3232
@@ -202,7 +202,7 @@ cglobal weighted_sse_4x8, 6, 6, 6, \
 INIT_XMM ssse3
 cglobal weighted_sse_4x16, 6, 6, 7, \
         src, src_stride, dst, dst_stride, scale, scale_stride
-    mova                m0, [addsub]
+    movu                m0, [addsub]
 
     WEIGHTED_SSE_4X8_KERNEL
     ; Swap so the use of this macro will use m6 as the result
@@ -279,12 +279,12 @@ cglobal weighted_sse_4x16, 6, 6, 7, \
 %macro WEIGHTED_SSE_32X4_KERNEL 0
     ; Unpacking high and low results in sums that are 8 samples apart. To
     ; correctly apply weights, two separate registers are needed to accumulate.
-    mova                m2, [srcq]
-    mova                m3, [dstq]
+    movu                m2, [srcq]
+    movu                m3, [dstq]
     punpcklbw           m1, m2, m3
     punpckhbw           m2, m3
-    mova                m4, [srcq+src_strideq]
-    mova                m5, [dstq+dst_strideq]
+    movu                m4, [srcq+src_strideq]
+    movu                m5, [dstq+dst_strideq]
     punpcklbw           m3, m4, m5
     punpckhbw           m4, m5
     pmaddubsw           m1, m0
@@ -298,12 +298,12 @@ cglobal weighted_sse_4x16, 6, 6, 7, \
     ; Accumulate
     paddd               m1, m3
     paddd               m2, m4
-    mova                m4, [srcq+src_strideq*2]
-    mova                m5, [dstq+dst_strideq*2]
+    movu                m4, [srcq+src_strideq*2]
+    movu                m5, [dstq+dst_strideq*2]
     punpcklbw           m3, m4, m5
     punpckhbw           m4, m5
-    mova                m6, [srcq+src_stride3q]
-    mova                m7, [dstq+dst_stride3q]
+    movu                m6, [srcq+src_stride3q]
+    movu                m7, [dstq+dst_stride3q]
     punpcklbw           m5, m6, m7
     punpckhbw           m6, m7
     pmaddubsw           m3, m0
@@ -365,11 +365,11 @@ cglobal weighted_sse_%1x%2, 6, 10, 9, \
 %define kernel_width %1
 %define kernel_height 4
 %if %1 == 8
-    mova                m0, [addsub]
+    movu                m0, [addsub]
 %endif
 
 %if %1 >= 32
-    mova                m0, [addsub]
+    movu                m0, [addsub]
     ; Iterate multiple times when w > 32.
     %define kernel_width 32
 %endif

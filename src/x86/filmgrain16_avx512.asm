@@ -156,7 +156,7 @@ cglobal fgy_32x32xn_16bpc, 6, 15, 21, dst, src, stride, fg_data, w, scaling, \
     pinsrd         xm17, [grain_lutq+left_offxyq*2+82*1], 1
     punpckldq      xm16, xm4, xm5
     punpcklwd      xm17, xm16
-    mova           xm16, xm19
+    movu           xm16, xm19
     vpdpwssd       xm16, xm20, xm17
     psrad          xm16, 1
     packssdw       xm16, xm16
@@ -282,11 +282,11 @@ cglobal fgy_32x32xn_16bpc, 6, 15, 21, dst, src, stride, fg_data, w, scaling, \
     pinsrd         xm18, [grain_lutq+topleft_offxyq*2+82*1], 1
     punpckldq      xm16, xm5, xm0
     punpcklwd      xm17, xm16
-    mova           xm16, xm19
+    movu           xm16, xm19
     vpdpwssd       xm16, xm20, xm17
     punpckldq      xm17, xm2, xm1
     punpcklwd      xm18, xm17
-    mova           xm17, xm19
+    movu           xm17, xm19
     vpdpwssd       xm17, xm20, xm18
     punpckhwd        m4, m0, m5
     punpcklwd        m0, m5
@@ -309,13 +309,13 @@ cglobal fgy_32x32xn_16bpc, 6, 15, 21, dst, src, stride, fg_data, w, scaling, \
     RET
 ALIGN function_align
 .add_noise_v:
-    mova             m2, m19
+    movu             m2, m19
     vpdpwssd         m2, m12, m4
-    mova             m3, m19
+    movu             m3, m19
     vpdpwssd         m3, m13, m5
-    mova             m4, m19
+    movu             m4, m19
     vpdpwssd         m4, m12, m0
-    mova             m5, m19
+    movu             m5, m19
     vpdpwssd         m5, m13, m1
     REPX   {psrad x, 1}, m2, m3, m4, m5
     packssdw         m4, m2
@@ -323,8 +323,8 @@ ALIGN function_align
     vpsravw          m4, m11
     vpsravw          m5, m11
 .add_noise:
-    mova             m0, [srcq+strideq*0]
-    mova             m1, [srcq+strideq*1]
+    movu             m0, [srcq+strideq*0]
+    movu             m1, [srcq+strideq*1]
     kmovw            k4, k1
     pand            m16, m6, m0
     psrld            m3, m0, 16
@@ -350,9 +350,9 @@ ALIGN function_align
     pmaxsw           m1, m8
     pminsw           m0, m9
     pminsw           m1, m9
-    mova    [dstq+srcq], m0
+    movu    [dstq+srcq], m0
     add            srcq, strideq
-    mova    [dstq+srcq], m1
+    movu    [dstq+srcq], m1
     add            srcq, strideq
     ret
 
@@ -382,7 +382,7 @@ cglobal fguv_32x32xn_i%1_16bpc, 6, 15, 22, dst, src, stride, fg_data, w, scaling
     packssdw         m4, m5, m5
     vpbroadcastd    m21, [base+scale_shift+r9*8+4]
 %if %2
-    mova            m12, [base+pb_0to63] ; pw_even
+    movu            m12, [base+pb_0to63] ; pw_even
     mov            r13d, 0x0101
     vpbroadcastq    m10, [base+pw_23_22+r9*8]
     kmovw            k3, r13d
@@ -519,7 +519,7 @@ cglobal fguv_32x32xn_i%1_16bpc, 6, 15, 22, dst, src, stride, fg_data, w, scaling
     punpckldq       m16, m17
     punpckldq       m17, m18, m19
     punpcklwd       m16, m17
-    mova            m17, m20
+    movu            m17, m20
     vpdpwssd        m17, m16, m10
     psrad           m17, 1
     packssdw        m17, m17
@@ -531,7 +531,7 @@ cglobal fguv_32x32xn_i%1_16bpc, 6, 15, 22, dst, src, stride, fg_data, w, scaling
     pinsrd         xm16, [grain_lutq+left_offxyq*2+82*2], 1
     punpckldq      xm17, xm18, xm19
     punpcklwd      xm16, xm17
-    mova           xm17, xm20
+    movu           xm17, xm20
     vpdpwssd       xm17, xm16, xm10
     psrad          xm17, 1
     packssdw       xm17, xm17
@@ -701,18 +701,18 @@ cglobal fguv_32x32xn_i%1_16bpc, 6, 15, 22, dst, src, stride, fg_data, w, scaling
     punpcklwd       m16, m17
     movu            ym1, [grain_lutq+top_offxyq*2+82*0]
     movd           xm17, [grain_lutq+topleft_offxyq*2+82*0]
-    mova             m0, m20
+    movu             m0, m20
     vpdpwssd         m0, m16, m10
 %if %3
     punpcklwd      xm17, xm1
-    mova           xm16, xm20
+    movu           xm16, xm20
     vpdpwssd       xm16, xm17, xm10
     psrad          xm16, 1
 %else
     vinserti32x8     m1, [grain_lutq+top_offxyq*2+82*2], 1
     vinserti32x4    m17, [grain_lutq+topleft_offxyq*2+82*2], 2
     punpcklwd       m17, m1
-    mova            m16, m20
+    movu            m16, m20
     vpdpwssd        m16, m17, m10
     psrad           m16, 1
 %endif
@@ -743,9 +743,9 @@ cglobal fguv_32x32xn_i%1_16bpc, 6, 15, 22, dst, src, stride, fg_data, w, scaling
     pinsrd         xm16, [grain_lutq+topleft_offxyq*2+82*2], 1
     punpckldq       xm1, xm2, xm0
     punpcklwd       xm1, xm16, xm1
-    mova           xm16, xm20
+    movu           xm16, xm20
     vpdpwssd       xm16, xm17, xm10
-    mova           xm17, xm20
+    movu           xm17, xm20
     vpdpwssd       xm17, xm1, xm10
     punpckhwd        m1, m19, m18
     punpcklwd       m19, m18
@@ -775,31 +775,31 @@ cglobal fguv_32x32xn_i%1_16bpc, 6, 15, 22, dst, src, stride, fg_data, w, scaling
 ALIGN function_align
 %%add_noise_v:
 %if %3
-    mova           ym16, ym20
+    movu           ym16, ym20
     vpdpwssd       ym16, ym17, ym11
-    mova           ym17, ym20
+    movu           ym17, ym20
     vpdpwssd       ym17, ym1, ym11
     psrad          ym16, 1
     psrad          ym17, 1
     packssdw       ym16, ym17
     vpsravw     m18{k1}, m16, m21
 %elif %2
-    mova            m18, m20
+    movu            m18, m20
     vpdpwssd        m18, m16, m11
-    mova            m16, m20
+    movu            m16, m20
     vpdpwssd        m16, m17, m11
     psrad           m18, 1
     psrad           m16, 1
     packssdw        m18, m16
     vpsravw         m18, m21
 %else
-    mova            m16, m20
+    movu            m16, m20
     vpdpwssd        m16, m1, m11
-    mova            m17, m20
+    movu            m17, m20
     vpdpwssd        m17, m18, m11
-    mova            m18, m20
+    movu            m18, m20
     vpdpwssd        m18, m19, m11
-    mova            m19, m20
+    movu            m19, m20
     vpdpwssd        m19, m2, m11
     REPX   {psrad x, 1}, m16, m17, m18, m19
     packssdw        m18, m16
@@ -809,53 +809,53 @@ ALIGN function_align
 %endif
 %%add_noise:
 %if %2
-    mova             m2, [lumaq+lstrideq*(0<<%3)]
-    mova             m0, [lumaq+lstrideq*(1<<%3)]
+    movu             m2, [lumaq+lstrideq*(0<<%3)]
+    movu             m0, [lumaq+lstrideq*(1<<%3)]
     lea           lumaq, [lumaq+lstrideq*(2<<%3)]
-    mova             m3, [lumaq+lstrideq*(0<<%3)]
-    mova             m1, [lumaq+lstrideq*(1<<%3)]
-    mova            m16, m12
+    movu             m3, [lumaq+lstrideq*(0<<%3)]
+    movu             m1, [lumaq+lstrideq*(1<<%3)]
+    movu            m16, m12
     vpermi2w        m16, m2, m0
     vpermt2w         m2, m13, m0
-    mova            m17, m12
+    movu            m17, m12
     vpermi2w        m17, m3, m1
     vpermt2w         m3, m13, m1
     pavgw            m2, m16
     pavgw            m3, m17
 %elif %1
-    mova             m2, [lumaq+lstrideq*0]
-    mova             m3, [lumaq+lstrideq*1]
+    movu             m2, [lumaq+lstrideq*0]
+    movu             m3, [lumaq+lstrideq*1]
 %endif
 %if %2
-    mova           ym16, [srcq+strideq*0]
+    movu           ym16, [srcq+strideq*0]
     vinserti32x8    m16, [srcq+strideq*1], 1
     lea            srcq, [srcq+strideq*2]
 %else
-    mova            m16, [srcq+strideq*0]
+    movu            m16, [srcq+strideq*0]
 %endif
 %if %1
     punpckhwd       m17, m2, m16
-    mova             m0, m14
+    movu             m0, m14
     vpdpwssd         m0, m17, m15
     punpcklwd       m17, m2, m16
-    mova             m2, m14
+    movu             m2, m14
     vpdpwssd         m2, m17, m15
 %endif
 %if %2
-    mova           ym17, [srcq+strideq*0]
+    movu           ym17, [srcq+strideq*0]
     vinserti32x8    m17, [srcq+strideq*1], 1
 %else
-    mova            m17, [srcq+strideq*1]
+    movu            m17, [srcq+strideq*1]
 %endif
 %if %1
     psrad            m0, 6
     psrad            m2, 6
     packusdw         m2, m0
     punpckhwd        m0, m3, m17
-    mova             m1, m14
+    movu             m1, m14
     vpdpwssd         m1, m15, m0
     punpcklwd        m0, m3, m17
-    mova             m3, m14
+    movu             m3, m14
     vpdpwssd         m3, m15, m0
     psrad            m1, 6
     psrad            m3, 6
@@ -895,14 +895,14 @@ ALIGN function_align
     pminsw          m16, m9
     pminsw          m17, m9
 %if %2
-    mova          [dstq+strideq*0], ym16
+    movu          [dstq+strideq*0], ym16
     vextracti32x8 [dstq+strideq*1], m16, 1
     lea            dstq, [dstq+strideq*2]
-    mova          [dstq+strideq*0], ym17
+    movu          [dstq+strideq*0], ym17
     vextracti32x8 [dstq+strideq*1], m17, 1
 %else
-    mova [dstq+strideq*0], m16
-    mova [dstq+strideq*1], m17
+    movu [dstq+strideq*0], m16
+    movu [dstq+strideq*1], m17
 %endif
     lea            dstq, [dstq+strideq*2]
     ret

@@ -159,8 +159,8 @@ cglobal wiener_filter7_16bpc, 4, 15, 16, -384*12-16, dst, stride, left, lpf, \
  %endif
     mov         PICmem, t0
 %endif
-    mova            m6, [base+wiener_shufA]
-    mova            m7, [base+wiener_shufB]
+    movu            m6, [base+wiener_shufA]
+    movu            m7, [base+wiener_shufB]
 %if ARCH_X86_64
     lea             t4, [wiener_shifts]
     add             wd, wd
@@ -168,8 +168,8 @@ cglobal wiener_filter7_16bpc, 4, 15, 16, -384*12-16, dst, stride, left, lpf, \
     pshufd         m13, m13, q1111 ; x2 x3
     pshufd         m14, m15, q0000 ; y0 y1
     pshufd         m15, m15, q1111 ; y2 y3
-    mova            m8, [wiener_shufC]
-    mova            m9, [wiener_shufD]
+    movu            m8, [wiener_shufC]
+    movu            m9, [wiener_shufD]
     add           lpfq, wq
     lea             t1, [rsp+wq+16]
     add           dstq, wq
@@ -190,19 +190,19 @@ cglobal wiener_filter7_16bpc, 4, 15, 16, -384*12-16, dst, stride, left, lpf, \
  %define pd_m262128_mem [pd_m262128]
 %else
     add             wd, wd
-    mova            m4, [base+wiener_shufC]
-    mova            m5, [base+wiener_shufD]
+    movu            m4, [base+wiener_shufC]
+    movu            m5, [base+wiener_shufD]
     pshufd          m0, m1, q0000
     pshufd          m1, m1, q1111
     pshufd          m2, m3, q0000
     pshufd          m3, m3, q1111
-    mova            m8, m4
-    mova            m9, m5
-    mova           m14, m2
-    mova           m15, m3
+    movu            m8, m4
+    movu            m9, m5
+    movu           m14, m2
+    movu           m15, m3
     shr             t1, 11
     add           lpfq, wq
-    mova            m3, [base+pd_m262128]
+    movu            m3, [base+pd_m262128]
     movd            m4, [base+wiener_round+t1*4]
     movq            m5, [base+wiener_shifts+t1*8]
     lea             t1, [esp+extra_stack+wq+16]
@@ -214,15 +214,15 @@ cglobal wiener_filter7_16bpc, 4, 15, 16, -384*12-16, dst, stride, left, lpf, \
     mov             wm, wq
     pmullw          m0, m2
     pmullw          m1, m2
-    mova            m2, [base+wiener_lshuf7]
+    movu            m2, [base+wiener_lshuf7]
  %define pd_m262128_mem [esp+calloff+16*10]
-    mova pd_m262128_mem, m3
-    mova           m10, m4
-    mova           m11, m5
-    mova           m12, m0
-    mova           m13, m1
+    movu pd_m262128_mem, m3
+    movu           m10, m4
+    movu           m11, m5
+    movu           m12, m0
+    movu           m13, m1
  %define wiener_lshuf7_mem [esp+calloff+16*11]
-    mova wiener_lshuf7_mem, m2
+    movu wiener_lshuf7_mem, m2
 %endif
     test         edgeb, 4 ; LR_HAVE_TOP
     jz .no_top
@@ -314,17 +314,17 @@ cglobal wiener_filter7_16bpc, 4, 15, 16, -384*12-16, dst, stride, left, lpf, \
     movif32         t0, PICmem
     pxor            m0, m0
     movd            m1, wd
-    mova            m2, [base+pb_0to15]
+    movu            m2, [base+pb_0to15]
     pshufb          m1, m0
-    mova            m0, [base+pb_6_7]
+    movu            m0, [base+pb_6_7]
     psubb           m0, m1
     pminub          m0, m2
     pshufb          m3, m0
-    mova            m0, [base+pb_m2_m1]
+    movu            m0, [base+pb_m2_m1]
     psubb           m0, m1
     pminub          m0, m2
     pshufb          m4, m0
-    mova            m0, [base+pb_m10_m9]
+    movu            m0, [base+pb_m10_m9]
     psubb           m0, m1
     pminub          m0, m2
     pshufb          m5, m0
@@ -342,7 +342,7 @@ cglobal wiener_filter7_16bpc, 4, 15, 16, -384*12-16, dst, stride, left, lpf, \
     add          leftq, 8
     jmp .h_main
 .h_extend_left:
-    mova            m3, [lpfq+wq]         ; avoid accessing memory located
+    movu            m3, [lpfq+wq]         ; avoid accessing memory located
     pshufb          m3, wiener_lshuf7_mem ; before the start of the buffer
     jmp .h_main
 .h_top:
@@ -352,7 +352,7 @@ cglobal wiener_filter7_16bpc, 4, 15, 16, -384*12-16, dst, stride, left, lpf, \
 .h_loop:
     movu            m3, [lpfq+wq-8]
 .h_main:
-    mova            m4, [lpfq+wq+0]
+    movu            m4, [lpfq+wq+0]
     movu            m5, [lpfq+wq+8]
     test         edgeb, 2 ; LR_HAVE_RIGHT
     jnz .h_have_right
@@ -371,7 +371,7 @@ cglobal wiener_filter7_16bpc, 4, 15, 16, -384*12-16, dst, stride, left, lpf, \
     pmaddwd         m3, m13
     pshufb          m2, m5, m7
     paddw           m1, m2
-    mova            m2, pd_m262128_mem ; (1 << 4) - (1 << 18)
+    movu            m2, pd_m262128_mem ; (1 << 4) - (1 << 18)
     pshufb          m4, m8
     pmaddwd         m1, m12
     pshufb          m5, m9
@@ -385,7 +385,7 @@ cglobal wiener_filter7_16bpc, 4, 15, 16, -384*12-16, dst, stride, left, lpf, \
     psrad           m1, 4
     packssdw        m0, m1
     psraw           m0, 1
-    mova       [t1+wq], m0
+    movu       [t1+wq], m0
     add             wq, 16
     jl .h_loop
     movif32         wq, wm
@@ -403,7 +403,7 @@ ALIGN function_align
     add          leftq, 8
     jmp .hv_main
 .hv_extend_left:
-    mova            m3, [lpfq+wq]
+    movu            m3, [lpfq+wq]
     pshufb          m3, wiener_lshuf7_mem
     jmp .hv_main
 .hv_bottom:
@@ -415,7 +415,7 @@ ALIGN function_align
 .hv_loop:
     movu            m3, [lpfq+wq-8]
 .hv_main:
-    mova            m4, [lpfq+wq+0]
+    movu            m4, [lpfq+wq+0]
     movu            m5, [lpfq+wq+8]
     test         edgeb, 2 ; LR_HAVE_RIGHT
     jnz .hv_have_right
@@ -436,7 +436,7 @@ ALIGN function_align
     pmaddwd         m3, m13
     pshufb          m2, m5, m7
     paddw           m1, m2
-    mova            m2, pd_m262128_mem
+    movu            m2, pd_m262128_mem
     pshufb          m4, m8
     pmaddwd         m1, m12
     pshufb          m5, m9
@@ -445,15 +445,15 @@ ALIGN function_align
     paddd           m0, m2
     paddd           m1, m2
 %if ARCH_X86_64
-    mova            m2, [t4+wq]
+    movu            m2, [t4+wq]
     paddw           m2, [t2+wq]
-    mova            m5, [t3+wq]
+    movu            m5, [t3+wq]
 %else
-    mova            m2, [t1+wq]
+    movu            m2, [t1+wq]
     paddw           m2, [t0+wq]
     mov             t1, t3m
     mov             t0, t5m
-    mova            m5, [t1+wq]
+    movu            m5, [t1+wq]
     mov             t1, t1m
 %endif
     paddd           m0, m3
@@ -462,19 +462,19 @@ ALIGN function_align
     psrad           m1, 4
     packssdw        m0, m1
 %if ARCH_X86_64
-    mova            m4, [t5+wq]
+    movu            m4, [t5+wq]
     paddw           m4, [t1+wq]
     psraw           m0, 1
     paddw           m3, m0, [t6+wq]
 %else
-    mova            m4, [t0+wq]
+    movu            m4, [t0+wq]
     paddw           m4, [t1+wq]
     mov             t0, t0m
     mov             t1, t6m
     psraw           m0, 1
     paddw           m3, m0, [t1+wq]
 %endif
-    mova       [t0+wq], m0
+    movu       [t0+wq], m0
     punpcklwd       m0, m2, m5
     pmaddwd         m0, m15
     punpckhwd       m2, m5
@@ -493,7 +493,7 @@ ALIGN function_align
     pmulhw          m0, m11
     pxor            m1, m1
     pmaxsw          m0, m1
-    mova     [dstq+wq], m0
+    movu     [dstq+wq], m0
     add             wq, 16
     jl .hv_loop
 %if ARCH_X86_64
@@ -527,21 +527,21 @@ ALIGN function_align
     movif32        t1m, t1
 .v_loop:
 %if ARCH_X86_64
-    mova            m1, [t4+wq]
+    movu            m1, [t4+wq]
     paddw           m1, [t2+wq]
-    mova            m2, [t3+wq]
-    mova            m4, [t1+wq]
+    movu            m2, [t3+wq]
+    movu            m4, [t1+wq]
     paddw           m3, m4, [t6+wq]
     paddw           m4, [t5+wq]
 %else
     mov             t0, t4m
     mov             t1, t2m
-    mova            m1, [t0+wq]
+    movu            m1, [t0+wq]
     paddw           m1, [t1+wq]
     mov             t0, t3m
     mov             t1, t1m
-    mova            m2, [t0+wq]
-    mova            m4, [t1+wq]
+    movu            m2, [t0+wq]
+    movu            m4, [t1+wq]
     mov             t0, t6m
     mov             t1, t5m
     paddw           m3, m4, [t0+wq]
@@ -565,7 +565,7 @@ ALIGN function_align
     pmulhw          m0, m11
     pxor            m1, m1
     pmaxsw          m0, m1
-    mova     [dstq+wq], m0
+    movu     [dstq+wq], m0
     add             wq, 16
     jl .v_loop
 %if ARCH_X86_64
@@ -666,9 +666,9 @@ cglobal wiener_filter5_16bpc, 4, 14, 16, 384*8+16, dst, stride, left, lpf, \
  %endif
     mov         PICmem, t0
 %endif
-    mova            m5, [base+wiener_shufE]
-    mova            m6, [base+wiener_shufB]
-    mova            m7, [base+wiener_shufD]
+    movu            m5, [base+wiener_shufE]
+    movu            m6, [base+wiener_shufB]
+    movu            m7, [base+wiener_shufD]
 %if ARCH_X86_64
     lea             t4, [wiener_shifts]
     add             wd, wd
@@ -679,7 +679,7 @@ cglobal wiener_filter5_16bpc, 4, 14, 16, 384*8+16, dst, stride, left, lpf, \
     pshufd         m13, m13, q1111 ; y1
     pshufd         m14, m14, q1111 ; y2 y3
     shr            t3d, 11
-    mova            m8, [pd_m262128] ; (1 << 4) - (1 << 18)
+    movu            m8, [pd_m262128] ; (1 << 4) - (1 << 18)
     add           lpfq, wq
     lea             t1, [rsp+wq+16]
     add           dstq, wq
@@ -690,7 +690,7 @@ cglobal wiener_filter5_16bpc, 4, 14, 16, 384*8+16, dst, stride, left, lpf, \
     pshufd          m9, m9, q0000
     pshufd          m0, m10, q0000
     pshufd         m10, m10, q1111
-    mova           m15, [wiener_lshuf5]
+    movu           m15, [wiener_lshuf5]
     pmullw         m11, m0
     pmullw         m12, m0
  DEFINE_ARGS dst, stride, left, lpf, _, h, edge, _, _, _, w
@@ -704,10 +704,10 @@ cglobal wiener_filter5_16bpc, 4, 14, 16, 384*8+16, dst, stride, left, lpf, \
     punpcklwd       m2, m3, m3
     pshufd          m2, m2, q1111 ; y1
     pshufd          m3, m3, q1111 ; y2 y3
-    mova            m4, [base+pd_m262128] ; (1 << 4) - (1 << 18)
-    mova           m13, m2
-    mova           m14, m3
-    mova            m8, m4
+    movu            m4, [base+pd_m262128] ; (1 << 4) - (1 << 18)
+    movu           m13, m2
+    movu           m14, m3
+    movu            m8, m4
     shr             t1, 11
     add           lpfq, wq
     movd            m2, [base+wiener_round+t1*4]
@@ -725,12 +725,12 @@ cglobal wiener_filter5_16bpc, 4, 14, 16, 384*8+16, dst, stride, left, lpf, \
     mov             wm, wq
     pmullw          m0, m4
     pmullw          m1, m4
-    mova            m4, [base+wiener_lshuf5]
-    mova            m9, m2
-    mova           m10, m3
-    mova           m11, m0
-    mova           m12, m1
-    mova           m15, m4
+    movu            m4, [base+wiener_lshuf5]
+    movu            m9, m2
+    movu           m10, m3
+    movu           m11, m0
+    movu           m12, m1
+    movu           m15, m4
 %endif
     test         edgeb, 4 ; LR_HAVE_TOP
     jz .no_top
@@ -817,12 +817,12 @@ cglobal wiener_filter5_16bpc, 4, 14, 16, 384*8+16, dst, stride, left, lpf, \
     movif32         t0, PICmem
     pxor            m1, m1
     movd            m2, wd
-    mova            m0, [base+pb_2_3]
+    movu            m0, [base+pb_2_3]
     pshufb          m2, m1
-    mova            m1, [base+pb_m6_m5]
+    movu            m1, [base+pb_m6_m5]
     psubb           m0, m2
     psubb           m1, m2
-    mova            m2, [base+pb_0to15]
+    movu            m2, [base+pb_0to15]
     pminub          m0, m2
     pminub          m1, m2
     pshufb          m3, m0
@@ -835,14 +835,14 @@ cglobal wiener_filter5_16bpc, 4, 14, 16, 384*8+16, dst, stride, left, lpf, \
     movif32         wq, wm
     test         edgeb, 1 ; LR_HAVE_LEFT
     jz .h_extend_left
-    mova            m4, [lpfq+wq]
+    movu            m4, [lpfq+wq]
     movd            m3, [leftq+4]
     pslldq          m4, 4
     por             m3, m4
     add          leftq, 8
     jmp .h_main
 .h_extend_left:
-    mova            m3, [lpfq+wq] ; avoid accessing memory located
+    movu            m3, [lpfq+wq] ; avoid accessing memory located
     pshufb          m3, m15       ; before the start of the buffer
     jmp .h_main
 .h_top:
@@ -880,7 +880,7 @@ cglobal wiener_filter5_16bpc, 4, 14, 16, 384*8+16, dst, stride, left, lpf, \
     psrad           m1, 4
     packssdw        m0, m1
     psraw           m0, 1
-    mova       [t1+wq], m0
+    movu       [t1+wq], m0
     add             wq, 16
     jl .h_loop
     movif32         wq, wm
@@ -893,14 +893,14 @@ ALIGN function_align
     movif32        t1m, t1
     test         edgeb, 1 ; LR_HAVE_LEFT
     jz .hv_extend_left
-    mova            m4, [lpfq+wq]
+    movu            m4, [lpfq+wq]
     movd            m3, [leftq+4]
     pslldq          m4, 4
     por             m3, m4
     add          leftq, 8
     jmp .hv_main
 .hv_extend_left:
-    mova            m3, [lpfq+wq]
+    movu            m3, [lpfq+wq]
     pshufb          m3, m15
     jmp .hv_main
 .hv_bottom:
@@ -937,33 +937,33 @@ ALIGN function_align
     paddd           m1, m8
     paddd           m0, m2
 %if ARCH_X86_64
-    mova            m2, [t3+wq]
+    movu            m2, [t3+wq]
     paddw           m2, [t1+wq]
     paddd           m1, m3
-    mova            m4, [t2+wq]
+    movu            m4, [t2+wq]
 %else
-    mova            m2, [t0+wq]
+    movu            m2, [t0+wq]
     mov             t0, t2m
     paddw           m2, [t1+wq]
     mov             t1, t4m
     paddd           m1, m3
-    mova            m4, [t0+wq]
+    movu            m4, [t0+wq]
     mov             t0, t0m
 %endif
     punpckhwd       m3, m2, m4
     pmaddwd         m3, m14
     punpcklwd       m2, m4
 %if ARCH_X86_64
-    mova            m4, [t4+wq]
+    movu            m4, [t4+wq]
 %else
-    mova            m4, [t1+wq]
+    movu            m4, [t1+wq]
 %endif
     psrad           m0, 4
     psrad           m1, 4
     packssdw        m0, m1
     pmaddwd         m2, m14
     psraw           m0, 1
-    mova       [t0+wq], m0
+    movu       [t0+wq], m0
     punpckhwd       m1, m0, m4
     pmaddwd         m1, m13
     punpcklwd       m0, m4
@@ -978,7 +978,7 @@ ALIGN function_align
     pmulhw          m0, m10
     pxor            m1, m1
     pmaxsw          m0, m1
-    mova     [dstq+wq], m0
+    movu     [dstq+wq], m0
     add             wq, 16
     jl .hv_loop
 %if ARCH_X86_64
@@ -1005,18 +1005,18 @@ ALIGN function_align
     movif32        t1m, t1
 .v_loop:
 %if ARCH_X86_64
-    mova            m0, [t1+wq]
+    movu            m0, [t1+wq]
     paddw           m2, m0, [t3+wq]
-    mova            m1, [t2+wq]
-    mova            m4, [t4+wq]
+    movu            m1, [t2+wq]
+    movu            m4, [t4+wq]
 %else
     mov             t0, t3m
-    mova            m0, [t1+wq]
+    movu            m0, [t1+wq]
     mov             t1, t2m
     paddw           m2, m0, [t0+wq]
     mov             t0, t4m
-    mova            m1, [t1+wq]
-    mova            m4, [t0+wq]
+    movu            m1, [t1+wq]
+    movu            m4, [t0+wq]
 %endif
     punpckhwd       m3, m2, m1
     pmaddwd         m3, m14
@@ -1036,7 +1036,7 @@ ALIGN function_align
     pmulhw          m0, m10
     pxor            m1, m1
     pmaxsw          m0, m1
-    mova     [dstq+wq], m0
+    movu     [dstq+wq], m0
     add             wq, 16
 %if ARCH_X86_64
     jl .v_loop
@@ -1169,22 +1169,22 @@ cglobal sgr_filter_5x5_16bpc, 4, 15, 15, -400*24-16, dst, stride, left, lpf, \
     add             wd, wd
     mov          edged, r7m
     movu           m10, [paramsq]
-    mova           m12, [sgr_lshuf5]
+    movu           m12, [sgr_lshuf5]
     add           lpfq, wq
-    mova            m8, [pd_8]
+    movu            m8, [pd_8]
     lea             t1, [rsp+wq+20]
-    mova            m9, [pd_0xfffffff0]
+    movu            m9, [pd_0xfffffff0]
     add           dstq, wq
     lea             t3, [rsp+wq*2+400*12+16]
-    mova           m11, [pd_0xf00800a4]
+    movu           m11, [pd_0xf00800a4]
     lea             t4, [rsp+wq+400*20+16]
     pshufhw         m7, m10, q0000
     pshufb         m10, [pw_256]  ; s0
     punpckhqdq      m7, m7        ; w0
     neg             wq
-    mova           m13, [pd_34816]  ; (1 << 11) + (1 << 15)
+    movu           m13, [pd_34816]  ; (1 << 11) + (1 << 15)
     pxor            m6, m6
-    mova           m14, [pw_1023]
+    movu           m14, [pw_1023]
     psllw           m7, 4
  DEFINE_ARGS dst, stride, left, lpf, _, h, edge, _, _, _, w
  %define lpfm        [rsp]
@@ -1206,7 +1206,7 @@ cglobal sgr_filter_5x5_16bpc, 4, 15, 15, -400*24-16, dst, stride, left, lpf, \
     punpckhqdq      m7, m7            ; w0
     psllw           m7, 4
     neg             wq
-    mova           m10, m1
+    movu           m10, m1
     pxor            m6, m6
     mov            w1m, wd
     sub             wd, 4
@@ -1316,13 +1316,13 @@ cglobal sgr_filter_5x5_16bpc, 4, 15, 15, -400*24-16, dst, stride, left, lpf, \
 .extend_right:
     movd            m0, wd
     movd            m1, [lpfq-2]
-    mova            m2, [base+pw_256]
-    mova            m3, [base+pb_m14_m13]
+    movu            m2, [base+pw_256]
+    movu            m3, [base+pb_m14_m13]
     pshufb          m0, m6
     pshufb          m1, m2
     psubb           m2, m0
     psubb           m3, m0
-    mova            m0, [base+pb_0to15]
+    movu            m0, [base+pb_0to15]
     pcmpgtb         m2, m0
     pcmpgtb         m3, m0
     pand            m4, m2
@@ -1345,13 +1345,13 @@ cglobal sgr_filter_5x5_16bpc, 4, 15, 15, -400*24-16, dst, stride, left, lpf, \
     movif32      leftq, leftm
     movddup         m5, [leftq]
     movif32         wq, w0m
-    mova            m4, [lpfq+wq+4]
+    movu            m4, [lpfq+wq+4]
     add         leftmp, 8
     palignr         m4, m5, 10
     jmp .h_main
 .h_extend_left:
     movif32         wq, w0m
-    mova            m4, [lpfq+wq+4]
+    movu            m4, [lpfq+wq+4]
     pshufb          m4, m12
     jmp .h_main
 .h_top:
@@ -1401,9 +1401,9 @@ cglobal sgr_filter_5x5_16bpc, 4, 15, 15, -400*24-16, dst, stride, left, lpf, \
 .h_loop_end:
     paddd           m1, m5             ; sumsq
     paddd           m2, m4
-    mova [t1+wq+400*0], m0
-    mova [t1+wq+400*2], m1
-    mova [t1+wq+400*4], m2
+    movu [t1+wq+400*0], m0
+    movu [t1+wq+400*2], m1
+    movu [t1+wq+400*4], m2
     add             wq, 16
     jl .h_loop
     ret
@@ -1414,15 +1414,15 @@ cglobal sgr_filter_5x5_16bpc, 4, 15, 15, -400*24-16, dst, stride, left, lpf, \
     mov             wd, w0m
 %endif
 .top_fixup_loop: ; the sums of the first row needs to be doubled
-    mova            m0, [t1+wq+400*0]
-    mova            m1, [t1+wq+400*2]
-    mova            m2, [t1+wq+400*4]
+    movu            m0, [t1+wq+400*0]
+    movu            m1, [t1+wq+400*2]
+    movu            m2, [t1+wq+400*4]
     paddw           m0, m0
     paddd           m1, m1
     paddd           m2, m2
-    mova [t2+wq+400*0], m0
-    mova [t2+wq+400*2], m1
-    mova [t2+wq+400*4], m2
+    movu [t2+wq+400*0], m0
+    movu [t2+wq+400*2], m1
+    movu [t2+wq+400*4], m2
     add             wq, 16
     jl .top_fixup_loop
     ret
@@ -1438,13 +1438,13 @@ ALIGN function_align
     movif32      leftq, leftm
     movddup         m5, [leftq]
     movif32         wq, w0m
-    mova            m4, [lpfq+wq+4]
+    movu            m4, [lpfq+wq+4]
     add         leftmp, 8
     palignr         m4, m5, 10
     jmp .hv_main
 .hv_extend_left:
     movif32         wq, w0m
-    mova            m4, [lpfq+wq+4]
+    movu            m4, [lpfq+wq+4]
     pshufb          m4, m12
     jmp .hv_main
 .hv_bottom:
@@ -1509,9 +1509,9 @@ ALIGN function_align
     paddw           m1, [t2+wq+400*0] ; hv sum
     paddd           m4, [t2+wq+400*2] ; hv sumsq
     paddd           m5, [t2+wq+400*4]
-    mova [t0+wq+400*0], m0
-    mova [t0+wq+400*2], m2
-    mova [t0+wq+400*4], m3
+    movu [t0+wq+400*0], m0
+    movu [t0+wq+400*2], m2
+    movu [t0+wq+400*4], m3
     psrlw           m3, m1, 1
     paddd           m4, m8
     pavgw           m3, m6             ; (b + 2) >> 2
@@ -1552,11 +1552,11 @@ ALIGN function_align
     MULLD           m1, m5, m2
     paddd           m0, m13            ; x * b * 164 + (1 << 11) + (1 << 15)
     paddd           m1, m13
-    mova     [t4+wq+4], m3
+    movu     [t4+wq+4], m3
     psrld           m0, 12             ; b
     psrld           m1, 12
-    mova  [t3+wq*2+ 8], m0
-    mova  [t3+wq*2+24], m1
+    movu  [t3+wq*2+ 8], m0
+    movu  [t3+wq*2+24], m1
     add             wq, 16
     jl .hv_loop
     mov             t2, t1
@@ -1566,11 +1566,11 @@ ALIGN function_align
     movif32        t0m, t0
     ret
 .hv_last_row: ; esoteric edge case for odd heights
-    mova [t1+wq+400*0], m1
+    movu [t1+wq+400*0], m1
     paddw           m1, m0
-    mova [t1+wq+400*2], m4
+    movu [t1+wq+400*2], m4
     paddd           m4, m2
-    mova [t1+wq+400*4], m5
+    movu [t1+wq+400*4], m5
     paddd           m5, m3
     jmp .hv_main2
 .v: ; vertical boxsum + ab
@@ -1580,9 +1580,9 @@ ALIGN function_align
     mov             wd, w0m
 %endif
 .v_loop:
-    mova            m0, [t1+wq+400*0]
-    mova            m2, [t1+wq+400*2]
-    mova            m3, [t1+wq+400*4]
+    movu            m0, [t1+wq+400*0]
+    movu            m2, [t1+wq+400*2]
+    movu            m3, [t1+wq+400*4]
     paddw           m1, m0, [t2+wq+400*0]
     paddd           m4, m2, [t2+wq+400*2]
     paddd           m5, m3, [t2+wq+400*4]
@@ -1631,11 +1631,11 @@ ALIGN function_align
     MULLD           m1, m5, m2
     paddd           m0, m13            ; x * b * 164 + (1 << 11) + (1 << 15)
     paddd           m1, m13
-    mova     [t4+wq+4], m3
+    movu     [t4+wq+4], m3
     psrld           m0, 12             ; b
     psrld           m1, 12
-    mova  [t3+wq*2+ 8], m0
-    mova  [t3+wq*2+24], m1
+    movu  [t3+wq*2+ 8], m0
+    movu  [t3+wq*2+24], m1
     add             wq, 16
     jl .v_loop
     ret
@@ -1664,9 +1664,9 @@ ALIGN function_align
     paddw           m0, m3             ; a 565
     paddd           m1, m4             ; b 565
     paddd           m2, m5
-    mova [t4+wq*1+400*2+ 0], m0
-    mova [t3+wq*2+400*4+ 0], m1
-    mova [t3+wq*2+400*4+16], m2
+    movu [t4+wq*1+400*2+ 0], m0
+    movu [t3+wq*2+400*4+ 0], m1
+    movu [t3+wq*2+400*4+16], m2
     add             wq, 16
     jl .prep_n_loop
     ret
@@ -1699,10 +1699,10 @@ ALIGN function_align
     paddw           m3, m0, [t4+wq*1+400*2+ 0]
     paddd           m4, m1, [t3+wq*2+400*4+ 0]
     paddd           m5, m2, [t3+wq*2+400*4+16]
-    mova [t4+wq*1+400*2+ 0], m0
-    mova [t3+wq*2+400*4+ 0], m1
-    mova [t3+wq*2+400*4+16], m2
-    mova            m0, [dstq+wq]
+    movu [t4+wq*1+400*2+ 0], m0
+    movu [t3+wq*2+400*4+ 0], m1
+    movu [t3+wq*2+400*4+16], m2
+    movu            m0, [dstq+wq]
     punpcklwd       m1, m0, m6          ; src
     punpcklwd       m2, m3, m6          ; a
     pmaddwd         m2, m1              ; a * src
@@ -1718,7 +1718,7 @@ ALIGN function_align
     paddw           m0, m4
     pmaxsw          m0, m6
     pminsw          m0, m14
-    mova     [dstq+wq], m0
+    movu     [dstq+wq], m0
     add             wq, 16
     jl .n0_loop
     add           dstq, stridemp
@@ -1728,10 +1728,10 @@ ALIGN function_align
     movif64         wq, r4
     movif32         wd, w1m
 .n1_loop:
-    mova            m0, [dstq+wq]
-    mova            m3, [t4+wq*1+400*2+ 0]
-    mova            m4, [t3+wq*2+400*4+ 0]
-    mova            m5, [t3+wq*2+400*4+16]
+    movu            m0, [dstq+wq]
+    movu            m3, [t4+wq*1+400*2+ 0]
+    movu            m4, [t3+wq*2+400*4+ 0]
+    movu            m5, [t3+wq*2+400*4+16]
     punpcklwd       m1, m0, m6          ; src
     punpcklwd       m2, m3, m6          ; a
     pmaddwd         m2, m1
@@ -1747,7 +1747,7 @@ ALIGN function_align
     paddw           m0, m4
     pmaxsw          m0, m6
     pminsw          m0, m14
-    mova     [dstq+wq], m0
+    movu     [dstq+wq], m0
     add             wq, 16
     jl .n1_loop
     add           dstq, stridemp
@@ -1821,20 +1821,20 @@ cglobal sgr_filter_3x3_16bpc, 4, 15, 15, -400*42-8, dst, stride, left, lpf, \
     movq            m9, [paramsq+4]
     add           lpfq, wq
     lea             t1, [rsp+wq+12]
-    mova            m8, [pd_8]
+    movu            m8, [pd_8]
     add           dstq, wq
     lea             t3, [rsp+wq*2+400*12+8]
-    mova           m10, [pd_0xf00801c7]
+    movu           m10, [pd_0xf00801c7]
     lea             t4, [rsp+wq+400*32+8]
-    mova           m11, [pd_34816]
+    movu           m11, [pd_34816]
     pshuflw         m7, m9, q3333
     pshufb          m9, [pw_256]  ; s1
     punpcklqdq      m7, m7        ; w1
     neg             wq
     pxor            m6, m6
-    mova           m13, [pw_1023]
+    movu           m13, [pw_1023]
     psllw           m7, 4
-    mova           m12, [sgr_lshuf3]
+    movu           m12, [sgr_lshuf3]
  DEFINE_ARGS dst, stride, left, lpf, _, h, edge, _, _, _, w
  %define lpfm [rsp]
 %else
@@ -1855,7 +1855,7 @@ cglobal sgr_filter_3x3_16bpc, 4, 15, 15, -400*42-8, dst, stride, left, lpf, \
     punpcklqdq      m7, m7            ; w1
     psllw           m7, 4
     neg             wq
-    mova            m9, m1
+    movu            m9, m1
     pxor            m6, m6
     mov            w1m, wd
     sub             wd, 4
@@ -1948,12 +1948,12 @@ cglobal sgr_filter_3x3_16bpc, 4, 15, 15, -400*42-8, dst, stride, left, lpf, \
 %endif
     lea             t2, [t1+400*6]
 .top_fixup_loop:
-    mova            m0, [t1+wq+400*0]
-    mova            m1, [t1+wq+400*2]
-    mova            m2, [t1+wq+400*4]
-    mova [t2+wq+400*0], m0
-    mova [t2+wq+400*2], m1
-    mova [t2+wq+400*4], m2
+    movu            m0, [t1+wq+400*0]
+    movu            m1, [t1+wq+400*2]
+    movu            m2, [t1+wq+400*4]
+    movu [t2+wq+400*0], m0
+    movu [t2+wq+400*2], m1
+    movu [t2+wq+400*4], m2
     add             wq, 16
     jl .top_fixup_loop
     movif32         t3, t3m
@@ -1963,8 +1963,8 @@ cglobal sgr_filter_3x3_16bpc, 4, 15, 15, -400*42-8, dst, stride, left, lpf, \
 .extend_right:
     movd            m1, wd
     movd            m5, [lpfq-2]
-    mova            m2, [base+pw_256]
-    mova            m3, [base+pb_0to15]
+    movu            m2, [base+pw_256]
+    movu            m3, [base+pb_0to15]
     pshufb          m1, m6
     pshufb          m5, m2
     psubb           m2, m1
@@ -1986,13 +1986,13 @@ cglobal sgr_filter_3x3_16bpc, 4, 15, 15, -400*42-8, dst, stride, left, lpf, \
     movif32      leftq, leftm
     movddup         m5, [leftq]
     movif32         wq, w0m
-    mova            m4, [lpfq+wq+4]
+    movu            m4, [lpfq+wq+4]
     add         leftmp, 8
     palignr         m4, m5, 12
     jmp .h_main
 .h_extend_left:
     movif32         wq, w0m
-    mova            m4, [lpfq+wq+4]
+    movu            m4, [lpfq+wq+4]
     pshufb          m4, m12
     jmp .h_main
 .h_top:
@@ -2026,9 +2026,9 @@ cglobal sgr_filter_3x3_16bpc, 4, 15, 15, -400*42-8, dst, stride, left, lpf, \
     pmaddwd         m5, m5
     paddd           m2, m4             ; sumsq
     paddd           m3, m5
-    mova [t1+wq+400*0], m1
-    mova [t1+wq+400*2], m2
-    mova [t1+wq+400*4], m3
+    movu [t1+wq+400*0], m1
+    movu [t1+wq+400*2], m2
+    movu [t1+wq+400*4], m3
     add             wq, 16
     jl .h_loop
     ret
@@ -2044,13 +2044,13 @@ ALIGN function_align
     movif32      leftq, leftm
     movddup         m5, [leftq]
     movif32         wq, w0m
-    mova            m4, [lpfq+wq+4]
+    movu            m4, [lpfq+wq+4]
     add         leftmp, 8
     palignr         m4, m5, 12
     jmp .hv0_main
 .hv0_extend_left:
     movif32         wq, w0m
-    mova            m4, [lpfq+wq+4]
+    movu            m4, [lpfq+wq+4]
     pshufb          m4, m12
     jmp .hv0_main
 .hv0_bottom:
@@ -2094,15 +2094,15 @@ ALIGN function_align
     paddw           m0, m1, [t1+wq+400*0]
     paddd           m4, m2, [t1+wq+400*2]
     paddd           m5, m3, [t1+wq+400*4]
-    mova [t1+wq+400*0], m1
-    mova [t1+wq+400*2], m2
-    mova [t1+wq+400*4], m3
+    movu [t1+wq+400*0], m1
+    movu [t1+wq+400*2], m2
+    movu [t1+wq+400*4], m3
     paddw           m1, m0, [t2+wq+400*0]
     paddd           m2, m4, [t2+wq+400*2]
     paddd           m3, m5, [t2+wq+400*4]
-    mova [t2+wq+400*0], m0
-    mova [t2+wq+400*2], m4
-    mova [t2+wq+400*4], m5
+    movu [t2+wq+400*0], m0
+    movu [t2+wq+400*2], m4
+    movu [t2+wq+400*4], m5
     paddd           m2, m8
     paddd           m3, m8
     psrld           m2, 4              ; (a + 8) >> 4
@@ -2142,11 +2142,11 @@ ALIGN function_align
 %endif
     paddd           m0, m11            ; x * b * 455 + (1 << 11) + (1 << 15)
     paddd           m1, m11
-    mova     [t4+wq+4], m3
+    movu     [t4+wq+4], m3
     psrld           m0, 12
     psrld           m1, 12
-    mova  [t3+wq*2+ 8], m0
-    mova  [t3+wq*2+24], m1
+    movu  [t3+wq*2+ 8], m0
+    movu  [t3+wq*2+24], m1
     add             wq, 16
     jl .hv0_loop
     ret
@@ -2162,13 +2162,13 @@ ALIGN function_align
     movif32      leftq, leftm
     movddup         m5, [leftq]
     movif32         wq, w0m
-    mova            m4, [lpfq+wq+4]
+    movu            m4, [lpfq+wq+4]
     add         leftmp, 8
     palignr         m4, m5, 12
     jmp .hv1_main
 .hv1_extend_left:
     movif32         wq, w0m
-    mova            m4, [lpfq+wq+4]
+    movu            m4, [lpfq+wq+4]
     pshufb          m4, m12
     jmp .hv1_main
 .hv1_bottom:
@@ -2212,9 +2212,9 @@ ALIGN function_align
     paddw           m1, m0, [t2+wq+400*0]
     paddd           m4, m2, [t2+wq+400*2]
     paddd           m5, m3, [t2+wq+400*4]
-    mova [t2+wq+400*0], m0
-    mova [t2+wq+400*2], m2
-    mova [t2+wq+400*4], m3
+    movu [t2+wq+400*0], m0
+    movu [t2+wq+400*2], m2
+    movu [t2+wq+400*4], m3
     paddd           m4, m8
     paddd           m5, m8
     psrld           m4, 4              ; (a + 8) >> 4
@@ -2254,11 +2254,11 @@ ALIGN function_align
 %endif
     paddd           m0, m11            ; x * b * 455 + (1 << 11) + (1 << 15)
     paddd           m1, m11
-    mova [t4+wq*1+400*2 +4], m3
+    movu [t4+wq*1+400*2 +4], m3
     psrld           m0, 12
     psrld           m1, 12
-    mova [t3+wq*2+400*4+ 8], m0
-    mova [t3+wq*2+400*4+24], m1
+    movu [t3+wq*2+400*4+ 8], m0
+    movu [t3+wq*2+400*4+24], m1
     add             wq, 16
     jl .hv1_loop
     mov            r10, t2
@@ -2272,18 +2272,18 @@ ALIGN function_align
     mov             wd, w0m
 %endif
 .v0_loop:
-    mova            m0, [t1+wq+400*0]
-    mova            m4, [t1+wq+400*2]
-    mova            m5, [t1+wq+400*4]
+    movu            m0, [t1+wq+400*0]
+    movu            m4, [t1+wq+400*2]
+    movu            m5, [t1+wq+400*4]
     paddw           m0, m0
     paddd           m4, m4
     paddd           m5, m5
     paddw           m1, m0, [t2+wq+400*0]
     paddd           m2, m4, [t2+wq+400*2]
     paddd           m3, m5, [t2+wq+400*4]
-    mova [t2+wq+400*0], m0
-    mova [t2+wq+400*2], m4
-    mova [t2+wq+400*4], m5
+    movu [t2+wq+400*0], m0
+    movu [t2+wq+400*2], m4
+    movu [t2+wq+400*4], m5
     paddd           m2, m8
     paddd           m3, m8
     psrld           m2, 4              ; (a + 8) >> 4
@@ -2322,11 +2322,11 @@ ALIGN function_align
 %endif
     paddd           m0, m11            ; x * b * 455 + (1 << 11) + (1 << 15)
     paddd           m1, m11
-    mova [t4+wq*1+400*0+ 4], m3
+    movu [t4+wq*1+400*0+ 4], m3
     psrld           m0, 12
     psrld           m1, 12
-    mova [t3+wq*2+400*0+ 8], m0
-    mova [t3+wq*2+400*0+24], m1
+    movu [t3+wq*2+400*0+ 8], m0
+    movu [t3+wq*2+400*0+24], m1
     add             wq, 16
     jl .v0_loop
     ret
@@ -2337,15 +2337,15 @@ ALIGN function_align
     mov             wd, w0m
 %endif
 .v1_loop:
-    mova            m0, [t1+wq+400*0]
-    mova            m4, [t1+wq+400*2]
-    mova            m5, [t1+wq+400*4]
+    movu            m0, [t1+wq+400*0]
+    movu            m4, [t1+wq+400*2]
+    movu            m5, [t1+wq+400*4]
     paddw           m1, m0, [t2+wq+400*0]
     paddd           m2, m4, [t2+wq+400*2]
     paddd           m3, m5, [t2+wq+400*4]
-    mova [t2+wq+400*0], m0
-    mova [t2+wq+400*2], m4
-    mova [t2+wq+400*4], m5
+    movu [t2+wq+400*0], m0
+    movu [t2+wq+400*2], m4
+    movu [t2+wq+400*4], m5
     paddd           m2, m8
     paddd           m3, m8
     psrld           m2, 4              ; (a + 8) >> 4
@@ -2384,11 +2384,11 @@ ALIGN function_align
 %endif
     paddd           m0, m11            ; x * b * 455 + (1 << 11) + (1 << 15)
     paddd           m1, m11
-    mova [t4+wq*1+400*2+ 4], m3
+    movu [t4+wq*1+400*2+ 4], m3
     psrld           m0, 12
     psrld           m1, 12
-    mova [t3+wq*2+400*4+ 8], m0
-    mova [t3+wq*2+400*4+24], m1
+    movu [t3+wq*2+400*4+ 8], m0
+    movu [t3+wq*2+400*4+24], m1
     add             wq, 16
     jl .v1_loop
     mov            r10, t2
@@ -2417,9 +2417,9 @@ ALIGN function_align
     psubw           m3, m0               ; a[-1] 343
     psubd           m4, m1               ; b[-1] 343
     psubd           m5, m2
-    mova [t4+wq*1+400*4], m3
-    mova [t3+wq*2+400*8+ 0], m4
-    mova [t3+wq*2+400*8+16], m5
+    movu [t4+wq*1+400*4], m3
+    movu [t3+wq*2+400*8+ 0], m4
+    movu [t3+wq*2+400*8+16], m5
     movu            m0, [t4+wq*1+400*2+ 4]
     movu            m1, [t3+wq*2+400*4+ 8]
     movu            m2, [t3+wq*2+400*4+24]
@@ -2435,15 +2435,15 @@ ALIGN function_align
     psllw           m3, 2                 ; a[ 0] 444
     pslld           m4, 2                 ; b[ 0] 444
     pslld           m5, 2
-    mova [t4+wq*1+400* 6], m3
-    mova [t3+wq*2+400*12+ 0], m4
-    mova [t3+wq*2+400*12+16], m5
+    movu [t4+wq*1+400* 6], m3
+    movu [t3+wq*2+400*12+ 0], m4
+    movu [t3+wq*2+400*12+16], m5
     psubw           m3, m0                ; a[ 0] 343
     psubd           m4, m1                ; b[ 0] 343
     psubd           m5, m2
-    mova [t4+wq*1+400* 8], m3
-    mova [t3+wq*2+400*16+ 0], m4
-    mova [t3+wq*2+400*16+16], m5
+    movu [t4+wq*1+400* 8], m3
+    movu [t3+wq*2+400*16+ 0], m4
+    movu [t3+wq*2+400*16+16], m5
     add             wq, 16
     jl .prep_n_loop
     ret
@@ -2460,8 +2460,8 @@ ALIGN function_align
     psubw           m2, m1, m3           ; a[ 1] 343
     paddw           m3, m2, [t4+wq*1+400*4]
     paddw           m3, [t4+wq*1+400*6]
-    mova [t4+wq*1+400*4], m2
-    mova [t4+wq*1+400*6], m1
+    movu [t4+wq*1+400*4], m2
+    movu [t4+wq*1+400*6], m1
     movu            m4, [t3+wq*2+400*0+8]
     movu            m1, [t3+wq*2+400*0+4]
     paddd           m4, [t3+wq*2+400*0+0]
@@ -2470,8 +2470,8 @@ ALIGN function_align
     psubd           m2, m1, m4           ; b[ 1] 343
     paddd           m4, m2, [t3+wq*2+400* 8+ 0]
     paddd           m4, [t3+wq*2+400*12+ 0]
-    mova [t3+wq*2+400* 8+ 0], m2
-    mova [t3+wq*2+400*12+ 0], m1
+    movu [t3+wq*2+400* 8+ 0], m2
+    movu [t3+wq*2+400*12+ 0], m1
     movu            m5, [t3+wq*2+400*0+24]
     movu            m1, [t3+wq*2+400*0+20]
     paddd           m5, [t3+wq*2+400*0+16]
@@ -2480,9 +2480,9 @@ ALIGN function_align
     psubd           m2, m1, m5
     paddd           m5, m2, [t3+wq*2+400* 8+16]
     paddd           m5, [t3+wq*2+400*12+16]
-    mova [t3+wq*2+400* 8+16], m2
-    mova [t3+wq*2+400*12+16], m1
-    mova            m0, [dstq+wq]
+    movu [t3+wq*2+400* 8+16], m2
+    movu [t3+wq*2+400*12+16], m1
+    movu            m0, [dstq+wq]
     punpcklwd       m1, m0, m6
     punpcklwd       m2, m3, m6
     pmaddwd         m2, m1               ; a * src
@@ -2498,7 +2498,7 @@ ALIGN function_align
     paddw           m0, m4
     pmaxsw          m0, m6
     pminsw          m0, m13
-    mova     [dstq+wq], m0
+    movu     [dstq+wq], m0
     add             wq, 16
     jl .n0_loop
     add           dstq, stridemp
@@ -2516,8 +2516,8 @@ ALIGN function_align
     psubw           m2, m1, m3           ; a[ 1] 343
     paddw           m3, m2, [t4+wq*1+400*6]
     paddw           m3, [t4+wq*1+400*8]
-    mova [t4+wq*1+400*6], m1
-    mova [t4+wq*1+400*8], m2
+    movu [t4+wq*1+400*6], m1
+    movu [t4+wq*1+400*8], m2
     movu            m4, [t3+wq*2+400*4+8]
     movu            m1, [t3+wq*2+400*4+4]
     paddd           m4, [t3+wq*2+400*4+0]
@@ -2526,8 +2526,8 @@ ALIGN function_align
     psubd           m2, m1, m4           ; b[ 1] 343
     paddd           m4, m2, [t3+wq*2+400*12+ 0]
     paddd           m4, [t3+wq*2+400*16+ 0]
-    mova [t3+wq*2+400*12+ 0], m1
-    mova [t3+wq*2+400*16+ 0], m2
+    movu [t3+wq*2+400*12+ 0], m1
+    movu [t3+wq*2+400*16+ 0], m2
     movu            m5, [t3+wq*2+400*4+24]
     movu            m1, [t3+wq*2+400*4+20]
     paddd           m5, [t3+wq*2+400*4+16]
@@ -2536,9 +2536,9 @@ ALIGN function_align
     psubd           m2, m1, m5
     paddd           m5, m2, [t3+wq*2+400*12+16]
     paddd           m5, [t3+wq*2+400*16+16]
-    mova [t3+wq*2+400*12+16], m1
-    mova [t3+wq*2+400*16+16], m2
-    mova            m0, [dstq+wq]
+    movu [t3+wq*2+400*12+16], m1
+    movu [t3+wq*2+400*16+16], m2
+    movu            m0, [dstq+wq]
     punpcklwd       m1, m0, m6
     punpcklwd       m2, m3, m6
     pmaddwd         m2, m1               ; a * src
@@ -2554,7 +2554,7 @@ ALIGN function_align
     paddw           m0, m4
     pmaxsw          m0, m6
     pminsw          m0, m13
-    mova     [dstq+wq], m0
+    movu     [dstq+wq], m0
     add             wq, 16
     jl .n1_loop
     add           dstq, stridemp
@@ -2627,15 +2627,15 @@ cglobal sgr_filter_mix_16bpc, 4, 15, 16, -400*66-40, dst, stride, left, lpf, \
     movifnidn       hd, hm
     add             wd, wd
     mov          edged, r7m
-    mova           m14, [paramsq]
+    movu           m14, [paramsq]
     add           lpfq, wq
-    mova            m9, [pd_8]
+    movu            m9, [pd_8]
     lea             t1, [rsp+wq+44]
-    mova           m10, [pd_34816]
+    movu           m10, [pd_34816]
     add           dstq, wq
-    mova           m11, [pd_0xf00801c7]
+    movu           m11, [pd_0xf00801c7]
     lea             t3, [rsp+wq*2+400*24+40]
-    mova           m12, [pd_0xf00800a4]
+    movu           m12, [pd_0xf00800a4]
     lea             t4, [rsp+wq+400*52+40]
     neg             wq
     pshufd         m15, m14, q2222 ; w0 w1
@@ -2650,7 +2650,7 @@ cglobal sgr_filter_mix_16bpc, 4, 15, 16, -400*66-40, dst, stride, left, lpf, \
     mov             r1, [rstk+stack_offset+28] ; params
     LEA             r6, $$
     add             wd, wd
-    mova            m2, [r1]
+    movu            m2, [r1]
     add           lpfm, wq
     lea             t1, [rsp+extra_stack+wq+52]
     add           dstq, wq
@@ -2669,11 +2669,11 @@ cglobal sgr_filter_mix_16bpc, 4, 15, 16, -400*66-40, dst, stride, left, lpf, \
     mov            w1m, wd
     pxor            m3, m3
     psllw           m2, 2
-    mova           m13, m0
-    mova           m14, m1
+    movu           m13, m0
+    movu           m14, m1
     sub             wd, 4
-    mova           m15, m2
-    mova            m6, m3
+    movu           m15, m2
+    movu            m6, m3
     mov           lpfq, lpfm
     mov            w0m, wd
  %define strideq r5
@@ -2769,21 +2769,21 @@ cglobal sgr_filter_mix_16bpc, 4, 15, 16, -400*66-40, dst, stride, left, lpf, \
 %endif
     lea             t2, [t1+400*12]
 .top_fixup_loop:
-    mova            m0, [t1+wq+400* 0]
-    mova            m1, [t1+wq+400* 2]
-    mova            m2, [t1+wq+400* 4]
+    movu            m0, [t1+wq+400* 0]
+    movu            m1, [t1+wq+400* 2]
+    movu            m2, [t1+wq+400* 4]
     paddw           m0, m0
-    mova            m3, [t1+wq+400* 6]
+    movu            m3, [t1+wq+400* 6]
     paddd           m1, m1
-    mova            m4, [t1+wq+400* 8]
+    movu            m4, [t1+wq+400* 8]
     paddd           m2, m2
-    mova            m5, [t1+wq+400*10]
-    mova [t2+wq+400* 0], m0
-    mova [t2+wq+400* 2], m1
-    mova [t2+wq+400* 4], m2
-    mova [t2+wq+400* 6], m3
-    mova [t2+wq+400* 8], m4
-    mova [t2+wq+400*10], m5
+    movu            m5, [t1+wq+400*10]
+    movu [t2+wq+400* 0], m0
+    movu [t2+wq+400* 2], m1
+    movu [t2+wq+400* 4], m2
+    movu [t2+wq+400* 6], m3
+    movu [t2+wq+400* 8], m4
+    movu [t2+wq+400*10], m5
     add             wq, 16
     jl .top_fixup_loop
     movif32         t3, t3m
@@ -2803,13 +2803,13 @@ cglobal sgr_filter_mix_16bpc, 4, 15, 16, -400*66-40, dst, stride, left, lpf, \
     movif32      leftq, leftm
     movddup         m5, [leftq]
     movif32         wq, w0m
-    mova            m4, [lpfq+wq+4]
+    movu            m4, [lpfq+wq+4]
     add         leftmp, 8
     palignr         m4, m5, 10
     jmp .h_main
 .h_extend_left:
     movif32         wq, w0m
-    mova            m4, [lpfq+wq+4]
+    movu            m4, [lpfq+wq+4]
     pshufb          m4, [base+sgr_lshuf5]
     jmp .h_main
 .h_top:
@@ -2853,15 +2853,15 @@ cglobal sgr_filter_mix_16bpc, 4, 15, 16, -400*66-40, dst, stride, left, lpf, \
     punpckhwd       m5, m4
     pmaddwd         m5, m5
     paddd           m3, m0
-    mova [t1+wq+400* 6], m1
-    mova [t1+wq+400* 8], m2
-    mova [t1+wq+400*10], m3
+    movu [t1+wq+400* 6], m1
+    movu [t1+wq+400* 8], m2
+    movu [t1+wq+400*10], m3
     paddw           m8, m1             ; sum5
     paddd           m7, m2             ; sumsq5
     paddd           m5, m3
-    mova [t1+wq+400* 0], m8
-    mova [t1+wq+400* 2], m7
-    mova [t1+wq+400* 4], m5
+    movu [t1+wq+400* 0], m8
+    movu [t1+wq+400* 2], m7
+    movu [t1+wq+400* 4], m5
     add             wq, 16
     jl .h_loop
     ret
@@ -2877,13 +2877,13 @@ ALIGN function_align
     movif32      leftq, leftm
     movddup         m5, [leftq]
     movif32         wq, w0m
-    mova            m4, [lpfq+wq+4]
+    movu            m4, [lpfq+wq+4]
     add         leftmp, 8
     palignr         m4, m5, 10
     jmp .hv0_main
 .hv0_extend_left:
     movif32         wq, w0m
-    mova            m4, [lpfq+wq+4]
+    movu            m4, [lpfq+wq+4]
     pshufb          m4, [base+sgr_lshuf5]
     jmp .hv0_main
 .hv0_bottom:
@@ -2938,27 +2938,27 @@ ALIGN function_align
     paddw           m8, m1             ; h sum5
     paddd           m7, m2             ; h sumsq5
     paddd           m5, m3
-    mova [t3+wq*2+400*8+ 8], m8
-    mova [t3+wq*2+400*0+ 8], m7
-    mova [t3+wq*2+400*0+24], m5
+    movu [t3+wq*2+400*8+ 8], m8
+    movu [t3+wq*2+400*0+ 8], m7
+    movu [t3+wq*2+400*0+24], m5
     paddw           m8, [t1+wq+400* 0]
     paddd           m7, [t1+wq+400* 2]
     paddd           m5, [t1+wq+400* 4]
-    mova [t1+wq+400* 0], m8
-    mova [t1+wq+400* 2], m7
-    mova [t1+wq+400* 4], m5
+    movu [t1+wq+400* 0], m8
+    movu [t1+wq+400* 2], m7
+    movu [t1+wq+400* 4], m5
     paddw           m0, m1, [t1+wq+400* 6]
     paddd           m4, m2, [t1+wq+400* 8]
     paddd           m5, m3, [t1+wq+400*10]
-    mova [t1+wq+400* 6], m1
-    mova [t1+wq+400* 8], m2
-    mova [t1+wq+400*10], m3
+    movu [t1+wq+400* 6], m1
+    movu [t1+wq+400* 8], m2
+    movu [t1+wq+400*10], m3
     paddw           m1, m0, [t2+wq+400* 6]
     paddd           m2, m4, [t2+wq+400* 8]
     paddd           m3, m5, [t2+wq+400*10]
-    mova [t2+wq+400* 6], m0
-    mova [t2+wq+400* 8], m4
-    mova [t2+wq+400*10], m5
+    movu [t2+wq+400* 6], m0
+    movu [t2+wq+400* 8], m4
+    movu [t2+wq+400*10], m5
     paddd           m2, m9
     paddd           m3, m9
     psrld           m2, 4              ; (a3 + 8) >> 4
@@ -3002,11 +3002,11 @@ ALIGN function_align
     MULLD           m1, m5, m7
     paddd           m0, m10            ; x3 * b3 * 455 + (1 << 11) + (1 << 15)
     paddd           m1, m10
-    mova [t4+wq*1+400*2+ 4], m3
+    movu [t4+wq*1+400*2+ 4], m3
     psrld           m0, 12
     psrld           m1, 12
-    mova [t3+wq*2+400*4+ 8], m0
-    mova [t3+wq*2+400*4+24], m1
+    movu [t3+wq*2+400*4+ 8], m0
+    movu [t3+wq*2+400*4+24], m1
     add             wq, 16
     jl .hv0_loop
     ret
@@ -3022,13 +3022,13 @@ ALIGN function_align
     movif32      leftq, leftm
     movddup         m5, [leftq]
     movif32         wq, w0m
-    mova            m4, [lpfq+wq+4]
+    movu            m4, [lpfq+wq+4]
     add         leftmp, 8
     palignr         m4, m5, 10
     jmp .hv1_main
 .hv1_extend_left:
     movif32         wq, w0m
-    mova            m4, [lpfq+wq+4]
+    movu            m4, [lpfq+wq+4]
     pshufb          m4, [base+sgr_lshuf5]
     jmp .hv1_main
 .hv1_bottom:
@@ -3080,12 +3080,12 @@ ALIGN function_align
     pmaddwd         m4, m4
     paddd           m7, m3
     paddw           m5, m2, [t2+wq+400* 6]
-    mova [t2+wq+400* 6], m2
+    movu [t2+wq+400* 6], m2
     paddw           m8, m2             ; h sum5
     paddd           m2, m0, [t2+wq+400* 8]
     paddd           m3, m7, [t2+wq+400*10]
-    mova [t2+wq+400* 8], m0
-    mova [t2+wq+400*10], m7
+    movu [t2+wq+400* 8], m0
+    movu [t2+wq+400*10], m7
     paddd           m4, m0             ; h sumsq5
     paddd           m1, m7
     paddd           m2, m9
@@ -3103,7 +3103,7 @@ ALIGN function_align
     punpckhwd       m7, m6
     pmaddwd         m7, m7
 %if ARCH_X86_32
-    mova      [esp+20], m8
+    movu      [esp+20], m8
 %else
     SWAP            m8, m6
 %endif
@@ -3132,11 +3132,11 @@ ALIGN function_align
     paddd           m5, m10
     psrld           m0, 12
     psrld           m5, 12
-    mova [t4+wq*1+400*4+4], m8
-    mova [t3+wq*2+400*8+ 8], m0
-    mova [t3+wq*2+400*8+24], m5
+    movu [t4+wq*1+400*4+4], m8
+    movu [t3+wq*2+400*8+ 8], m0
+    movu [t3+wq*2+400*8+24], m5
 %if ARCH_X86_32
-    mova            m8, [esp+20]
+    movu            m8, [esp+20]
 %else
     SWAP            m6, m8
     pxor            m6, m6
@@ -3147,14 +3147,14 @@ ALIGN function_align
     paddw           m5, [t1+wq+400*0]
     paddd           m2, [t1+wq+400*2]
     paddd           m3, [t1+wq+400*4]
-    mova [t2+wq+400*0], m8
+    movu [t2+wq+400*0], m8
     paddd           m2, m9
     paddd           m3, m9
     psrld           m2, 4              ; (a5 + 8) >> 4
     psrld           m3, 4
-    mova [t2+wq+400*2], m4
+    movu [t2+wq+400*2], m4
     pslld           m8, m2, 4
-    mova [t2+wq+400*4], m1
+    movu [t2+wq+400*4], m1
     pslld           m4, m3, 4
     paddd           m8, m2
     pslld           m2, 3
@@ -3197,11 +3197,11 @@ ALIGN function_align
     MULLD           m5, m3, m7
     paddd           m0, m10            ; x5 * b5 * 164 + (1 << 11) + (1 << 15)
     paddd           m5, m10
-    mova [t4+wq*1+400*0+ 4], m1
+    movu [t4+wq*1+400*0+ 4], m1
     psrld           m0, 12
     psrld           m5, 12
-    mova [t3+wq*2+400*0+ 8], m0
-    mova [t3+wq*2+400*0+24], m5
+    movu [t3+wq*2+400*0+ 8], m0
+    movu [t3+wq*2+400*0+24], m5
     add             wq, 16
     jl .hv1_loop
     mov            r10, t2
@@ -3215,18 +3215,18 @@ ALIGN function_align
     mov             wd, w0m
 %endif
 .v0_loop:
-    mova            m0, [t1+wq+400* 6]
-    mova            m4, [t1+wq+400* 8]
-    mova            m5, [t1+wq+400*10]
+    movu            m0, [t1+wq+400* 6]
+    movu            m4, [t1+wq+400* 8]
+    movu            m5, [t1+wq+400*10]
     paddw           m0, m0
     paddd           m4, m4
     paddd           m5, m5
     paddw           m1, m0, [t2+wq+400* 6]
     paddd           m2, m4, [t2+wq+400* 8]
     paddd           m3, m5, [t2+wq+400*10]
-    mova [t2+wq+400* 6], m0
-    mova [t2+wq+400* 8], m4
-    mova [t2+wq+400*10], m5
+    movu [t2+wq+400* 6], m0
+    movu [t2+wq+400* 8], m4
+    movu [t2+wq+400*10], m5
     paddd           m2, m9
     paddd           m3, m9
     psrld           m2, 4              ; (a3 + 8) >> 4
@@ -3270,23 +3270,23 @@ ALIGN function_align
     MULLD           m1, m5, m7
     paddd           m0, m10            ; x3 * b3 * 455 + (1 << 11) + (1 << 15)
     paddd           m1, m10
-    mova [t4+wq*1+400*2+4], m3
+    movu [t4+wq*1+400*2+4], m3
     psrld           m0, 12
     psrld           m1, 12
-    mova            m3, [t1+wq+400*0]
-    mova            m4, [t1+wq+400*2]
-    mova            m5, [t1+wq+400*4]
-    mova [t3+wq*2+400*8+ 8], m3
-    mova [t3+wq*2+400*0+ 8], m4
-    mova [t3+wq*2+400*0+24], m5
+    movu            m3, [t1+wq+400*0]
+    movu            m4, [t1+wq+400*2]
+    movu            m5, [t1+wq+400*4]
+    movu [t3+wq*2+400*8+ 8], m3
+    movu [t3+wq*2+400*0+ 8], m4
+    movu [t3+wq*2+400*0+24], m5
     paddw           m3, m3 ; cc5
     paddd           m4, m4
     paddd           m5, m5
-    mova [t1+wq+400*0], m3
-    mova [t1+wq+400*2], m4
-    mova [t1+wq+400*4], m5
-    mova [t3+wq*2+400*4+ 8], m0
-    mova [t3+wq*2+400*4+24], m1
+    movu [t1+wq+400*0], m3
+    movu [t1+wq+400*2], m4
+    movu [t1+wq+400*4], m5
+    movu [t3+wq*2+400*4+ 8], m0
+    movu [t3+wq*2+400*4+24], m1
     add             wq, 16
     jl .v0_loop
     ret
@@ -3297,15 +3297,15 @@ ALIGN function_align
     mov             wd, w0m
 %endif
 .v1_loop:
-    mova            m4, [t1+wq+400* 6]
-    mova            m5, [t1+wq+400* 8]
-    mova            m7, [t1+wq+400*10]
+    movu            m4, [t1+wq+400* 6]
+    movu            m5, [t1+wq+400* 8]
+    movu            m7, [t1+wq+400*10]
     paddw           m1, m4, [t2+wq+400* 6]
     paddd           m2, m5, [t2+wq+400* 8]
     paddd           m3, m7, [t2+wq+400*10]
-    mova [t2+wq+400* 6], m4
-    mova [t2+wq+400* 8], m5
-    mova [t2+wq+400*10], m7
+    movu [t2+wq+400* 6], m4
+    movu [t2+wq+400* 8], m5
+    movu [t2+wq+400*10], m7
     paddd           m2, m9
     paddd           m3, m9
     psrld           m2, 4              ; (a3 + 8) >> 4
@@ -3349,28 +3349,28 @@ ALIGN function_align
     MULLD           m1, m5, m7
     paddd           m0, m10            ; x3 * b3 * 455 + (1 << 11) + (1 << 15)
     paddd           m1, m10
-    mova [t4+wq*1+400*4+4], m3
+    movu [t4+wq*1+400*4+4], m3
     psrld           m0, 12
     psrld           m8, m1, 12
-    mova            m4, [t3+wq*2+400*8+ 8]
-    mova            m5, [t3+wq*2+400*0+ 8]
-    mova            m7, [t3+wq*2+400*0+24]
+    movu            m4, [t3+wq*2+400*8+ 8]
+    movu            m5, [t3+wq*2+400*0+ 8]
+    movu            m7, [t3+wq*2+400*0+24]
     paddw           m1, m4, [t2+wq+400*0]
     paddd           m2, m5, [t2+wq+400*2]
     paddd           m3, m7, [t2+wq+400*4]
     paddw           m1, [t1+wq+400*0]
     paddd           m2, [t1+wq+400*2]
     paddd           m3, [t1+wq+400*4]
-    mova [t2+wq+400*0], m4
-    mova [t2+wq+400*2], m5
-    mova [t2+wq+400*4], m7
+    movu [t2+wq+400*0], m4
+    movu [t2+wq+400*2], m5
+    movu [t2+wq+400*4], m7
     paddd           m2, m9
     paddd           m3, m9
     psrld           m2, 4              ; (a5 + 8) >> 4
     psrld           m3, 4
-    mova         [t3+wq*2+400*8+ 8], m0
+    movu         [t3+wq*2+400*8+ 8], m0
     pslld           m4, m2, 4
-    mova         [t3+wq*2+400*8+24], m8
+    movu         [t3+wq*2+400*8+24], m8
     pslld           m5, m3, 4
     paddd           m4, m2
     pslld           m2, 3
@@ -3413,11 +3413,11 @@ ALIGN function_align
     MULLD           m1, m3, m7
     paddd           m0, m10            ; x5 * b5 * 164 + (1 << 11) + (1 << 15)
     paddd           m1, m10
-    mova [t4+wq*1+400*0+ 4], m4
+    movu [t4+wq*1+400*0+ 4], m4
     psrld           m0, 12
     psrld           m1, 12
-    mova [t3+wq*2+400*0+ 8], m0
-    mova [t3+wq*2+400*0+24], m1
+    movu [t3+wq*2+400*0+ 8], m0
+    movu [t3+wq*2+400*0+24], m1
     add             wq, 16
     jl .v1_loop
     mov            r10, t2
@@ -3449,9 +3449,9 @@ ALIGN function_align
     paddw           m0, m3               ; a5 565
     paddd           m1, m4               ; b5 565
     paddd           m2, m5
-    mova [t4+wq*1+400* 6+ 0], m0
-    mova [t3+wq*2+400*12+ 0], m1
-    mova [t3+wq*2+400*12+16], m2
+    movu [t4+wq*1+400* 6+ 0], m0
+    movu [t3+wq*2+400*12+ 0], m1
+    movu [t3+wq*2+400*12+16], m2
     movu            m0, [t4+wq*1+400*2+ 4]
     movu            m1, [t3+wq*2+400*4+ 8]
     movu            m2, [t3+wq*2+400*4+24]
@@ -3470,9 +3470,9 @@ ALIGN function_align
     psubw           m3, m0               ; a3[-1] 343
     psubd           m4, m1               ; b3[-1] 343
     psubd           m5, m2
-    mova [t4+wq*1+400* 8+ 0], m3
-    mova [t3+wq*2+400*16+ 0], m4
-    mova [t3+wq*2+400*16+16], m5
+    movu [t4+wq*1+400* 8+ 0], m3
+    movu [t3+wq*2+400*16+ 0], m4
+    movu [t3+wq*2+400*16+16], m5
     movu            m0, [t4+wq*1+400*4+ 4]
     movu            m1, [t3+wq*2+400*8+ 8]
     movu            m2, [t3+wq*2+400*8+24]
@@ -3488,15 +3488,15 @@ ALIGN function_align
     psllw           m3, 2                 ; a3[ 0] 444
     pslld           m4, 2                 ; b3[ 0] 444
     pslld           m5, 2
-    mova [t4+wq*1+400*10+ 0], m3
-    mova [t3+wq*2+400*20+ 0], m4
-    mova [t3+wq*2+400*20+16], m5
+    movu [t4+wq*1+400*10+ 0], m3
+    movu [t3+wq*2+400*20+ 0], m4
+    movu [t3+wq*2+400*20+16], m5
     psubw           m3, m0                ; a3[ 0] 343
     psubd           m4, m1                ; b3[ 0] 343
     psubd           m5, m2
-    mova [t4+wq*1+400*12+ 0], m3
-    mova [t3+wq*2+400*24+ 0], m4
-    mova [t3+wq*2+400*24+16], m5
+    movu [t4+wq*1+400*12+ 0], m3
+    movu [t3+wq*2+400*24+ 0], m4
+    movu [t3+wq*2+400*24+16], m5
     add             wq, 16
     jl .prep_n_loop
     ret
@@ -3528,12 +3528,12 @@ ALIGN function_align
     paddd           m5, m3
     movu            m2, [t4+wq*1+400* 6]
     paddw           m2, m0
-    mova [t4+wq*1+400* 6], m0
+    movu [t4+wq*1+400* 6], m0
     paddd           m0, m4, [t3+wq*2+400*12+ 0]
     paddd           m1, m5, [t3+wq*2+400*12+16]
-    mova [t3+wq*2+400*12+ 0], m4
-    mova [t3+wq*2+400*12+16], m5
-    mova [rsp+16+ARCH_X86_32*4], m1
+    movu [t3+wq*2+400*12+ 0], m4
+    movu [t3+wq*2+400*12+16], m5
+    movu [rsp+16+ARCH_X86_32*4], m1
     movu            m3, [t4+wq*1+400*2+4]
     movu            m5, [t4+wq*1+400*2+2]
     paddw           m3, [t4+wq*1+400*2+0]
@@ -3543,8 +3543,8 @@ ALIGN function_align
     movu            m3, [t4+wq*1+400* 8]
     paddw           m3, [t4+wq*1+400*10]
     paddw           m3, m4
-    mova [t4+wq*1+400* 8], m4
-    mova [t4+wq*1+400*10], m5
+    movu [t4+wq*1+400* 8], m4
+    movu [t4+wq*1+400*10], m5
     movu            m1, [t3+wq*2+400*4+ 8]
     movu            m5, [t3+wq*2+400*4+ 4]
     movu            m7, [t3+wq*2+400*4+24]
@@ -3557,7 +3557,7 @@ ALIGN function_align
     pslld           m8, 2
     psubd           m4, m5, m1           ; b3[ 1] 343
 %if ARCH_X86_32
-    mova      [esp+52], m8
+    movu      [esp+52], m8
     psubd           m8, m7
 %else
     psubd           m6, m8, m7
@@ -3567,17 +3567,17 @@ ALIGN function_align
     paddd           m7, m8, [t3+wq*2+400*16+16]
     paddd           m1, [t3+wq*2+400*20+ 0]
     paddd           m7, [t3+wq*2+400*20+16]
-    mova [t3+wq*2+400*16+ 0], m4
-    mova [t3+wq*2+400*16+16], m8
-    mova [t3+wq*2+400*20+ 0], m5
+    movu [t3+wq*2+400*16+ 0], m4
+    movu [t3+wq*2+400*16+16], m8
+    movu [t3+wq*2+400*20+ 0], m5
 %if ARCH_X86_32
-    mova            m8, [esp+52]
+    movu            m8, [esp+52]
 %else
     SWAP            m8, m6
     pxor            m6, m6
 %endif
-    mova [t3+wq*2+400*20+16], m8
-    mova [rsp+32+ARCH_X86_32*4], m7
+    movu [t3+wq*2+400*20+16], m8
+    movu [rsp+32+ARCH_X86_32*4], m7
     movu            m5, [dstq+wq]
     punpcklwd       m4, m5, m6
     punpcklwd       m7, m2, m6
@@ -3593,17 +3593,17 @@ ALIGN function_align
     pslld           m5, 13
     psubd           m0, m7               ; b5 - a5 * src + (1 << 8)
     psubd           m1, m8               ; b3 - a3 * src + (1 << 8)
-    mova            m7, [base+pd_0xffff]
+    movu            m7, [base+pd_0xffff]
     psrld           m0, 9
     pslld           m1, 7
     pand            m0, m7
     pandn           m8, m7, m1
     por             m0, m8
-    mova            m1, [rsp+16+ARCH_X86_32*4]
-    mova            m8, [rsp+32+ARCH_X86_32*4]
+    movu            m1, [rsp+16+ARCH_X86_32*4]
+    movu            m8, [rsp+32+ARCH_X86_32*4]
     psubd           m1, m2
     psubd           m8, m3
-    mova            m2, [base+pd_4096]
+    movu            m2, [base+pd_4096]
     psrld           m1, 9
     pslld           m8, 7
     pand            m1, m7
@@ -3625,7 +3625,7 @@ ALIGN function_align
     packssdw        m0, m1               ; clip
     pmaxsw          m0, m7
     psrlw           m0, 5
-    mova     [dstq+wq], m0
+    movu     [dstq+wq], m0
     add             wq, 16
     jl .n0_loop
     add           dstq, stridemp
@@ -3646,8 +3646,8 @@ ALIGN function_align
     psubw           m4, m5, m3           ; a3[ 1] 343
     paddw           m3, m4, [t4+wq*1+400*12]
     paddw           m3, [t4+wq*1+400*10]
-    mova [t4+wq*1+400*10], m5
-    mova [t4+wq*1+400*12], m4
+    movu [t4+wq*1+400*10], m5
+    movu [t4+wq*1+400*12], m4
     movu            m1, [t3+wq*2+400*8+ 8]
     movu            m5, [t3+wq*2+400*8+ 4]
     movu            m7, [t3+wq*2+400*8+24]
@@ -3664,12 +3664,12 @@ ALIGN function_align
     paddd           m7, m0, [t3+wq*2+400*24+16]
     paddd           m1, [t3+wq*2+400*20+ 0]
     paddd           m7, [t3+wq*2+400*20+16]
-    mova [t3+wq*2+400*20+ 0], m5
-    mova [t3+wq*2+400*20+16], m8
-    mova [t3+wq*2+400*24+ 0], m4
-    mova [t3+wq*2+400*24+16], m0
-    mova            m5, [dstq+wq]
-    mova            m2, [t4+wq*1+400* 6]
+    movu [t3+wq*2+400*20+ 0], m5
+    movu [t3+wq*2+400*20+16], m8
+    movu [t3+wq*2+400*24+ 0], m4
+    movu [t3+wq*2+400*24+16], m0
+    movu            m5, [dstq+wq]
+    movu            m2, [t4+wq*1+400* 6]
     punpcklwd       m4, m5, m6
     punpcklwd       m8, m2, m6
     pmaddwd         m8, m4               ; a5 * src
@@ -3683,12 +3683,12 @@ ALIGN function_align
     psubd           m1, m0               ; b3 - a3 * src + (1 << 8)
     pslld           m4, 13
     pslld           m5, 13
-    mova            m0, [t3+wq*2+400*12+ 0]
+    movu            m0, [t3+wq*2+400*12+ 0]
     psubd           m0, m8               ; b5 - a5 * src + (1 << 8)
-    mova            m8, [t3+wq*2+400*12+16]
+    movu            m8, [t3+wq*2+400*12+16]
     psubd           m8, m2
     psubd           m7, m3
-    mova            m2, [base+pd_0xffff]
+    movu            m2, [base+pd_0xffff]
     pslld           m1, 7
     psrld           m0, 8
     psrld           m8, 8
@@ -3699,7 +3699,7 @@ ALIGN function_align
     pand            m8, m2
     pandn           m2, m7
     por             m2, m8
-    mova            m1, [base+pd_4096]
+    movu            m1, [base+pd_4096]
     pmaddwd         m0, m15
     pmaddwd         m2, m15
 %if ARCH_X86_64
@@ -3715,7 +3715,7 @@ ALIGN function_align
     packssdw        m0, m2              ; clip
     pmaxsw          m0, m7
     psrlw           m0, 5
-    mova     [dstq+wq], m0
+    movu     [dstq+wq], m0
     add             wq, 16
     jl .n1_loop
     add           dstq, stridemp

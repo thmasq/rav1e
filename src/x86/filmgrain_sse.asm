@@ -77,7 +77,7 @@ SECTION .text
 
 %macro SCRATCH 3
 %if ARCH_X86_32
-    mova [rsp+%3*mmsize], m%1
+    movu [rsp+%3*mmsize], m%1
 %define m%2 [rsp+%3*mmsize]
 %else
     SWAP             %1, %2
@@ -94,7 +94,7 @@ cglobal generate_grain_y_8bpc, 2, 7 + 2 * ARCH_X86_64, 16, buf, fg_data
     mov             r2d, [fg_dataq+FGData.grain_scale_shift]
     movd             m2, [base+round+r2*2]
     movd             m0, [fg_dataq+FGData.seed]
-    mova             m5, [base+pb_mask]
+    movu             m5, [base+pb_mask]
     pshuflw          m2, m2, q0000
     pshuflw          m0, m0, q0000
     mov              r2, -73*82
@@ -360,10 +360,10 @@ cglobal generate_grain_y_8bpc, 2, 7 + 2 * ARCH_X86_64, 16, buf, fg_data
     pshufd           m4, m0, q2222
     pshufd           m5, m0, q3333
     pshufd           m0, m0, q0000
-    mova    [rsp+ 0*16], m0
-    mova    [rsp+ 1*16], m3
-    mova    [rsp+ 2*16], m4
-    mova    [rsp+ 3*16], m5
+    movu    [rsp+ 0*16], m0
+    movu    [rsp+ 1*16], m3
+    movu    [rsp+ 2*16], m4
+    movu    [rsp+ 3*16], m5
     pshufd           m6, m1, q1111
     pshufd           m7, m1, q2222
     pshufd           m5, m1, q3333
@@ -374,8 +374,8 @@ cglobal generate_grain_y_8bpc, 2, 7 + 2 * ARCH_X86_64, 16, buf, fg_data
     pshufd           m4, m2, q2222
     pshufd           m2, m2, q0000
     pinsrw           m0, [base+round_vals+shiftq*2-10], 3
-    mova    [rsp+ 4*16], m1
-    mova    [rsp+ 5*16], m6
+    movu    [rsp+ 4*16], m1
+    movu    [rsp+ 5*16], m6
     SCRATCH           7, 8,  6
     SCRATCH           5, 9,  7
     SCRATCH           2, 10, 8
@@ -504,7 +504,7 @@ cglobal generate_grain_uv_%1_8bpc, 1, 7 + 3 * ARCH_X86_64, 16, buf, bufy, fg_dat
     movq             m7, [base+hmul_bits]
     mov             r5d, [fg_dataq+FGData.grain_scale_shift]
     movd             m6, [base+round+r5*2]
-    mova             m5, [base+pb_mask]
+    movu             m5, [base+pb_mask]
     movd             m0, [fg_dataq+FGData.seed]
     movd             m2, [base+pw_seed_xor+uvq*4]
     pxor             m0, m2
@@ -1043,13 +1043,13 @@ cglobal generate_grain_uv_%1_8bpc, 1, 7 + 3 * ARCH_X86_64, 16, buf, bufy, fg_dat
     pshufd           m6, m1, q2222
     pshufd           m7, m1, q3333
     pshufd           m1, m1, q0000
-    mova    [rsp+ 0*16], m0
-    mova    [rsp+ 1*16], m2
-    mova    [rsp+ 2*16], m3
-    mova    [rsp+ 3*16], m4
-    mova    [rsp+ 4*16], m1
-    mova    [rsp+ 5*16], m5
-    mova    [rsp+ 6*16], m6
+    movu    [rsp+ 0*16], m0
+    movu    [rsp+ 1*16], m2
+    movu    [rsp+ 2*16], m3
+    movu    [rsp+ 3*16], m4
+    movu    [rsp+ 4*16], m1
+    movu    [rsp+ 5*16], m5
+    movu    [rsp+ 6*16], m6
     SCRATCH           7, 8, 7
 
     movu             m2, [fg_dataq+FGData.ar_coeffs_uv+uvq+16]   ; cf16-24 [24=luma]
@@ -1339,8 +1339,8 @@ cglobal fgy_32x32xn_8bpc, 6, 15, 16, dst, src, stride, fg_data, w, scaling, grai
     mov        overlapd, [fg_dataq+FGData.overlap_flag] ; left_overlap: overlap & 1
     test       overlapd, overlapd
     jz .no_vertical_overlap
-    mova             m6, [base+pw_1024]
-    mova             m7, [base+pb_27_17_17_27]
+    movu             m6, [base+pw_1024]
+    movu             m7, [base+pb_27_17_17_27]
     SCRATCH           6, 14, 3
     SCRATCH           7, 15, 4
     test           sbyd, sbyd
@@ -1422,7 +1422,7 @@ cglobal fgy_32x32xn_8bpc, 6, 15, 16, dst, src, stride, fg_data, w, scaling, grai
     mov      grain_lutq, grain_lutmp
 .loop_y:
     ; src
-    mova             m0, [srcq]
+    movu             m0, [srcq]
     pxor             m2, m2
     punpckhbw        m1, m0, m2
     punpcklbw        m0, m2                 ; m0-1: src as word
@@ -1458,7 +1458,7 @@ cglobal fgy_32x32xn_8bpc, 6, 15, 16, dst, src, stride, fg_data, w, scaling, grai
     pminsw           m1, m12
     packuswb         m0, m1
     movifnidn      dstq, dstmp
-    mova    [dstq+srcq], m0
+    movu    [dstq+srcq], m0
 
     add            srcq, r2mp
     add      grain_lutq, 82
@@ -1552,7 +1552,7 @@ cglobal fgy_32x32xn_8bpc, 6, 15, 16, dst, src, stride, fg_data, w, scaling, grai
     mov      grain_lutq, grain_lutmp
 .loop_y_h_overlap:
     ; src
-    mova             m0, [srcq]
+    movu             m0, [srcq]
     pxor             m2, m2
     punpckhbw        m1, m0, m2
     punpcklbw        m0, m2                 ; m0-1: src as word
@@ -1599,7 +1599,7 @@ cglobal fgy_32x32xn_8bpc, 6, 15, 16, dst, src, stride, fg_data, w, scaling, grai
     pminsw           m1, m12
     packuswb         m0, m1
     movifnidn      dstq, dstmp
-    mova    [dstq+srcq], m0
+    movu    [dstq+srcq], m0
 
     add            srcq, r2mp
     add      grain_lutq, 82
@@ -1742,13 +1742,13 @@ cglobal fgy_32x32xn_8bpc, 6, 15, 16, dst, src, stride, fg_data, w, scaling, grai
     lea              r5, [base+pb_27_17]
     mov [rsp+5*mmsize+12], r5
 %else
-    mova             m8, [pb_27_17]
+    movu             m8, [pb_27_17]
 %endif
     mov              hd, r7m
     mov      grain_lutq, grain_lutmp
 .loop_y_v_overlap:
     ; src
-    mova             m0, [srcq]
+    movu             m0, [srcq]
     pxor             m2, m2
     punpckhbw        m1, m0, m2
     punpcklbw        m0, m2                 ; m0-1: src as word
@@ -1803,12 +1803,12 @@ cglobal fgy_32x32xn_8bpc, 6, 15, 16, dst, src, stride, fg_data, w, scaling, grai
     pminsw           m1, m12
     packuswb         m0, m1
     movifnidn      dstq, dstmp
-    mova    [dstq+srcq], m0
+    movu    [dstq+srcq], m0
 
 %if ARCH_X86_32
     add dword [rsp+5*mmsize+12], mmsize
 %else
-    mova             m8, [pb_17_27]
+    movu             m8, [pb_17_27]
 %endif
     add            srcq, r2mp
     add      grain_lutq, 82
@@ -1863,7 +1863,7 @@ cglobal fgy_32x32xn_8bpc, 6, 15, 16, dst, src, stride, fg_data, w, scaling, grai
     xor            tmpd, tmpd
     mov            seed, r3m
 %else
-    mova             m8, [pb_27_17]
+    movu             m8, [pb_27_17]
 
     DEFINE_ARGS dst, src, stride, src_bak, w, scaling, grain_lut, \
                 tmp, unused2, see, unused3
@@ -1967,7 +1967,7 @@ cglobal fgy_32x32xn_8bpc, 6, 15, 16, dst, src, stride, fg_data, w, scaling, grai
     punpckhbw        m4, m7
 
     ; src
-    mova             m0, [srcq]
+    movu             m0, [srcq]
     punpckhbw        m1, m0, m2
     punpcklbw        m0, m2                 ; m0-1: src as word
 
@@ -1996,12 +1996,12 @@ cglobal fgy_32x32xn_8bpc, 6, 15, 16, dst, src, stride, fg_data, w, scaling, grai
     pminsw           m1, m12
     packuswb         m0, m1
     movifnidn      dstq, dstmp
-    mova    [dstq+srcq], m0
+    movu    [dstq+srcq], m0
 
 %if ARCH_X86_32
     add dword [rsp+5*mmsize+12], mmsize
 %else
-    mova             m8, [pb_17_27]
+    movu             m8, [pb_17_27]
 %endif
     add            srcq, r2mp
     add      grain_lutq, 82
@@ -2150,18 +2150,18 @@ cglobal fguv_32x32xn_i%1_8bpc, 6, 15, 16, dst, src, stride, fg_data, w, scaling,
     jz %%no_vertical_overlap
 %if ARCH_X86_32
 %if %2
-    mova             m1, [base+pb_23_22_h]
+    movu             m1, [base+pb_23_22_h]
 %else
-    mova             m1, [base+pb_27_17_17_27]
+    movu             m1, [base+pb_27_17_17_27]
 %endif
-    mova             m0, [base+pw_1024]
+    movu             m0, [base+pw_1024]
 %else
 %if %2
-    mova             m1, [pb_23_22_h]
+    movu             m1, [pb_23_22_h]
 %else
-    mova             m1, [pb_27_17_17_27]
+    movu             m1, [pb_27_17_17_27]
 %endif
-    mova             m0, [pw_1024]
+    movu             m0, [pw_1024]
 %endif
     SCRATCH           0, 8, 5
     SCRATCH           1, 9, 6
@@ -2260,9 +2260,9 @@ cglobal fguv_32x32xn_i%1_8bpc, 6, 15, 16, dst, src, stride, fg_data, w, scaling,
     mov           lumaq, r9mp
 %endif
 %if %2
-    mova             m4, [lumaq+ 0]
-    mova             m6, [lumaq+16]
-    mova             m0, [srcq]
+    movu             m4, [lumaq+ 0]
+    movu             m6, [lumaq+16]
+    movu             m0, [srcq]
 %if ARCH_X86_32
     add           lumaq, r10mp
     mov            r9mp, lumaq
@@ -2278,8 +2278,8 @@ cglobal fguv_32x32xn_i%1_8bpc, 6, 15, 16, dst, src, stride, fg_data, w, scaling,
     pavgw            m4, m2
     pavgw            m6, m2
 %else
-    mova             m4, [lumaq]
-    mova             m0, [srcq]
+    movu             m4, [lumaq]
+    movu             m0, [srcq]
 %if ARCH_X86_32
     add           lumaq, r10mp
     mov            r9mp, lumaq
@@ -2346,7 +2346,7 @@ cglobal fguv_32x32xn_i%1_8bpc, 6, 15, 16, dst, src, stride, fg_data, w, scaling,
     pminsw           m1, m12
     packuswb         m0, m1
     movifnidn      dstq, dstmp
-    mova    [dstq+srcq], m0
+    movu    [dstq+srcq], m0
 
 %if ARCH_X86_32
     add            srcq, r2mp
@@ -2468,9 +2468,9 @@ cglobal fguv_32x32xn_i%1_8bpc, 6, 15, 16, dst, src, stride, fg_data, w, scaling,
     mov           lumaq, r9mp
 %endif
 %if %2
-    mova             m4, [lumaq+ 0]
-    mova             m6, [lumaq+16]
-    mova             m0, [srcq]
+    movu             m4, [lumaq+ 0]
+    movu             m6, [lumaq+16]
+    movu             m0, [srcq]
 %if ARCH_X86_32
     add           lumaq, r10mp
     mov            r9mp, lumaq
@@ -2486,8 +2486,8 @@ cglobal fguv_32x32xn_i%1_8bpc, 6, 15, 16, dst, src, stride, fg_data, w, scaling,
     pavgw            m4, m2
     pavgw            m6, m2
 %else
-    mova             m4, [lumaq]
-    mova             m0, [srcq]
+    movu             m4, [lumaq]
+    movu             m0, [srcq]
 %if ARCH_X86_32
     add           lumaq, r10mp
     mov            r9mp, lumaq
@@ -2566,7 +2566,7 @@ cglobal fguv_32x32xn_i%1_8bpc, 6, 15, 16, dst, src, stride, fg_data, w, scaling,
     pminsw           m1, m12
     packuswb         m0, m1
     movifnidn      dstq, dstmp
-    mova    [dstq+srcq], m0
+    movu    [dstq+srcq], m0
 
 %if ARCH_X86_32
     add            srcq, r2mp
@@ -2746,18 +2746,18 @@ cglobal fguv_32x32xn_i%1_8bpc, 6, 15, 16, dst, src, stride, fg_data, w, scaling,
     mov              r5, r5m
 %endif
 %if %3
-    mova             m1, [PIC_ptr(pb_23_22)]
+    movu             m1, [PIC_ptr(pb_23_22)]
 %else
-    mova             m1, [PIC_ptr(pb_27_17)]
+    movu             m1, [PIC_ptr(pb_27_17)]
 %endif
 %%loop_y_v_overlap:
 %if ARCH_X86_32
     mov           lumaq, r9mp
 %endif
 %if %2
-    mova             m4, [lumaq+ 0]
-    mova             m6, [lumaq+16]
-    mova             m0, [srcq]
+    movu             m4, [lumaq+ 0]
+    movu             m6, [lumaq+16]
+    movu             m0, [srcq]
 %if ARCH_X86_32
     add           lumaq, r10mp
     mov            r9mp, lumaq
@@ -2773,8 +2773,8 @@ cglobal fguv_32x32xn_i%1_8bpc, 6, 15, 16, dst, src, stride, fg_data, w, scaling,
     pavgw            m4, m2
     pavgw            m6, m2
 %else
-    mova             m4, [lumaq]
-    mova             m0, [srcq]
+    movu             m4, [lumaq]
+    movu             m0, [srcq]
 %if ARCH_X86_32
     add           lumaq, r10mp
     mov            r9mp, lumaq
@@ -2856,7 +2856,7 @@ cglobal fguv_32x32xn_i%1_8bpc, 6, 15, 16, dst, src, stride, fg_data, w, scaling,
     pminsw           m6, m12
     packuswb         m0, m6
     movifnidn      dstq, dstmp
-    mova    [dstq+srcq], m0
+    movu    [dstq+srcq], m0
 
     dec              hw
     je %%end_y_v_overlap
@@ -2877,7 +2877,7 @@ cglobal fguv_32x32xn_i%1_8bpc, 6, 15, 16, dst, src, stride, fg_data, w, scaling,
 %if ARCH_X86_32
     mov              r5, r5m
 %endif
-    mova             m1, [PIC_ptr(pb_17_27)]
+    movu             m1, [PIC_ptr(pb_17_27)]
     jnc %%loop_y_v_overlap
 %endif
     jmp %%loop_y
@@ -3003,9 +3003,9 @@ cglobal fguv_32x32xn_i%1_8bpc, 6, 15, 16, dst, src, stride, fg_data, w, scaling,
     mov              r5, r5m
 %endif
 %if %3
-    mova             m3, [PIC_ptr(pb_23_22)]
+    movu             m3, [PIC_ptr(pb_23_22)]
 %else
-    mova             m3, [PIC_ptr(pb_27_17)]
+    movu             m3, [PIC_ptr(pb_27_17)]
 %endif
 %%loop_y_hv_overlap:
     ; grain = grain_lut[offy+y][offx+x]
@@ -3050,9 +3050,9 @@ cglobal fguv_32x32xn_i%1_8bpc, 6, 15, 16, dst, src, stride, fg_data, w, scaling,
     mov           lumaq, r9mp
 %endif
 %if %2
-    mova             m4, [lumaq+ 0]
-    mova             m6, [lumaq+16]
-    mova             m0, [srcq]
+    movu             m4, [lumaq+ 0]
+    movu             m6, [lumaq+16]
+    movu             m0, [srcq]
 %if ARCH_X86_32
     add           lumaq, r10mp
     mov            r9mp, lumaq
@@ -3068,8 +3068,8 @@ cglobal fguv_32x32xn_i%1_8bpc, 6, 15, 16, dst, src, stride, fg_data, w, scaling,
     pavgw            m4, m2
     pavgw            m6, m2
 %else
-    mova             m4, [lumaq]
-    mova             m0, [srcq]
+    movu             m4, [lumaq]
+    movu             m0, [srcq]
 %if ARCH_X86_32
     add           lumaq, r10mp
     mov            r9mp, lumaq
@@ -3142,7 +3142,7 @@ cglobal fguv_32x32xn_i%1_8bpc, 6, 15, 16, dst, src, stride, fg_data, w, scaling,
     pminsw           m5, m12
     packuswb         m0, m5
     movifnidn      dstq, dstmp
-    mova    [dstq+srcq], m0
+    movu    [dstq+srcq], m0
 
 %if ARCH_X86_32
     add            srcq, r2mp
@@ -3164,7 +3164,7 @@ cglobal fguv_32x32xn_i%1_8bpc, 6, 15, 16, dst, src, stride, fg_data, w, scaling,
 %if ARCH_X86_32
     mov              r5, r5m
 %endif
-    mova             m3, [PIC_ptr(pb_17_27)]
+    movu             m3, [PIC_ptr(pb_17_27)]
     btc              hd, 16
     jnc %%loop_y_hv_overlap
 %if ARCH_X86_64

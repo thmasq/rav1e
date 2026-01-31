@@ -191,10 +191,10 @@ SECTION .text
     PMOVZXBW        m1, [%2+strideq*1]
     PMOVZXBW        m2, [%2+strideq*2]
     PMOVZXBW        m3, [%2+stride3q]
-    mova     [%1+32*0], m0
-    mova     [%1+32*1], m1
-    mova     [%1+32*2], m2
-    mova     [%1+32*3], m3
+    movu     [%1+32*0], m0
+    movu     [%1+32*1], m1
+    movu     [%1+32*2], m2
+    movu     [%1+32*3], m3
  %else
     movu            m0, [%2+strideq*0]
     movu            m1, [%2+strideq*1]
@@ -202,20 +202,20 @@ SECTION .text
     movu            m3, [%2+stride3q]
     punpcklbw       m4, m0, m7
     punpckhbw       m0, m7
-    mova  [%1+32*0+ 0], m4
-    mova  [%1+32*0+16], m0
+    movu  [%1+32*0+ 0], m4
+    movu  [%1+32*0+16], m0
     punpcklbw       m4, m1, m7
     punpckhbw       m1, m7
-    mova  [%1+32*1+ 0], m4
-    mova  [%1+32*1+16], m1
+    movu  [%1+32*1+ 0], m4
+    movu  [%1+32*1+16], m1
     punpcklbw       m4, m2, m7
     punpckhbw       m2, m7
-    mova  [%1+32*2+ 0], m4
-    mova  [%1+32*2+16], m2
+    movu  [%1+32*2+ 0], m4
+    movu  [%1+32*2+16], m2
     punpcklbw       m4, m3, m7
     punpckhbw       m3, m7
-    mova  [%1+32*3+ 0], m4
-    mova  [%1+32*3+16], m3
+    movu  [%1+32*3+ 0], m4
+    movu  [%1+32*3+16], m3
  %endif
 %endmacro
 
@@ -271,7 +271,7 @@ cglobal cdef_filter_%1x%2_8bpc, 2, 7, 8, - 7 * 16 - (%2+4)*32, \
  %else
    %define OUT_OF_BOUNDS_MEM [base+pw_0x7FFF]
  %endif
-    mova            m6, OUT_OF_BOUNDS_MEM
+    movu            m6, OUT_OF_BOUNDS_MEM
     pxor            m7, m7
 
     ; prepare pixel buffers - body/right
@@ -291,10 +291,10 @@ cglobal cdef_filter_%1x%2_8bpc, 2, 7, 8, - 7 * 16 - (%2+4)*32, \
     PMOVZXBW        m1, [dstq+strideq*1], %1 == 4
     PMOVZXBW        m2, [dstq+strideq*2], %1 == 4
     PMOVZXBW        m3, [dstq+stride3q ], %1 == 4
-    mova     [px+32*0], m0
-    mova     [px+32*1], m1
-    mova     [px+32*2], m2
-    mova     [px+32*3], m3
+    movu     [px+32*0], m0
+    movu     [px+32*1], m1
+    movu     [px+32*2], m2
+    movu     [px+32*3], m3
     movd [px+32*0+%1*2], m6
     movd [px+32*1+%1*2], m6
     movd [px+32*2+%1*2], m6
@@ -304,10 +304,10 @@ cglobal cdef_filter_%1x%2_8bpc, 2, 7, 8, - 7 * 16 - (%2+4)*32, \
     PMOVZXBW        m1, [dst4q+strideq*1], %1 == 4
     PMOVZXBW        m2, [dst4q+strideq*2], %1 == 4
     PMOVZXBW        m3, [dst4q+stride3q ], %1 == 4
-    mova     [px+32*4], m0
-    mova     [px+32*5], m1
-    mova     [px+32*6], m2
-    mova     [px+32*7], m3
+    movu     [px+32*4], m0
+    movu     [px+32*5], m1
+    movu     [px+32*6], m2
+    movu     [px+32*7], m3
     movd [px+32*4+%1*2], m6
     movd [px+32*5+%1*2], m6
     movd [px+32*6+%1*2], m6
@@ -352,10 +352,10 @@ cglobal cdef_filter_%1x%2_8bpc, 2, 7, 8, - 7 * 16 - (%2+4)*32, \
     punpcklbw       m0, m7
     punpckhbw       m3, m1, m7
     punpcklbw       m1, m7
-    mova  [px-32*2-16], m0
-    mova  [px-32*2+ 0], m2
-    mova  [px-32*1-16], m1
-    mova  [px-32*1+ 0], m3
+    movu  [px-32*2-16], m0
+    movu  [px-32*2+ 0], m2
+    movu  [px-32*1-16], m1
+    movu  [px-32*1+ 0], m3
  %endif
     movd [px-32*2+%1*2], m6
     movd [px-32*1+%1*2], m6
@@ -378,16 +378,16 @@ cglobal cdef_filter_%1x%2_8bpc, 2, 7, 8, - 7 * 16 - (%2+4)*32, \
  %endif
     movd  [px-32*2- 4], m6
     movd  [px-32*1- 4], m6
-    mova  [px-32*2+ 0], m0
-    mova  [px-32*1+ 0], m1
+    movu  [px-32*2+ 0], m0
+    movu  [px-32*1+ 0], m1
     jmp .top_done
 .top_no_left_right:
     PMOVZXBW        m0, [topq+strideq*0], %1 == 4
     PMOVZXBW        m1, [topq+strideq*1], %1 == 4
     movd   [px-32*2-4], m6
     movd   [px-32*1-4], m6
-    mova   [px-32*2+0], m0
-    mova   [px-32*1+0], m1
+    movu   [px-32*2+0], m0
+    movu   [px-32*1+0], m1
     movd [px-32*2+%1*2], m6
     movd [px-32*1+%1*2], m6
     jmp .top_done
@@ -480,11 +480,11 @@ cglobal cdef_filter_%1x%2_8bpc, 2, 7, 8, - 7 * 16 - (%2+4)*32, \
     punpcklbw       m0, m7
     punpckhbw       m3, m1, m7
     punpcklbw       m1, m7
-    mova [px+32*(%2+0)-16], m0
-    mova [px+32*(%2+0)+ 0], m2
-    mova [px+32*(%2+1)-16], m1
-    mova [px+32*(%2+1)+ 0], m3
-    movd [px+32*(%2-1)+16], m6 ; overwritten by first mova
+    movu [px+32*(%2+0)-16], m0
+    movu [px+32*(%2+0)+ 0], m2
+    movu [px+32*(%2+1)-16], m1
+    movu [px+32*(%2+1)+ 0], m3
+    movd [px+32*(%2-1)+16], m6 ; overwritten by first movu
  %endif
     movd [px+32*(%2+0)+%1*2], m6
     movd [px+32*(%2+1)+%1*2], m6
@@ -502,19 +502,19 @@ cglobal cdef_filter_%1x%2_8bpc, 2, 7, 8, - 7 * 16 - (%2+4)*32, \
     punpcklbw       m0, m7
     punpckhbw       m3, m1, m7
     punpcklbw       m1, m7
-    mova [px+32*(%2+0)+16], m2
-    mova [px+32*(%2+1)+16], m3
+    movu [px+32*(%2+0)+16], m2
+    movu [px+32*(%2+1)+16], m3
  %endif
-    mova [px+32*(%2+0)+ 0], m0
-    mova [px+32*(%2+1)+ 0], m1
+    movu [px+32*(%2+0)+ 0], m0
+    movu [px+32*(%2+1)+ 0], m1
     movd [px+32*(%2+0)- 4], m6
     movd [px+32*(%2+1)- 4], m6
     jmp .bottom_done
 .bottom_no_left_right:
     PMOVZXBW        m0, [botq+strideq*0], %1 == 4
     PMOVZXBW        m1, [botq+strideq*1], %1 == 4
-    mova [px+32*(%2+0)+ 0], m0
-    mova [px+32*(%2+1)+ 0], m1
+    movu [px+32*(%2+0)+ 0], m0
+    movu [px+32*(%2+1)+ 0], m1
     movd [px+32*(%2+0)+%1*2], m6
     movd [px+32*(%2+1)+%1*2], m6
     movd [px+32*(%2+0)- 4], m6
@@ -532,13 +532,13 @@ cglobal cdef_filter_%1x%2_8bpc, 2, 7, 8, - 7 * 16 - (%2+4)*32, \
     ; actual filter
  %if ARCH_X86_64
     DEFINE_ARGS dst, stride, _, pridmp, damping, pri, sec
-    mova           m13, [shufb_lohi]
+    movu           m13, [shufb_lohi]
  %if cpuflag(ssse3)
-    mova           m15, [pw_2048]
+    movu           m15, [pw_2048]
  %else
-    mova           m15, [pw_8]
+    movu           m15, [pw_8]
  %endif
-    mova           m14, m6
+    movu           m14, m6
  %else
     DEFINE_ARGS dst, pridmp, sec, damping, pri, tap
     %xdefine        m8  m1
@@ -593,10 +593,10 @@ cglobal cdef_filter_%1x%2_8bpc, 2, 7, 8, - 7 * 16 - (%2+4)*32, \
   %define         offq  dstq
   %define           kd  strided
   %define           kq  strideq
-    mova    [esp+0x10], m2
-    mova    [esp+0x40], m3
-    mova    [esp+0x20], m1
-    mova    [esp+0x50], m10
+    movu    [esp+0x10], m2
+    movu    [esp+0x40], m3
+    movu    [esp+0x20], m1
+    movu    [esp+0x50], m10
  %endif
     mov           dird, r7m
     lea           stkq, [px]
@@ -610,11 +610,11 @@ cglobal cdef_filter_%1x%2_8bpc, 2, 7, 8, - 7 * 16 - (%2+4)*32, \
     movq            m4, [stkq+32*0]
     movhps          m4, [stkq+32*1]
  %else
-    mova            m4, [stkq+32*0]       ; px
+    movu            m4, [stkq+32*0]       ; px
  %endif
     pxor            m0, m0                ; sum
-    mova            m7, m4                ; max
-    mova            m8, m4                ; min
+    movu            m7, m4                ; max
+    movu            m8, m4                ; min
 .k_loop:
     MOVDDUP         m2, [priq+kq*8]
  %if ARCH_X86_64
@@ -671,7 +671,7 @@ cglobal cdef_filter_%1x%2_8bpc, 2, 7, 8, - 7 * 16 - (%2+4)*32, \
     movq            m4, [stkq+32*0]
     movhps          m4, [stkq+32*1]
  %else
-    mova            m4, [stkq+32*0]
+    movu            m4, [stkq+32*0]
  %endif
     pxor            m0, m0
 .pri_k_loop:
@@ -720,7 +720,7 @@ cglobal cdef_filter_%1x%2_8bpc, 2, 7, 8, - 7 * 16 - (%2+4)*32, \
     movq            m4, [stkq+32*0]
     movhps          m4, [stkq+32*1]
  %else
-    mova            m4, [stkq+32*0]
+    movu            m4, [stkq+32*0]
  %endif
     pxor            m0, m0
 .sec_k_loop:
@@ -785,7 +785,7 @@ cglobal cdef_dir_8bpc, 3, 7, 16, src, stride, var
     punpcklbw       m6, m7, m8
     punpckhbw       m7, m8
 cglobal_label .main
-    mova            m8, [pw_128]
+    movu            m8, [pw_128]
     psubw           m0, m8
     psubw           m1, m8
     psubw           m2, m8
@@ -1020,8 +1020,8 @@ cglobal_label .main
 %else
     %define tmp rsp-40
 %endif
-    mova    [tmp+0x00], m2                  ; emulate ymm in stack
-    mova    [tmp+0x10], m3
+    movu    [tmp+0x00], m2                  ; emulate ymm in stack
+    movu    [tmp+0x10], m3
     pcmpeqd         m1, m0                  ; compute best cost mask
     pcmpeqd         m4, m0
     packssdw        m4, m1
@@ -1041,7 +1041,7 @@ cglobal cdef_dir_8bpc, 2, 4, 8, 96, src, stride, var, stride3
     movhps          m5, [srcq+strideq*1]
     movq            m7, [srcq+strideq*2]
     movhps          m7, [srcq+stride3q]
-    mova            m1, [base+pw_128]
+    movu            m1, [base+pw_128]
     psadbw          m2, m5, m0
     psadbw          m3, m7, m0
     packssdw        m2, m3
@@ -1054,10 +1054,10 @@ cglobal cdef_dir_8bpc, 2, 4, 8, 96, src, stride, var, stride3
     psubw           m6, m1
     psubw           m7, m1
 
-    mova    [esp+0x00], m4
-    mova    [esp+0x10], m5
-    mova    [esp+0x20], m6
-    mova    [esp+0x50], m7
+    movu    [esp+0x00], m4
+    movu    [esp+0x10], m5
+    movu    [esp+0x20], m6
+    movu    [esp+0x50], m7
 
     lea           srcq, [srcq+strideq*4]
     movq            m5, [srcq+strideq*0]
@@ -1082,8 +1082,8 @@ cglobal_label .main
     psubw           m2, m1                  ; partial_sum_hv[0]
     pmaddwd         m2, m2
 
-    mova            m3, [esp+0x50]
-    mova            m0, [esp+0x00]
+    movu            m3, [esp+0x50]
+    movu            m0, [esp+0x00]
     paddw           m0, [esp+0x10]
     paddw           m1, m3, [esp+0x20]
     paddw           m0, m4
@@ -1095,9 +1095,9 @@ cglobal_label .main
 
     phaddd          m2, m0
     MULLD           m2, [base+div_table%+SUFFIX+48]
-    mova    [esp+0x30], m2
+    movu    [esp+0x30], m2
 
-    mova            m1, [esp+0x10]
+    movu            m1, [esp+0x10]
     pslldq          m0, m1, 2
     psrldq          m1, 14
     paddw           m0, [esp+0x00]
@@ -1105,7 +1105,7 @@ cglobal_label .main
     psrldq          m3, 10
     paddw           m0, m2
     paddw           m1, m3
-    mova            m3, [esp+0x20]
+    movu            m3, [esp+0x20]
     pslldq          m2, m3, 4
     psrldq          m3, 12
     paddw           m0, m2                  ; partial_sum_diag[0] top/left half
@@ -1126,7 +1126,7 @@ cglobal_label .main
     psrldq          m3, m7, 2
     paddw           m0, m2                  ; partial_sum_diag[0][0-7]
     paddw           m1, m3                  ; partial_sum_diag[0][8-14,zero]
-    mova            m3, [esp+0x50]
+    movu            m3, [esp+0x50]
     pshufb          m1, [base+shufw_6543210x]
     punpckhwd       m2, m0, m1
     punpcklwd       m0, m1
@@ -1135,9 +1135,9 @@ cglobal_label .main
     MULLD           m2, [base+div_table%+SUFFIX+16]
     MULLD           m0, [base+div_table%+SUFFIX+ 0]
     paddd           m0, m2                  ; cost[0a-d]
-    mova    [esp+0x40], m0
+    movu    [esp+0x40], m0
 
-    mova            m1, [esp+0x00]
+    movu            m1, [esp+0x00]
     pslldq          m0, m1, 14
     psrldq          m1, 2
     paddw           m0, m7
@@ -1145,12 +1145,12 @@ cglobal_label .main
     psrldq          m3, 8
     paddw           m0, m2
     paddw           m1, m3
-    mova            m3, [esp+0x20]
+    movu            m3, [esp+0x20]
     pslldq          m2, m3, 10
     psrldq          m3, 6
     paddw           m0, m2
     paddw           m1, m3
-    mova            m3, [esp+0x10]
+    movu            m3, [esp+0x10]
     pslldq          m2, m3, 12
     psrldq          m3, 4
     paddw           m0, m2
@@ -1167,7 +1167,7 @@ cglobal_label .main
     psrldq          m3, m6, 14
     paddw           m0, m2                  ; partial_sum_diag[1][0-7]
     paddw           m1, m3                  ; partial_sum_diag[1][8-14,zero]
-    mova            m3, [esp+0x50]
+    movu            m3, [esp+0x50]
     pshufb          m1, [base+shufw_6543210x]
     punpckhwd       m2, m0, m1
     punpcklwd       m0, m1
@@ -1178,21 +1178,21 @@ cglobal_label .main
     paddd           m0, m2                  ; cost[4a-d]
     phaddd          m1, [esp+0x40], m0      ; cost[0a/b,4a/b]
     phaddd          m1, [esp+0x30]          ; cost[0,4,2,6]
-    mova    [esp+0x30], m1
+    movu    [esp+0x30], m1
 
     phaddw          m0, [esp+0x00], m4
     phaddw          m1, [esp+0x10], m5
     paddw           m4, m5
-    mova            m2, [esp+0x20]
+    movu            m2, [esp+0x20]
     paddw           m5, m2, m3
     phaddw          m2, m6
     paddw           m6, m7
     phaddw          m3, m7
-    mova            m7, [esp+0x00]
+    movu            m7, [esp+0x00]
     paddw           m7, [esp+0x10]
-    mova    [esp+0x00], m0
-    mova    [esp+0x10], m1
-    mova    [esp+0x20], m2
+    movu    [esp+0x00], m0
+    movu    [esp+0x10], m1
+    movu    [esp+0x20], m2
 
     pslldq          m1, m4, 4
     pslldq          m2, m6, 6
@@ -1213,7 +1213,7 @@ cglobal_label .main
     MULLD           m2, [base+div_table%+SUFFIX+48]
     MULLD           m0, [base+div_table%+SUFFIX+32]
     paddd           m0, m2                  ; cost[7a-d]
-    mova    [esp+0x40], m0
+    movu    [esp+0x40], m0
 
     pslldq          m0, m7, 6
     psrldq          m7, 10
@@ -1234,10 +1234,10 @@ cglobal_label .main
     MULLD           m7, [base+div_table%+SUFFIX+48]
     MULLD           m0, [base+div_table%+SUFFIX+32]
     paddd           m0, m7                  ; cost[5a-d]
-    mova    [esp+0x50], m0
+    movu    [esp+0x50], m0
 
-    mova            m7, [esp+0x10]
-    mova            m2, [esp+0x20]
+    movu            m7, [esp+0x10]
+    movu            m2, [esp+0x20]
     pslldq          m0, m7, 2
     psrldq          m7, 14
     pslldq          m4, m2, 4
@@ -1263,7 +1263,7 @@ cglobal_label .main
     pshufd          m1, [esp+0x10], q1032
     pshufd          m2, [esp+0x20], q1032
     pshufd          m3, m3, q1032
-    mova    [esp+0x00], m4
+    movu    [esp+0x00], m4
 
     pslldq          m4, m0, 6
     psrldq          m0, 10
@@ -1285,9 +1285,9 @@ cglobal_label .main
     MULLD           m4, [base+div_table%+SUFFIX+32]
     paddd           m4, m0                   ; cost[3a-d]
 
-    mova            m1, [esp+0x00]
-    mova            m2, [esp+0x50]
-    mova            m0, [esp+0x30]          ; cost[0,4,2,6]
+    movu            m1, [esp+0x00]
+    movu            m2, [esp+0x50]
+    movu            m0, [esp+0x30]          ; cost[0,4,2,6]
     phaddd          m1, m4
     phaddd          m2, [esp+0x40]          ; cost[1,3,5,7]
     phaddd          m1, m2
@@ -1323,8 +1323,8 @@ cglobal_label .main
     punpckldq       m2, m1
     psubd           m1, m0, m3
     psubd           m4, m0, m2
-    mova    [esp+0x00], m1                  ; emulate ymm in stack
-    mova    [esp+0x10], m4
+    movu    [esp+0x00], m1                  ; emulate ymm in stack
+    movu    [esp+0x10], m4
     pcmpeqd         m3, m0                  ; compute best cost mask
     pcmpeqd         m2, m0
     packssdw        m2, m3
