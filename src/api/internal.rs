@@ -358,13 +358,7 @@ where
       let EncoderConfig { width, height, .. } = *self.config;
 
       if let Some(ref mut frame) = Arc::get_mut(frame) {
-        let planes_iter = std::iter::once(&mut frame.y_plane)
-          .chain(frame.u_plane.as_mut())
-          .chain(frame.v_plane.as_mut());
-
-        for plane in planes_iter {
-          plane.pad(width, height);
-        }
+        frame.pad(width, height, 3);
       }
 
       let planes_iter = std::iter::once(&frame.y_plane)
