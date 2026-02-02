@@ -234,7 +234,7 @@ impl<T: Pixel> FrameAlloc for Frame<T> {
   }
 }
 
-pub(crate) trait FramePad {
+pub trait FramePad {
   fn pad(&mut self, w: usize, h: usize, planes: usize);
 }
 

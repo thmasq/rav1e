@@ -121,7 +121,7 @@ pub mod prelude {
   pub use crate::api::*;
   pub use crate::encoder::{Sequence, Tune};
   pub use crate::frame::{
-    Frame, FrameParameters, FrameTypeOverride, Plane, PlaneConfig,
+    Frame, FramePad, FrameParameters, FrameTypeOverride, Plane, PlaneConfig,
   };
   pub use crate::partition::BlockSize;
   pub use crate::predict::PredictionMode;
