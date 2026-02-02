@@ -571,10 +571,10 @@ impl<T: Pixel> FrameState<T> {
     fi: &FrameInvariants<T>, frame: Arc<Frame<T>>,
   ) -> Self {
     let rs = RestorationState::new(fi, &frame);
-    let luma_width = frame.planes().next().unwrap().geometry().width.get();
-    let luma_height = frame.planes().next().unwrap().geometry().height.get();
+    let luma_width = frame.y_plane.width().get();
+    let luma_height = frame.y_plane.height().get();
 
-    let hres = frame.planes().next().unwrap().downsampled(fi.width, fi.height);
+    let hres = frame.y_plane.downsampled(fi.width, fi.height);
     let qres = hres.downsampled(fi.width, fi.height);
 
     Self {
@@ -603,7 +603,7 @@ impl<T: Pixel> FrameState<T> {
     F: FnOnce(&mut TileStateMut<'_, T>) -> R,
   {
     let PlaneConfig { width, height, .. } =
-      PlaneConfig::new(&self.rec.planes().next().unwrap().geometry());
+      PlaneConfig::new(&self.rec.y_plane.geometry());
     let sbo_0 = PlaneSuperBlockOffset(SuperBlockOffset { x: 0, y: 0 });
     let frame_me_stats = self.frame_me_stats.clone();
     let frame_me_stats = &mut *frame_me_stats.write().expect("poisoned lock");
@@ -1537,8 +1537,20 @@ where
   i32: util::math::CastFromPrimitive<<T as util::pixel::Pixel>::Coeff>,
   <T as util::pixel::Pixel>::Coeff: num_traits::AsPrimitive<u8>,
 {
-  let PlaneConfig { xdec, ydec, .. } =
-    PlaneConfig::new(&ts.input.planes().nth(p).unwrap().geometry());
+  let (xdec, ydec) = if fi.sequence.chroma_sampling
+    == ChromaSubsampling::Monochrome
+  {
+    if p > 0 {
+      return (false, ScaledDistortion::zero());
+    }
+    (0, 0)
+  } else {
+    let PlaneConfig { xdec, ydec, .. } = PlaneConfig::new(
+      &ts.input.planes().nth(p).expect("Input frame is malformed").geometry(),
+    );
+    (xdec, ydec)
+  };
+
   let tile_rect = ts.tile_rect().decimated(xdec, ydec);
   let area = Area::BlockRect {
     bo: tx_bo.0,
@@ -1780,8 +1792,14 @@ pub fn motion_compensate<T: Pixel>(
 ) {
   debug_assert!(!luma_mode.is_intra());
 
-  let PlaneConfig { xdec: u_xdec, ydec: u_ydec, .. } =
-    PlaneConfig::new(&ts.input.planes().nth(1).unwrap().geometry());
+  let (u_xdec, u_ydec) = if fi.sequence.chroma_sampling
+    == ChromaSubsampling::Monochrome
+  {
+    (1, 1)
+  } else {
+    let cfg = PlaneConfig::new(&ts.input.planes().nth(1).unwrap().geometry());
+    (cfg.xdec, cfg.ydec)
+  };
 
   // Inter mode prediction can take place once for a whole partition,
   // instead of each tx-block.
@@ -2076,8 +2094,16 @@ where
   } else {
     BlockSize::BLOCK_64X64
   };
-  let PlaneConfig { xdec, ydec, .. } =
-    PlaneConfig::new(&ts.input.planes().nth(1).unwrap().geometry());
+
+  let (xdec, ydec) = if fi.sequence.chroma_sampling
+    == ChromaSubsampling::Monochrome
+  {
+    (1, 1)
+  } else {
+    let cfg = PlaneConfig::new(&ts.input.planes().nth(1).unwrap().geometry());
+    (cfg.xdec, cfg.ydec)
+  };
+
   if skip {
     cw.bc.reset_skip_context(
       tile_bo,
@@ -2387,8 +2413,15 @@ where
     assert_ne!(qidx, 0);
   }
 
-  let PlaneConfig { xdec, ydec, .. } =
-    PlaneConfig::new(&ts.input.planes().nth(1).unwrap().geometry());
+  let (xdec, ydec) = if fi.sequence.chroma_sampling
+    == ChromaSubsampling::Monochrome
+  {
+    (1, 1)
+  } else {
+    let cfg = PlaneConfig::new(&ts.input.planes().nth(1).unwrap().geometry());
+    (cfg.xdec, cfg.ydec)
+  };
+
   let mut ac = Aligned::<[MaybeUninit<i16>; 32 * 32]>::uninit_array();
   let mut partition_has_coeff: bool = false;
   let mut tx_dist = ScaledDistortion::zero();
@@ -2413,8 +2446,7 @@ where
       if tx_bo.0.x >= ts.mi_width || tx_bo.0.y >= ts.mi_height {
         continue;
       }
-      let cfg =
-        PlaneConfig::new(&ts.input.planes().next().unwrap().geometry());
+      let cfg = PlaneConfig::new(&ts.input.y_plane.geometry());
       let po = tx_bo.plane_offset(&cfg);
       let (has_coeff, dist) = encode_tx_block(
         fi,
@@ -2562,8 +2594,15 @@ where
   let bh = bsize.height_mi() / tx_size.height_mi();
   let qidx = get_qidx(fi, ts, cw, tile_bo);
 
-  let PlaneConfig { xdec, ydec, .. } =
-    PlaneConfig::new(&ts.input.planes().nth(1).unwrap().geometry());
+  let (xdec, ydec) = if fi.sequence.chroma_sampling
+    == ChromaSubsampling::Monochrome
+  {
+    (1, 1)
+  } else {
+    let cfg = PlaneConfig::new(&ts.input.planes().nth(1).unwrap().geometry());
+    (cfg.xdec, cfg.ydec)
+  };
+
   let ac = &[0i16; 0];
   let mut partition_has_coeff: bool = false;
   let mut tx_dist = ScaledDistortion::zero();
@@ -2590,8 +2629,7 @@ where
         continue;
       }
 
-      let cfg =
-        PlaneConfig::new(&ts.input.planes().next().unwrap().geometry());
+      let cfg = PlaneConfig::new(&ts.input.y_plane.geometry());
       let po = tx_bo.plane_offset(&cfg);
       let (has_coeff, dist) = encode_tx_block(
         fi,

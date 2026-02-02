@@ -24,6 +24,7 @@ cfg_if::cfg_if! {
 }
 
 use aligned_vec::{avec, ABox};
+use v_frame::chroma::ChromaSubsampling;
 
 use crate::context::{TileBlockOffset, MAX_SB_SIZE_LOG2, MAX_TX_SIZE};
 use crate::cpu_features::CpuFeatureLevel;
@@ -659,8 +660,15 @@ where
 {
   use crate::context::MI_SIZE_LOG2;
 
-  let PlaneConfig { xdec, ydec, .. } =
-    PlaneConfig::new(&ts.input.planes().nth(1).unwrap().geometry());
+  let (xdec, ydec) =
+    if fi.sequence.chroma_sampling == ChromaSubsampling::Monochrome {
+      (1, 1)
+    } else {
+      let PlaneConfig { xdec, ydec, .. } =
+        PlaneConfig::new(&ts.input.planes().nth(1).unwrap().geometry());
+      (xdec, ydec)
+    };
+
   let plane_bsize = bsize.subsampled_size(xdec, ydec).unwrap();
 
   // ensure ac has the right length, so there aren't any uninitialized elements at the end
