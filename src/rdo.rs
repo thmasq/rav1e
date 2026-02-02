@@ -270,7 +270,7 @@ where
   let input_region = ts.input_tile.planes[0].subregion(area);
   let rec_region = ts.rec.planes[0].subregion(area);
 
-  // clip a block to have visible pixles only
+  // clip a block to have visible pixels only
   let frame_bo = ts.to_frame_block_offset(tile_bo);
   let (visible_w, visible_h) = clip_visible_bsize(
     fi.width,
@@ -321,37 +321,41 @@ where
     && !luma_only
     && fi.sequence.chroma_sampling != ChromaSubsampling::Monochrome
   {
-    let PlaneConfig { xdec, ydec, .. } =
-      PlaneConfig::new(&ts.input.planes().nth(1).unwrap().geometry());
-    let chroma_w = if bsize.width() >= 8 || xdec == 0 {
-      (visible_w + xdec) >> xdec
-    } else {
-      (4 + visible_w + xdec) >> xdec
-    };
-    let chroma_h = if bsize.height() >= 8 || ydec == 0 {
-      (visible_h + ydec) >> ydec
-    } else {
-      (4 + visible_h + ydec) >> ydec
-    };
+    if let Some(plane1) = ts.input.planes().nth(1) {
+      let PlaneConfig { xdec, ydec, .. } =
+        PlaneConfig::new(&plane1.geometry());
 
-    for p in 1..3 {
-      let input_region = ts.input_tile.planes[p].subregion(area);
-      let rec_region = ts.rec.planes[p].subregion(area);
-      distortion += sse_wxh(
-        &input_region,
-        &rec_region,
-        chroma_w,
-        chroma_h,
-        |bias_area, bsize| {
-          distortion_scale(
-            fi,
-            input_region.subregion(bias_area).frame_block_offset(),
-            bsize,
-          )
-        },
-        fi.sequence.bit_depth,
-        fi.cpu_feature_level,
-      ) * fi.dist_scale[p];
+      let chroma_w = if bsize.width() >= 8 || xdec == 0 {
+        (visible_w + xdec) >> xdec
+      } else {
+        (4 + visible_w + xdec) >> xdec
+      };
+      let chroma_h = if bsize.height() >= 8 || ydec == 0 {
+        (visible_h + ydec) >> ydec
+      } else {
+        (4 + visible_h + ydec) >> ydec
+      };
+
+      let max_p = ts.input_tile.planes.len().min(3);
+      for p in 1..max_p {
+        let input_region = ts.input_tile.planes[p].subregion(area);
+        let rec_region = ts.rec.planes[p].subregion(area);
+        distortion += sse_wxh(
+          &input_region,
+          &rec_region,
+          chroma_w,
+          chroma_h,
+          |bias_area, bsize| {
+            distortion_scale(
+              fi,
+              input_region.subregion(bias_area).frame_block_offset(),
+              bsize,
+            )
+          },
+          fi.sequence.bit_depth,
+          fi.cpu_feature_level,
+        ) * fi.dist_scale[p];
+      }
     }
   }
   distortion
@@ -413,37 +417,40 @@ where
     && skip
     && fi.sequence.chroma_sampling != ChromaSubsampling::Monochrome
   {
-    let PlaneConfig { xdec, ydec, .. } =
-      PlaneConfig::new(&ts.input.planes().nth(1).unwrap().geometry());
-    let chroma_w = if bsize.width() >= 8 || xdec == 0 {
-      (visible_w + xdec) >> xdec
-    } else {
-      (4 + visible_w + xdec) >> xdec
-    };
-    let chroma_h = if bsize.height() >= 8 || ydec == 0 {
-      (visible_h + ydec) >> ydec
-    } else {
-      (4 + visible_h + ydec) >> ydec
-    };
+    if let Some(plane1) = ts.input.planes().nth(1) {
+      let PlaneConfig { xdec, ydec, .. } =
+        PlaneConfig::new(&plane1.geometry());
+      let chroma_w = if bsize.width() >= 8 || xdec == 0 {
+        (visible_w + xdec) >> xdec
+      } else {
+        (4 + visible_w + xdec) >> xdec
+      };
+      let chroma_h = if bsize.height() >= 8 || ydec == 0 {
+        (visible_h + ydec) >> ydec
+      } else {
+        (4 + visible_h + ydec) >> ydec
+      };
 
-    for p in 1..3 {
-      let input_region = ts.input_tile.planes[p].subregion(area);
-      let rec_region = ts.rec.planes[p].subregion(area);
-      distortion += sse_wxh(
-        &input_region,
-        &rec_region,
-        chroma_w,
-        chroma_h,
-        |bias_area, bsize| {
-          distortion_scale(
-            fi,
-            input_region.subregion(bias_area).frame_block_offset(),
-            bsize,
-          )
-        },
-        fi.sequence.bit_depth,
-        fi.cpu_feature_level,
-      ) * fi.dist_scale[p];
+      let max_p = ts.input_tile.planes.len().min(3);
+      for p in 1..max_p {
+        let input_region = ts.input_tile.planes[p].subregion(area);
+        let rec_region = ts.rec.planes[p].subregion(area);
+        distortion += sse_wxh(
+          &input_region,
+          &rec_region,
+          chroma_w,
+          chroma_h,
+          |bias_area, bsize| {
+            distortion_scale(
+              fi,
+              input_region.subregion(bias_area).frame_block_offset(),
+              bsize,
+            )
+          },
+          fi.sequence.bit_depth,
+          fi.cpu_feature_level,
+        ) * fi.dist_scale[p];
+      }
     }
   }
   distortion
@@ -862,8 +869,14 @@ fn luma_chroma_mode_rdo<T: Pixel>(
   u32: crate::util::math::CastFromPrimitive<T>,
   i16: util::math::CastFromPrimitive<T>,
 {
-  let PlaneConfig { xdec, ydec, .. } =
-    PlaneConfig::new(&ts.input.planes().nth(1).unwrap().geometry());
+  let (xdec, ydec) =
+    if fi.sequence.chroma_sampling == ChromaSubsampling::Monochrome {
+      (1, 1)
+    } else {
+      let PlaneConfig { xdec, ydec, .. } =
+        PlaneConfig::new(&ts.input.planes().nth(1).unwrap().geometry());
+      (xdec, ydec)
+    };
 
   let is_chroma_block =
     has_chroma(tile_bo, bsize, xdec, ydec, fi.sequence.chroma_sampling);
@@ -1017,8 +1030,15 @@ where
   u32: crate::util::math::CastFromPrimitive<T>,
   i16: util::math::CastFromPrimitive<T>,
 {
-  let PlaneConfig { xdec, ydec, .. } =
-    PlaneConfig::new(&ts.input.planes().nth(1).unwrap().geometry());
+  let (xdec, ydec) =
+    if fi.sequence.chroma_sampling == ChromaSubsampling::Monochrome {
+      (1, 1)
+    } else {
+      let PlaneConfig { xdec, ydec, .. } =
+        PlaneConfig::new(&ts.input.planes().nth(1).unwrap().geometry());
+      (xdec, ydec)
+    };
+
   let cw_checkpoint = cw.checkpoint(&tile_bo, fi.sequence.chroma_sampling);
 
   let rdo_type = if fi.use_tx_domain_rate {
@@ -1675,6 +1695,11 @@ where
   i16: util::math::CastFromPrimitive<T>,
   i32: util::math::CastFromPrimitive<T>,
 {
+  if fi.sequence.chroma_sampling == ChromaSubsampling::Monochrome {
+    return None;
+  }
+
+  #[allow(clippy::unwrap_used)]
   let PlaneConfig { xdec, ydec, .. } =
     PlaneConfig::new(&ts.input.planes().nth(1).unwrap().geometry());
   let uv_tx_size = bsize.largest_chroma_tx_size(xdec, ydec);
@@ -1696,6 +1721,13 @@ where
   };
   let mut ac = Aligned::<[MaybeUninit<i16>; 32 * 32]>::uninit_array();
   let ac = luma_ac(&mut ac.data, ts, tile_bo, bsize, luma_tx_size, fi);
+
+  let num_planes = ts.rec.planes.len().min(3);
+
+  if num_planes < 3 {
+    return None;
+  }
+
   let best_alpha: ArrayVec<i16, 2> = (1..3)
     .map(|p| {
       let PlaneConfig { xdec, ydec, .. } = ts.rec.planes[p].plane_cfg;
@@ -1802,8 +1834,15 @@ where
   let mut best_type = TxType::DCT_DCT;
   let mut best_rd = f64::MAX;
 
-  let PlaneConfig { xdec, ydec, .. } =
-    PlaneConfig::new(&ts.input.planes().nth(1).unwrap().geometry());
+  let (xdec, ydec) =
+    if fi.sequence.chroma_sampling == ChromaSubsampling::Monochrome {
+      (1, 1)
+    } else {
+      let PlaneConfig { xdec, ydec, .. } =
+        PlaneConfig::new(&ts.input.planes().nth(1).unwrap().geometry());
+      (xdec, ydec)
+    };
+
   let is_chroma_block =
     has_chroma(tile_bo, bsize, xdec, ydec, fi.sequence.chroma_sampling);
 
@@ -2251,6 +2290,7 @@ pub fn rdo_loop_decision<T: Pixel, W: Writer>(
   } else {
     MAX_PLANES
   };
+
   assert!(fi.sequence.enable_cdef || fi.sequence.enable_restoration);
   // Determine area of optimization: Which plane has the largest LRUs?
   // How many LRUs for each?
@@ -2260,6 +2300,7 @@ pub fn rdo_loop_decision<T: Pixel, W: Writer>(
                     // is/how many SBs we're processing (same thing)
   let mut lru_w = [0; MAX_PLANES]; // how many LRUs we're processing
   let mut lru_h = [0; MAX_PLANES]; // how many LRUs we're processing
+
   for pli in 0..planes {
     let sb_h_shift = ts.restoration.planes[pli].rp_cfg.sb_h_shift;
     let sb_v_shift = ts.restoration.planes[pli].rp_cfg.sb_v_shift;
@@ -2615,8 +2656,8 @@ pub fn rdo_loop_decision<T: Pixel, W: Writer>(
                       &PlaneSlice::new(cdef_ref_plane, loop_po.x, loop_po.y),
                       &mut lrf_ref.planes_mut().nth(pli).unwrap().region_mut(
                         Area::Rect {
-                          x: loop_po.x,
-                          y: loop_po.y,
+                          x: lrf_po.x,
+                          y: lrf_po.y,
                           width: vis_width,
                           height: vis_height,
                         },
