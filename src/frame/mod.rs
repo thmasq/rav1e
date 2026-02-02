@@ -209,6 +209,9 @@ impl<T: Pixel> FrameAlloc for Frame<T> {
   fn new(
     width: usize, height: usize, chroma_sampling: ChromaSubsampling,
   ) -> Self {
+    let allocated_width = (width + 7) & !7;
+    let allocated_height = (height + 7) & !7;
+
     use v_frame::frame::FrameBuilder;
 
     // Default to 8-bit for allocation if u8, else 10-bit for u16 (covers 10/12b)
@@ -217,8 +220,8 @@ impl<T: Pixel> FrameAlloc for Frame<T> {
         .unwrap();
 
     FrameBuilder::new(
-      NonZeroUsize::new(width).expect("Frame width must be > 0"),
-      NonZeroUsize::new(height).expect("Frame height must be > 0"),
+      NonZeroUsize::new(allocated_width).expect("Frame width must be > 0"),
+      NonZeroUsize::new(allocated_height).expect("Frame height must be > 0"),
       chroma_sampling,
       bit_depth,
     )
