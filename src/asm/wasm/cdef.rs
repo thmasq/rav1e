@@ -40,16 +40,17 @@ unsafe fn cdef_filter_8x8_u16(
   let pri_damping = cmp::max(0, damping - msb(pri_strength));
   let sec_damping = cmp::max(0, damping - msb(sec_strength));
 
-  let pri_thresh = pri_strength << coeff_shift;
-  let sec_thresh = sec_strength << coeff_shift;
+  let pri_thresh = pri_strength;
+  let sec_thresh = sec_strength;
 
   let pri_thresh_vec = i16x8_splat(pri_thresh as i16);
   let sec_thresh_vec = i16x8_splat(sec_thresh as i16);
 
   let cdef_pri_taps = [[4, 2], [3, 3]];
   let cdef_sec_taps = [[2, 1], [2, 1]];
-  let pri_taps = cdef_pri_taps[(pri_strength & 1) as usize];
-  let sec_taps = cdef_sec_taps[(pri_strength & 1) as usize];
+
+  let pri_taps = cdef_pri_taps[((pri_strength >> coeff_shift) & 1) as usize];
+  let sec_taps = cdef_sec_taps[((pri_strength >> coeff_shift) & 1) as usize];
 
   let pri_tap0 = i16x8_splat(pri_taps[0] as i16);
   let pri_tap1 = i16x8_splat(pri_taps[1] as i16);
@@ -91,7 +92,7 @@ unsafe fn cdef_filter_8x8_u16(
                        min_px: &mut v128,
                        max_px: &mut v128,
                        sum: &mut v128| {
-      let p_ptr = ptr_in.offset(offset);
+      let p_ptr = (ptr_in as *const u8).offset(offset) as *const u16;
       let p_val = v128_load(p_ptr as *const v128);
 
       *max_px = u16x8_max(*max_px, p_val);
@@ -241,7 +242,7 @@ pub(crate) unsafe fn cdef_filter_block<T: Pixel>(
     dst.data_ptr_mut() as *mut u8,
     T::to_asm_stride(dst.plane_cfg.stride),
     src_ptr,
-    src_stride,
+    src_stride * (std::mem::size_of::<T>() as isize),
     pri_strength,
     sec_strength,
     dir,
