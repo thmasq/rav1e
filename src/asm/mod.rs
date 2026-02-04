@@ -13,5 +13,8 @@ pub mod x86;
 #[cfg(asm_neon)]
 pub mod aarch64;
 
+#[cfg(target_arch = "wasm32")]
+pub mod wasm;
+
 #[cfg(any(nasm_x86_64, asm_neon))]
 pub mod shared;

@@ -25,6 +25,8 @@ cfg_if::cfg_if! {
     pub(crate) use crate::asm::x86::cdef::*;
   } else if #[cfg(asm_neon)] {
     pub(crate) use crate::asm::aarch64::cdef::*;
+  } else if #[cfg(all(target_arch = "wasm32", target_feature = "simd128"))] {
+    pub(crate) use crate::asm::wasm::cdef::*;
   } else {
     pub(crate) use self::rust::*;
   }
@@ -60,7 +62,8 @@ pub(crate) mod rust {
   // Instead of dividing by n between 2 and 8, we multiply by 3*5*7*8/n.
   // The output is then 840 times larger, but we don't care for finding
   // the max.
-  const CDEF_DIV_TABLE: [i32; 9] = [0, 840, 420, 280, 210, 168, 140, 120, 105];
+  pub const CDEF_DIV_TABLE: [i32; 9] =
+    [0, 840, 420, 280, 210, 168, 140, 120, 105];
 
   /// Returns the position and value of the first instance of the max element in
   /// a slice as a tuple.
@@ -72,6 +75,7 @@ pub(crate) mod rust {
   /// # Panics
   ///
   /// Panics if `elems` is empty
+  #[allow(unused)]
   #[inline]
   fn first_max_element(elems: &[i32]) -> (usize, i32) {
     // In case of a tie, the first element must be selected.
@@ -90,6 +94,7 @@ pub(crate) mod rust {
   // in a particular direction. Since each direction have the same sum(x^2) term,
   // that term is never computed. See Section 2, step 2, of:
   // http://jmvalin.ca/notes/intra_paint.pdf
+  #[allow(unused)]
   pub fn cdef_find_dir<T: Pixel>(
     img: &PlaneRegion<'_, T>, var: &mut u32, coeff_shift: usize,
     _cpu: CpuFeatureLevel,
@@ -154,6 +159,7 @@ pub(crate) mod rust {
     best_dir as i32
   }
 
+  #[allow(unused)]
   #[inline(always)]
   fn constrain(diff: i32, threshold: i32, damping: i32) -> i32 {
     if threshold != 0 {
@@ -209,6 +215,7 @@ pub(crate) mod rust {
 
   #[cold_for_target_arch("x86_64")]
   #[allow(clippy::erasing_op, clippy::identity_op, clippy::neg_multiply)]
+  #[allow(unused)]
   pub(crate) unsafe fn cdef_filter_block<T: Pixel, U: Pixel>(
     dst: &mut PlaneRegionMut<'_, T>, input: *const U, istride: isize,
     pri_strength: i32, sec_strength: i32, dir: usize, damping: i32,
