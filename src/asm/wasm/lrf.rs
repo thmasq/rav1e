@@ -29,7 +29,7 @@ static X_BY_XPLUS1: [u32; 256] = [
   256,
 ];
 
-#[inline]
+#[inline(always)]
 pub fn sgrproj_box_ab_r1<const BD: usize>(
   af: &mut [u32], bf: &mut [u32], iimg: &[u32], iimg_sq: &[u32],
   iimg_stride: usize, y: usize, stripe_w: usize, s: u32,
@@ -51,7 +51,7 @@ pub fn sgrproj_box_ab_r1<const BD: usize>(
   }
 }
 
-#[inline]
+#[inline(always)]
 pub fn sgrproj_box_ab_r2<const BD: usize>(
   af: &mut [u32], bf: &mut [u32], iimg: &[u32], iimg_sq: &[u32],
   iimg_stride: usize, y: usize, stripe_w: usize, s: u32,
@@ -73,7 +73,7 @@ pub fn sgrproj_box_ab_r2<const BD: usize>(
   }
 }
 
-#[inline]
+#[inline(always)]
 pub fn sgrproj_box_f_r0<T: Pixel>(
   f: &mut [u32], y: usize, w: usize, cdeffed: &PlaneSlice<T>,
   _cpu: CpuFeatureLevel,
@@ -83,7 +83,7 @@ pub fn sgrproj_box_f_r0<T: Pixel>(
   }
 }
 
-#[inline]
+#[inline(always)]
 pub fn sgrproj_box_f_r1<T: Pixel>(
   af: &[&[u32]; 3], bf: &[&[u32]; 3], f: &mut [u32], y: usize, w: usize,
   cdeffed: &PlaneSlice<T>, _cpu: CpuFeatureLevel,
@@ -93,7 +93,7 @@ pub fn sgrproj_box_f_r1<T: Pixel>(
   }
 }
 
-#[inline]
+#[inline(always)]
 pub fn sgrproj_box_f_r2<T: Pixel>(
   af: &[&[u32]; 2], bf: &[&[u32]; 2], f0: &mut [u32], f1: &mut [u32],
   y: usize, w: usize, cdeffed: &PlaneSlice<T>, _cpu: CpuFeatureLevel,
@@ -103,6 +103,7 @@ pub fn sgrproj_box_f_r2<T: Pixel>(
   }
 }
 
+#[inline(always)]
 unsafe fn get_integral_square_wasm(
   iimg: &[u32], stride: usize, x: usize, y: usize, size: usize,
 ) -> v128 {
@@ -115,6 +116,7 @@ unsafe fn get_integral_square_wasm(
   i32x4_sub(i32x4_sub(i32x4_add(tl, br), bl), tr)
 }
 
+#[inline(always)]
 unsafe fn sgrproj_box_ab_wasm<const BD: usize>(
   r: usize, af: &mut [u32], bf: &mut [u32], iimg: &[u32], iimg_sq: &[u32],
   iimg_stride: usize, start_x: usize, y: usize, stripe_w: usize, s: u32,
@@ -188,20 +190,23 @@ unsafe fn sgrproj_box_ab_wasm<const BD: usize>(
   }
 }
 
+#[inline(always)]
 unsafe fn sgrproj_box_f_r0_wasm<T: Pixel>(
   f: &mut [u32], y: usize, w: usize, cdeffed: &PlaneSlice<T>,
 ) {
   let shift = SGRPROJ_RST_BITS as u32;
 
+  let row_ptr = cdeffed.subslice(0, y).as_ptr();
+
   for x in (0..w).step_by(4) {
     if x + 4 <= w {
       let val_i32 = if mem::size_of::<T>() == 1 {
-        let ptr = cdeffed.subslice(x, y).as_ptr() as *const u32;
+        let ptr = row_ptr.add(x) as *const u32;
         let v_u8 = v128_load32_zero(ptr);
         let v_u16 = u16x8_extend_low_u8x16(v_u8);
         i32x4_extend_low_u16x8(v_u16)
       } else {
-        let ptr = cdeffed.subslice(x, y).as_ptr() as *const u64;
+        let ptr = row_ptr.add(x) as *const u64;
         let v_u16 = v128_load64_zero(ptr);
         i32x4_extend_low_u16x8(v_u16)
       };
@@ -214,6 +219,7 @@ unsafe fn sgrproj_box_f_r0_wasm<T: Pixel>(
   }
 }
 
+#[inline(always)]
 unsafe fn sgrproj_box_f_r1_wasm<T: Pixel>(
   af: &[&[u32]; 3], bf: &[&[u32]; 3], f: &mut [u32], y: usize, w: usize,
   cdeffed: &PlaneSlice<T>,
@@ -229,6 +235,8 @@ unsafe fn sgrproj_box_f_r1_wasm<T: Pixel>(
   let b0_ptr = bf[0].as_ptr();
   let b1_ptr = bf[1].as_ptr();
   let b2_ptr = bf[2].as_ptr();
+
+  let row_ptr = cdeffed.subslice(0, y).as_ptr();
 
   for x in (0..w).step_by(4) {
     if x + 4 <= w {
@@ -283,12 +291,12 @@ unsafe fn sgrproj_box_f_r1_wasm<T: Pixel>(
       let b = i32x4_add(b_term1, b_term2);
 
       let p_val = if mem::size_of::<T>() == 1 {
-        let ptr = cdeffed.subslice(x, y).as_ptr() as *const u32;
+        let ptr = row_ptr.add(x) as *const u32;
         let v_u8 = v128_load32_zero(ptr);
         let v_u16 = u16x8_extend_low_u8x16(v_u8);
         i32x4_extend_low_u16x8(v_u16)
       } else {
-        let ptr = cdeffed.subslice(x, y).as_ptr() as *const u64;
+        let ptr = row_ptr.add(x) as *const u64;
         let v_u16 = v128_load64_zero(ptr);
         i32x4_extend_low_u16x8(v_u16)
       };
@@ -303,6 +311,7 @@ unsafe fn sgrproj_box_f_r1_wasm<T: Pixel>(
   }
 }
 
+#[inline(always)]
 unsafe fn sgrproj_box_f_r2_wasm<T: Pixel>(
   af: &[&[u32]; 2], bf: &[&[u32]; 2], f0: &mut [u32], f1: &mut [u32],
   y: usize, w: usize, cdeffed: &PlaneSlice<T>,
@@ -318,6 +327,9 @@ unsafe fn sgrproj_box_f_r2_wasm<T: Pixel>(
   let a1_ptr = af[1].as_ptr();
   let b0_ptr = bf[0].as_ptr();
   let b1_ptr = bf[1].as_ptr();
+
+  let row_ptr = cdeffed.subslice(0, y).as_ptr();
+  let next_row_ptr = cdeffed.subslice(0, y).as_ptr();
 
   for x in (0..w).step_by(4) {
     if x + 4 <= w {
@@ -359,23 +371,23 @@ unsafe fn sgrproj_box_f_r2_wasm<T: Pixel>(
       );
 
       let p0_val = if mem::size_of::<T>() == 1 {
-        let ptr = cdeffed.subslice(x, y).as_ptr() as *const u32;
+        let ptr = row_ptr.add(x) as *const u32;
         let v_u8 = v128_load32_zero(ptr);
         let v_u16 = u16x8_extend_low_u8x16(v_u8);
         i32x4_extend_low_u16x8(v_u16)
       } else {
-        let ptr = cdeffed.subslice(x, y).as_ptr() as *const u64;
+        let ptr = row_ptr.add(x) as *const u64;
         let v_u16 = v128_load64_zero(ptr);
         i32x4_extend_low_u16x8(v_u16)
       };
 
       let p1_val = if mem::size_of::<T>() == 1 {
-        let ptr = cdeffed.subslice(x, y + 1).as_ptr() as *const u32;
+        let ptr = next_row_ptr.add(x) as *const u32;
         let v_u8 = v128_load32_zero(ptr);
         let v_u16 = u16x8_extend_low_u8x16(v_u8);
         i32x4_extend_low_u16x8(v_u16)
       } else {
-        let ptr = cdeffed.subslice(x, y + 1).as_ptr() as *const u64;
+        let ptr = next_row_ptr.add(x) as *const u64;
         let v_u16 = v128_load64_zero(ptr);
         i32x4_extend_low_u16x8(v_u16)
       };
