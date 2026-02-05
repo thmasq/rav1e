@@ -23,6 +23,8 @@ use crate::util::{clamp, ILog, Pixel};
 cfg_if::cfg_if! {
   if #[cfg(nasm_x86_64)] {
     use crate::asm::x86::lrf::*;
+  } else if #[cfg(all(target_arch = "wasm32", target_feature = "simd128"))] {
+    pub(crate) use crate::asm::wasm::lrf::*;
   } else {
     use self::rust::*;
   }
@@ -198,6 +200,7 @@ pub(crate) mod rust {
   }
 
   // computes an intermediate (ab) row for stripe_w + 2 columns at row y
+  #[allow(unused)]
   pub(crate) fn sgrproj_box_ab_r1<const BD: usize>(
     af: &mut [u32], bf: &mut [u32], iimg: &[u32], iimg_sq: &[u32],
     iimg_stride: usize, y: usize, stripe_w: usize, s: u32,
@@ -218,6 +221,7 @@ pub(crate) mod rust {
   }
 
   // computes an intermediate (ab) row for stripe_w + 2 columns at row y
+  #[allow(unused)]
   pub(crate) fn sgrproj_box_ab_r2<const BD: usize>(
     af: &mut [u32], bf: &mut [u32], iimg: &[u32], iimg_sq: &[u32],
     iimg_stride: usize, y: usize, stripe_w: usize, s: u32,
@@ -237,6 +241,7 @@ pub(crate) mod rust {
     );
   }
 
+  #[allow(unused)]
   pub(crate) fn sgrproj_box_f_r0<T: Pixel>(
     f: &mut [u32], y: usize, w: usize, cdeffed: &PlaneSlice<T>,
     _cpu: CpuFeatureLevel,
@@ -254,6 +259,7 @@ pub(crate) mod rust {
     }
   }
 
+  #[allow(unused)]
   pub(crate) fn sgrproj_box_f_r1<T: Pixel>(
     af: &[&[u32]; 3], bf: &[&[u32]; 3], f: &mut [u32], y: usize, w: usize,
     cdeffed: &PlaneSlice<T>, _cpu: CpuFeatureLevel,
@@ -288,6 +294,7 @@ pub(crate) mod rust {
     }
   }
 
+  #[allow(unused)]
   pub(crate) fn sgrproj_box_f_r2<T: Pixel>(
     af: &[&[u32]; 2], bf: &[&[u32]; 2], f0: &mut [u32], f1: &mut [u32],
     y: usize, w: usize, cdeffed: &PlaneSlice<T>, _cpu: CpuFeatureLevel,
