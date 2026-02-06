@@ -23,24 +23,28 @@ unsafe fn cdef_dist_8x8_simd<T: Pixel>(
   let mut sum_d2: i32 = 0;
   let mut sum_sd: i32 = 0;
 
-  let src_ptr = src.data_ptr() as *const u16;
-  let dst_ptr = dst.data_ptr() as *const u16;
+  let src_ptr = src.data_ptr();
+  let dst_ptr = dst.data_ptr();
   let src_stride = src.plane_cfg.stride as usize;
   let dst_stride = dst.plane_cfg.stride as usize;
 
   for i in 0..8 {
     let s_row = if T::type_enum() == PixelType::U8 {
-      let s_u8 = v128_load64_zero(src_ptr.add(i * src_stride) as *const u64);
+      let ptr = (src_ptr as *const u8).add(i * src_stride);
+      let s_u8 = v128_load64_zero(ptr as *const u64);
       u16x8_extend_low_u8x16(s_u8)
     } else {
-      v128_load(src_ptr.add(i * src_stride) as *const v128)
+      let ptr = (src_ptr as *const u16).add(i * src_stride);
+      v128_load(ptr as *const v128)
     };
 
     let d_row = if T::type_enum() == PixelType::U8 {
-      let d_u8 = v128_load64_zero(dst_ptr.add(i * dst_stride) as *const u64);
+      let ptr = (dst_ptr as *const u8).add(i * dst_stride);
+      let d_u8 = v128_load64_zero(ptr as *const u64);
       u16x8_extend_low_u8x16(d_u8)
     } else {
-      v128_load(dst_ptr.add(i * dst_stride) as *const v128)
+      let ptr = (dst_ptr as *const u16).add(i * dst_stride);
+      v128_load(ptr as *const v128)
     };
 
     let ones = i16x8_splat(1);
@@ -71,24 +75,28 @@ unsafe fn cdef_dist_4x4_simd<T: Pixel>(
   let mut sum_d2: i32 = 0;
   let mut sum_sd: i32 = 0;
 
-  let src_ptr = src.data_ptr() as *const u16;
-  let dst_ptr = dst.data_ptr() as *const u16;
+  let src_ptr = src.data_ptr();
+  let dst_ptr = dst.data_ptr();
   let src_stride = src.plane_cfg.stride as usize;
   let dst_stride = dst.plane_cfg.stride as usize;
 
   for i in 0..4 {
     let s_row = if T::type_enum() == PixelType::U8 {
-      let s_u8 = v128_load32_zero(src_ptr.add(i * src_stride) as *const u32);
+      let ptr = (src_ptr as *const u8).add(i * src_stride);
+      let s_u8 = v128_load32_zero(ptr as *const u32);
       u16x8_extend_low_u8x16(s_u8)
     } else {
-      v128_load64_zero(src_ptr.add(i * src_stride) as *const u64)
+      let ptr = (src_ptr as *const u16).add(i * src_stride);
+      v128_load64_zero(ptr as *const u64)
     };
 
     let d_row = if T::type_enum() == PixelType::U8 {
-      let d_u8 = v128_load32_zero(dst_ptr.add(i * dst_stride) as *const u32);
+      let ptr = (dst_ptr as *const u8).add(i * dst_stride);
+      let d_u8 = v128_load32_zero(ptr as *const u32);
       u16x8_extend_low_u8x16(d_u8)
     } else {
-      v128_load64_zero(dst_ptr.add(i * dst_stride) as *const u64)
+      let ptr = (dst_ptr as *const u16).add(i * dst_stride);
+      v128_load64_zero(ptr as *const u64)
     };
 
     let ones = i16x8_splat(1);
@@ -123,7 +131,7 @@ where
   debug_assert!(dst.plane_cfg.ydec == 0);
 
   let call_rust = || -> u32 {
-    crate::dist::rust::cdef_dist_kernel(dst, src, w, h, bit_depth, _cpu)
+    crate::dist::rust::cdef_dist_kernel(src, dst, w, h, bit_depth, _cpu)
   };
 
   let (sum_s, sum_d, sum_s2, sum_d2, sum_sd) = unsafe {
