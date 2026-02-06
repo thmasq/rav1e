@@ -58,14 +58,14 @@ unsafe fn cdef_filter_8x8_u16(
   let sec_tap1 = i16x8_splat(sec_taps[1] as i16);
 
   let cdef_directions = [
-    [-1 * src_stride + 1, -2 * src_stride + 2],
-    [0 * src_stride + 1, -1 * src_stride + 2],
-    [0 * src_stride + 1, 0 * src_stride + 2],
-    [0 * src_stride + 1, 1 * src_stride + 2],
-    [1 * src_stride + 1, 2 * src_stride + 2],
-    [1 * src_stride + 0, 2 * src_stride + 1],
+    [-1 * src_stride + 2, -2 * src_stride + 4],
+    [0 * src_stride + 2, -1 * src_stride + 4],
+    [0 * src_stride + 2, 0 * src_stride + 4],
+    [0 * src_stride + 2, 1 * src_stride + 4],
+    [1 * src_stride + 2, 2 * src_stride + 4],
+    [1 * src_stride + 0, 2 * src_stride + 2],
     [1 * src_stride + 0, 2 * src_stride + 0],
-    [1 * src_stride + 0, 2 * src_stride - 1],
+    [1 * src_stride + 0, 2 * src_stride - 2],
   ];
 
   let dirs = [
@@ -73,6 +73,9 @@ unsafe fn cdef_filter_8x8_u16(
     cdef_directions[(dir + 2) & 7],
     cdef_directions[(dir + 6) & 7],
   ];
+
+  let padding_val = i16x8_splat(CDEF_VERY_LARGE as i16);
+  let bitdepth_max = i16x8_splat(((1 << bit_depth) - 1) as i16);
 
   for y in 0..ysize {
     let ptr_in =
@@ -95,7 +98,10 @@ unsafe fn cdef_filter_8x8_u16(
       let p_ptr = (ptr_in as *const u8).offset(offset) as *const u16;
       let p_val = v128_load(p_ptr as *const v128);
 
-      *max_px = u16x8_max(*max_px, p_val);
+      let is_padding = u16x8_eq(p_val, padding_val);
+      let valid_max = u16x8_max(*max_px, p_val);
+      *max_px = v128_bitselect(*max_px, valid_max, is_padding);
+
       *min_px = u16x8_min(*min_px, p_val);
 
       let diff = i16x8_sub(p_val, px);
@@ -174,15 +180,16 @@ unsafe fn cdef_filter_8x8_u16(
     let new_val = i16x8_add(px, offset);
 
     let clamped = i16x8_max(min_px, i16x8_min(max_px, new_val));
+    let final_val = i16x8_min(clamped, bitdepth_max);
 
     if is_hbd {
       if xsize == 8 {
-        v128_store(dst_row as *mut v128, clamped);
+        v128_store(dst_row as *mut v128, final_val);
       } else {
-        v128_store64_lane::<0>(clamped, dst_row as *mut u64);
+        v128_store64_lane::<0>(final_val, dst_row as *mut u64);
       }
     } else {
-      let res_u8 = u8x16_narrow_i16x8(clamped, clamped);
+      let res_u8 = u8x16_narrow_i16x8(final_val, final_val);
       if xsize == 8 {
         v128_store64_lane::<0>(res_u8, dst_row as *mut u64);
       } else {
@@ -242,7 +249,7 @@ pub(crate) unsafe fn cdef_filter_block<T: Pixel>(
     dst.data_ptr_mut() as *mut u8,
     T::to_asm_stride(dst.plane_cfg.stride),
     src_ptr,
-    src_stride * (std::mem::size_of::<T>() as isize),
+    src_stride * (std::mem::size_of::<u16>() as isize),
     pri_strength,
     sec_strength,
     dir,
@@ -300,7 +307,11 @@ unsafe fn cdef_filter_block_8bit_fast(
     let ptr_in = input.offset((y as isize) * istride);
     let dst_row = &mut dst[y];
 
-    let px_u8 = v128_load64_zero(ptr_in as *const u64);
+    let px_u8 = if xsize == 8 {
+      v128_load64_zero(ptr_in as *const u64)
+    } else {
+      v128_load32_zero(ptr_in as *const u32)
+    };
     let px = u16x8_extend_low_u8x16(px_u8);
 
     let mut min_px = px;
@@ -315,7 +326,11 @@ unsafe fn cdef_filter_block_8bit_fast(
                        max_px: &mut v128,
                        sum: &mut v128| {
       let p_ptr = ptr_in.offset(offset);
-      let p_u8 = v128_load64_zero(p_ptr as *const u64);
+      let p_u8 = if xsize == 8 {
+        v128_load64_zero(p_ptr as *const u64)
+      } else {
+        v128_load32_zero(p_ptr as *const u32)
+      };
       let p_val = u16x8_extend_low_u8x16(p_u8);
 
       *max_px = u16x8_max(*max_px, p_val);
