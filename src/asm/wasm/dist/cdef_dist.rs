@@ -14,59 +14,30 @@ unsafe fn sum128_i32(v: v128) -> i32 {
 }
 
 #[inline(always)]
-unsafe fn cdef_dist_8x8_simd<T: Pixel>(
-  src: &PlaneRegion<'_, T>, dst: &PlaneRegion<'_, T>,
-) -> (u32, u32, u32, u32, u32) {
-  let mut sum_s: i32 = 0;
-  let mut sum_d: i32 = 0;
-  let mut sum_s2: i32 = 0;
-  let mut sum_d2: i32 = 0;
-  let mut sum_sd: i32 = 0;
-
-  let src_ptr = src.data_ptr();
-  let dst_ptr = dst.data_ptr();
-  let src_stride = src.plane_cfg.stride as usize;
-  let dst_stride = dst.plane_cfg.stride as usize;
-
-  for i in 0..8 {
-    let s_row = if T::type_enum() == PixelType::U8 {
-      let ptr = (src_ptr as *const u8).add(i * src_stride);
-      let s_u8 = v128_load64_zero(ptr as *const u64);
-      u16x8_extend_low_u8x16(s_u8)
-    } else {
-      let ptr = (src_ptr as *const u16).add(i * src_stride);
-      v128_load(ptr as *const v128)
-    };
-
-    let d_row = if T::type_enum() == PixelType::U8 {
-      let ptr = (dst_ptr as *const u8).add(i * dst_stride);
-      let d_u8 = v128_load64_zero(ptr as *const u64);
-      u16x8_extend_low_u8x16(d_u8)
-    } else {
-      let ptr = (dst_ptr as *const u16).add(i * dst_stride);
-      v128_load(ptr as *const v128)
-    };
-
-    let ones = i16x8_splat(1);
-    let s_sum_row = i32x4_dot_i16x8(s_row, ones);
-    let d_sum_row = i32x4_dot_i16x8(d_row, ones);
-    sum_s += sum128_i32(s_sum_row);
-    sum_d += sum128_i32(d_sum_row);
-
-    let s2_row = i32x4_dot_i16x8(s_row, s_row);
-    let d2_row = i32x4_dot_i16x8(d_row, d_row);
-    let sd_row = i32x4_dot_i16x8(s_row, d_row);
-
-    sum_s2 += sum128_i32(s2_row);
-    sum_d2 += sum128_i32(d2_row);
-    sum_sd += sum128_i32(sd_row);
+unsafe fn load_row<T: Pixel, const W: usize>(ptr: *const u8) -> v128 {
+  match W {
+    4 => {
+      if T::type_enum() == PixelType::U8 {
+        let val = v128_load32_zero(ptr as *const u32);
+        u16x8_extend_low_u8x16(val)
+      } else {
+        v128_load64_zero(ptr as *const u64)
+      }
+    }
+    8 => {
+      if T::type_enum() == PixelType::U8 {
+        let val = v128_load64_zero(ptr as *const u64);
+        u16x8_extend_low_u8x16(val)
+      } else {
+        v128_load(ptr as *const v128)
+      }
+    }
+    _ => unreachable!(),
   }
-
-  (sum_s as u32, sum_d as u32, sum_s2 as u32, sum_d2 as u32, sum_sd as u32)
 }
 
 #[inline(always)]
-unsafe fn cdef_dist_4x4_simd<T: Pixel>(
+unsafe fn cdef_dist_wxh_simd<T: Pixel, const W: usize, const H: usize>(
   src: &PlaneRegion<'_, T>, dst: &PlaneRegion<'_, T>,
 ) -> (u32, u32, u32, u32, u32) {
   let mut sum_s: i32 = 0;
@@ -80,24 +51,9 @@ unsafe fn cdef_dist_4x4_simd<T: Pixel>(
   let src_stride = src.plane_cfg.stride as usize;
   let dst_stride = dst.plane_cfg.stride as usize;
 
-  for i in 0..4 {
-    let s_row = if T::type_enum() == PixelType::U8 {
-      let ptr = (src_ptr as *const u8).add(i * src_stride);
-      let s_u8 = v128_load32_zero(ptr as *const u32);
-      u16x8_extend_low_u8x16(s_u8)
-    } else {
-      let ptr = (src_ptr as *const u16).add(i * src_stride);
-      v128_load64_zero(ptr as *const u64)
-    };
-
-    let d_row = if T::type_enum() == PixelType::U8 {
-      let ptr = (dst_ptr as *const u8).add(i * dst_stride);
-      let d_u8 = v128_load32_zero(ptr as *const u32);
-      u16x8_extend_low_u8x16(d_u8)
-    } else {
-      let ptr = (dst_ptr as *const u16).add(i * dst_stride);
-      v128_load64_zero(ptr as *const u64)
-    };
+  for i in 0..H {
+    let s_row = load_row::<T, W>((src_ptr as *const u8).add(i * src_stride));
+    let d_row = load_row::<T, W>((dst_ptr as *const u8).add(i * dst_stride));
 
     let ones = i16x8_splat(1);
     let s_sum_row = i32x4_dot_i16x8(s_row, ones);
@@ -135,12 +91,10 @@ where
   };
 
   let (sum_s, sum_d, sum_s2, sum_d2, sum_sd) = unsafe {
-    if w == 8 && h == 8 {
-      cdef_dist_8x8_simd(src, dst)
-    } else if w == 4 && h == 4 {
-      cdef_dist_4x4_simd(src, dst)
-    } else {
-      return call_rust();
+    match (w, h) {
+      (4, 4) => cdef_dist_wxh_simd::<T, 4, 4>(src, dst),
+      (8, 8) => cdef_dist_wxh_simd::<T, 8, 8>(src, dst),
+      _ => return call_rust(),
     }
   };
 
