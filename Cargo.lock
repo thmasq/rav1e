@@ -200,8 +200,8 @@ dependencies = [
 
 [[package]]
 name = "av-scenechange"
-version = "0.22.5"
-source = "git+https://github.com/thmasq/av-scenechange?tag=0.22.5#76a529f2ee46840923359251511e1cf6039e6824"
+version = "0.22.4"
+source = "git+https://github.com/thmasq/av-scenechange?tag=0.22.4#bb530e1a4dc4c94b5f4901a3edb8a82038645ab8"
 dependencies = [
  "aligned",
  "anyhow",
