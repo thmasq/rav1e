@@ -59,72 +59,162 @@ unsafe fn sad_wxh<T: Pixel, const W: usize, const H: usize>(
   let sum;
 
   if T::type_enum() == PixelType::U8 {
-    let mut sum_lanes = i32x4_splat(0);
+    if W == 4 {
+      let mut sum0 = i32x4_splat(0);
+      let mut sum1 = i32x4_splat(0);
 
-    for i in 0..H {
-      let s_row = (src_ptr as *const u8).add(i * src_stride);
-      let d_row = (dst_ptr as *const u8).add(i * dst_stride);
+      for i in (0..H).step_by(2) {
+        let s_row0 = (src_ptr as *const u8).add(i * src_stride);
+        let d_row0 = (dst_ptr as *const u8).add(i * dst_stride);
+        let s_row1 = s_row0.add(src_stride);
+        let d_row1 = d_row0.add(dst_stride);
 
-      if W == 4 {
-        let s = v128_load32_zero(s_row as *const u32);
-        let d = v128_load32_zero(d_row as *const u32);
-        let diff = v128_or(u8x16_sub_sat(s, d), u8x16_sub_sat(d, s));
-        let diff_lo = u16x8_extend_low_u8x16(diff);
-        sum_lanes = i32x4_add(sum_lanes, i32x4_extadd_pairwise_i16x8(diff_lo));
-      } else if W == 8 {
-        let s = v128_load64_zero(s_row as *const u64);
-        let d = v128_load64_zero(d_row as *const u64);
-        let diff = v128_or(u8x16_sub_sat(s, d), u8x16_sub_sat(d, s));
-        let diff_lo = u16x8_extend_low_u8x16(diff);
-        sum_lanes = i32x4_add(sum_lanes, i32x4_extadd_pairwise_i16x8(diff_lo));
-      } else {
+        let s0 = v128_load32_zero(s_row0 as *const u32);
+        let d0 = v128_load32_zero(d_row0 as *const u32);
+        let diff0 = v128_or(u8x16_sub_sat(s0, d0), u8x16_sub_sat(d0, s0));
+        sum0 = i32x4_add(
+          sum0,
+          i32x4_extadd_pairwise_i16x8(u16x8_extend_low_u8x16(diff0)),
+        );
+
+        let s1 = v128_load32_zero(s_row1 as *const u32);
+        let d1 = v128_load32_zero(d_row1 as *const u32);
+        let diff1 = v128_or(u8x16_sub_sat(s1, d1), u8x16_sub_sat(d1, s1));
+        sum1 = i32x4_add(
+          sum1,
+          i32x4_extadd_pairwise_i16x8(u16x8_extend_low_u8x16(diff1)),
+        );
+      }
+      sum = sum128_i32(i32x4_add(sum0, sum1));
+    } else if W == 8 {
+      let mut sum0 = i32x4_splat(0);
+      let mut sum1 = i32x4_splat(0);
+
+      for i in (0..H).step_by(2) {
+        let s_row0 = (src_ptr as *const u8).add(i * src_stride);
+        let d_row0 = (dst_ptr as *const u8).add(i * dst_stride);
+        let s_row1 = s_row0.add(src_stride);
+        let d_row1 = d_row0.add(dst_stride);
+
+        let s0 = v128_load64_zero(s_row0 as *const u64);
+        let d0 = v128_load64_zero(d_row0 as *const u64);
+        let diff0 = v128_or(u8x16_sub_sat(s0, d0), u8x16_sub_sat(d0, s0));
+        sum0 = i32x4_add(
+          sum0,
+          i32x4_extadd_pairwise_i16x8(u16x8_extend_low_u8x16(diff0)),
+        );
+
+        let s1 = v128_load64_zero(s_row1 as *const u64);
+        let d1 = v128_load64_zero(d_row1 as *const u64);
+        let diff1 = v128_or(u8x16_sub_sat(s1, d1), u8x16_sub_sat(d1, s1));
+        sum1 = i32x4_add(
+          sum1,
+          i32x4_extadd_pairwise_i16x8(u16x8_extend_low_u8x16(diff1)),
+        );
+      }
+      sum = sum128_i32(i32x4_add(sum0, sum1));
+    } else {
+      let mut sum_lo = i32x4_splat(0);
+      let mut sum_hi = i32x4_splat(0);
+
+      for i in 0..H {
+        let s_row = (src_ptr as *const u8).add(i * src_stride);
+        let d_row = (dst_ptr as *const u8).add(i * dst_stride);
+
         for j in (0..W).step_by(16) {
           let s = v128_load(s_row.add(j) as *const v128);
           let d = v128_load(d_row.add(j) as *const v128);
+
           let diff = v128_or(u8x16_sub_sat(s, d), u8x16_sub_sat(d, s));
-          let diff_lo = u16x8_extend_low_u8x16(diff);
-          let diff_hi = u16x8_extend_high_u8x16(diff);
-          sum_lanes =
-            i32x4_add(sum_lanes, i32x4_extadd_pairwise_i16x8(diff_lo));
-          sum_lanes =
-            i32x4_add(sum_lanes, i32x4_extadd_pairwise_i16x8(diff_hi));
+          sum_lo = i32x4_add(
+            sum_lo,
+            i32x4_extadd_pairwise_i16x8(u16x8_extend_low_u8x16(diff)),
+          );
+          sum_hi = i32x4_add(
+            sum_hi,
+            i32x4_extadd_pairwise_i16x8(u16x8_extend_high_u8x16(diff)),
+          );
         }
       }
+      sum = sum128_i32(i32x4_add(sum_lo, sum_hi));
     }
-    sum = sum128_i32(sum_lanes);
   } else {
-    let mut sum_lanes = i32x4_splat(0);
+    if W == 4 {
+      let mut sum0 = i32x4_splat(0);
+      let mut sum1 = i32x4_splat(0);
 
-    for i in 0..H {
-      let s_row = (src_ptr as *const u8).add(i * src_stride);
-      let d_row = (dst_ptr as *const u8).add(i * dst_stride);
+      for i in (0..H).step_by(2) {
+        let s_row0 = (src_ptr as *const u8).add(i * src_stride);
+        let d_row0 = (dst_ptr as *const u8).add(i * dst_stride);
+        let s_row1 = s_row0.add(src_stride);
+        let d_row1 = d_row0.add(dst_stride);
 
-      if W == 4 {
-        let s = v128_load64_zero(s_row as *const u64);
-        let d = v128_load64_zero(d_row as *const u64);
-        let diff = i16x8_sub(s, d);
-        let abs_diff = i16x8_abs(diff);
-        sum_lanes =
-          i32x4_add(sum_lanes, i32x4_extadd_pairwise_i16x8(abs_diff));
-      } else if W == 8 {
-        let s = v128_load(s_row as *const v128);
-        let d = v128_load(d_row as *const v128);
-        let diff = i16x8_sub(s, d);
-        let abs_diff = i16x8_abs(diff);
-        sum_lanes =
-          i32x4_add(sum_lanes, i32x4_extadd_pairwise_i16x8(abs_diff));
-      } else {
+        let s0 = v128_load64_zero(s_row0 as *const u64);
+        let d0 = v128_load64_zero(d_row0 as *const u64);
+        sum0 = i32x4_add(
+          sum0,
+          i32x4_extadd_pairwise_i16x8(i16x8_abs(i16x8_sub(s0, d0))),
+        );
+
+        let s1 = v128_load64_zero(s_row1 as *const u64);
+        let d1 = v128_load64_zero(d_row1 as *const u64);
+        sum1 = i32x4_add(
+          sum1,
+          i32x4_extadd_pairwise_i16x8(i16x8_abs(i16x8_sub(s1, d1))),
+        );
+      }
+      sum = sum128_i32(i32x4_add(sum0, sum1));
+    } else if W == 8 {
+      let mut sum0 = i32x4_splat(0);
+      let mut sum1 = i32x4_splat(0);
+
+      for i in (0..H).step_by(2) {
+        let s_row0 = (src_ptr as *const u8).add(i * src_stride);
+        let d_row0 = (dst_ptr as *const u8).add(i * dst_stride);
+        let s_row1 = s_row0.add(src_stride);
+        let d_row1 = d_row0.add(dst_stride);
+
+        let s0 = v128_load(s_row0 as *const v128);
+        let d0 = v128_load(d_row0 as *const v128);
+        sum0 = i32x4_add(
+          sum0,
+          i32x4_extadd_pairwise_i16x8(i16x8_abs(i16x8_sub(s0, d0))),
+        );
+
+        let s1 = v128_load(s_row1 as *const v128);
+        let d1 = v128_load(d_row1 as *const v128);
+        sum1 = i32x4_add(
+          sum1,
+          i32x4_extadd_pairwise_i16x8(i16x8_abs(i16x8_sub(s1, d1))),
+        );
+      }
+      sum = sum128_i32(i32x4_add(sum0, sum1));
+    } else {
+      let mut sum0 = i32x4_splat(0);
+      let mut sum1 = i32x4_splat(0);
+
+      for i in (0..H).step_by(2) {
+        let s_row0 = (src_ptr as *const u8).add(i * src_stride);
+        let d_row0 = (dst_ptr as *const u8).add(i * dst_stride);
+        let s_row1 = s_row0.add(src_stride);
+        let d_row1 = d_row0.add(dst_stride);
+
         for j in (0..W).step_by(8) {
-          let s = v128_load(s_row.add(j * 2) as *const v128);
-          let d = v128_load(d_row.add(j * 2) as *const v128);
-          let diff = i16x8_sub(s, d);
-          let abs_diff = i16x8_abs(diff);
-          sum_lanes =
-            i32x4_add(sum_lanes, i32x4_extadd_pairwise_i16x8(abs_diff));
+          let offset = j * 2;
+
+          let s0 = v128_load(s_row0.add(offset) as *const v128);
+          let d0 = v128_load(d_row0.add(offset) as *const v128);
+          let diff0 = i16x8_abs(i16x8_sub(s0, d0));
+          sum0 = i32x4_add(sum0, i32x4_extadd_pairwise_i16x8(diff0));
+
+          let s1 = v128_load(s_row1.add(offset) as *const v128);
+          let d1 = v128_load(d_row1.add(offset) as *const v128);
+          let diff1 = i16x8_abs(i16x8_sub(s1, d1));
+          sum1 = i32x4_add(sum1, i32x4_extadd_pairwise_i16x8(diff1));
         }
       }
+      sum = sum128_i32(i32x4_add(sum0, sum1));
     }
-    sum = sum128_i32(sum_lanes);
   }
 
   sum
@@ -229,11 +319,15 @@ unsafe fn satd_wxh<T: Pixel, const W: usize, const H: usize>(
     for i in (0..H).step_by(8) {
       for j in (0..W).step_by(8) {
         let mut v = [i32x4_splat(0); 8];
+
+        let s_base = (src_ptr as *const u8)
+          .add(i * src_stride + j * std::mem::size_of::<T>());
+        let d_base = (dst_ptr as *const u8)
+          .add(i * dst_stride + j * std::mem::size_of::<T>());
+
         for k in 0..8 {
-          let s_row = (src_ptr as *const u8)
-            .add((i + k) * src_stride + j * std::mem::size_of::<T>());
-          let d_row = (dst_ptr as *const u8)
-            .add((i + k) * dst_stride + j * std::mem::size_of::<T>());
+          let s_row = s_base.add(k * src_stride);
+          let d_row = d_base.add(k * dst_stride);
           let s = load_pixels::<T, 8>(s_row);
           let d = load_pixels::<T, 8>(d_row);
           v[k] = i16x8_sub(s, d);
@@ -243,22 +337,41 @@ unsafe fn satd_wxh<T: Pixel, const W: usize, const H: usize>(
         transpose_8x8_i16(&mut v);
         hadamard_butterfly(&mut v);
 
-        for k in 0..8 {
-          sum = i32x4_add(sum, i32x4_extadd_pairwise_i16x8(i16x8_abs(v[k])));
-        }
+        let abs0 = i32x4_extadd_pairwise_i16x8(i16x8_abs(v[0]));
+        let abs1 = i32x4_extadd_pairwise_i16x8(i16x8_abs(v[1]));
+        let abs2 = i32x4_extadd_pairwise_i16x8(i16x8_abs(v[2]));
+        let abs3 = i32x4_extadd_pairwise_i16x8(i16x8_abs(v[3]));
+        let abs4 = i32x4_extadd_pairwise_i16x8(i16x8_abs(v[4]));
+        let abs5 = i32x4_extadd_pairwise_i16x8(i16x8_abs(v[5]));
+        let abs6 = i32x4_extadd_pairwise_i16x8(i16x8_abs(v[6]));
+        let abs7 = i32x4_extadd_pairwise_i16x8(i16x8_abs(v[7]));
+
+        let sum01 = i32x4_add(abs0, abs1);
+        let sum23 = i32x4_add(abs2, abs3);
+        let sum45 = i32x4_add(abs4, abs5);
+        let sum67 = i32x4_add(abs6, abs7);
+
+        let sum0123 = i32x4_add(sum01, sum23);
+        let sum4567 = i32x4_add(sum45, sum67);
+
+        sum = i32x4_add(sum, i32x4_add(sum0123, sum4567));
       }
     }
-    let total = sum128_i32(sum);
-    (total + 2) >> 2
   } else {
+    let mask = i32x4(-1, -1, 0, 0);
+
     for i in (0..H).step_by(4) {
       for j in (0..W).step_by(4) {
         let mut v = [i32x4_splat(0); 4];
+
+        let s_base = (src_ptr as *const u8)
+          .add(i * src_stride + j * std::mem::size_of::<T>());
+        let d_base = (dst_ptr as *const u8)
+          .add(i * dst_stride + j * std::mem::size_of::<T>());
+
         for k in 0..4 {
-          let s_row = (src_ptr as *const u8)
-            .add((i + k) * src_stride + j * std::mem::size_of::<T>());
-          let d_row = (dst_ptr as *const u8)
-            .add((i + k) * dst_stride + j * std::mem::size_of::<T>());
+          let s_row = s_base.add(k * src_stride);
+          let d_row = d_base.add(k * dst_stride);
           let s = load_pixels::<T, 4>(s_row);
           let d = load_pixels::<T, 4>(d_row);
           v[k] = i16x8_sub(s, d);
@@ -268,16 +381,25 @@ unsafe fn satd_wxh<T: Pixel, const W: usize, const H: usize>(
         transpose_4x4_packed(&mut v);
         hadamard_4x4(&mut v);
 
-        for k in 0..4 {
-          let mask = u32x4(0xFFFF, 0xFFFF, 0, 0);
-          let valid = v128_and(v[k], mask);
-          sum = i32x4_add(sum, i32x4_extadd_pairwise_i16x8(i16x8_abs(valid)));
-        }
+        let abs0 =
+          i32x4_extadd_pairwise_i16x8(i16x8_abs(v128_and(v[0], mask)));
+        let abs1 =
+          i32x4_extadd_pairwise_i16x8(i16x8_abs(v128_and(v[1], mask)));
+        let abs2 =
+          i32x4_extadd_pairwise_i16x8(i16x8_abs(v128_and(v[2], mask)));
+        let abs3 =
+          i32x4_extadd_pairwise_i16x8(i16x8_abs(v128_and(v[3], mask)));
+
+        let sum01 = i32x4_add(abs0, abs1);
+        let sum23 = i32x4_add(abs2, abs3);
+
+        sum = i32x4_add(sum, i32x4_add(sum01, sum23));
       }
     }
-    let total = sum128_i32(sum);
-    (total + 2) >> 2
   }
+
+  let total = sum128_i32(sum);
+  (total + 2) >> 2
 }
 
 macro_rules! dist_dispatch {
