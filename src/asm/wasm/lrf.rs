@@ -8,27 +8,6 @@ use crate::util::Pixel;
 use core::arch::wasm32::*;
 use std::mem;
 
-static X_BY_XPLUS1: [u32; 256] = [
-  1, 128, 171, 192, 205, 213, 219, 224, 228, 230, 233, 235, 236, 238, 239,
-  240, 241, 242, 243, 243, 244, 244, 245, 245, 246, 246, 247, 247, 247, 247,
-  248, 248, 248, 248, 249, 249, 249, 249, 249, 250, 250, 250, 250, 250, 250,
-  250, 251, 251, 251, 251, 251, 251, 251, 251, 251, 251, 252, 252, 252, 252,
-  252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 252, 253, 253,
-  253, 253, 253, 253, 253, 253, 253, 253, 253, 253, 253, 253, 253, 253, 253,
-  253, 253, 253, 253, 253, 253, 253, 253, 253, 253, 253, 253, 254, 254, 254,
-  254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254,
-  254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254,
-  254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254,
-  254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254,
-  254, 254, 254, 254, 254, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
-  255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
-  255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
-  255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
-  255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
-  255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
-  256,
-];
-
 #[inline(always)]
 pub fn sgrproj_box_ab_r1<const BD: usize>(
   af: &mut [u32], bf: &mut [u32], iimg: &[u32], iimg_sq: &[u32],
@@ -133,6 +112,13 @@ unsafe fn sgrproj_box_ab_wasm<const BD: usize>(
   let sgr_bits_vec = i32x4_splat(1 << SGRPROJ_SGR_BITS);
   let recip_bits_vec = i32x4_splat(1 << SGRPROJ_RECIP_BITS >> 1);
 
+  let k256 = f32x4_splat(256.0);
+  let k256_5 = f32x4_splat(256.5);
+  let one_f = f32x4_splat(1.0);
+  let max_val = u32x4_splat(255);
+  let min_fix = u32x4_splat(1);
+  let map_255_to_256 = u32x4_splat(256);
+
   for x in (start_x..stripe_w + 2).step_by(4) {
     if x + 4 <= stripe_w + 2 {
       let sum = get_integral_square_wasm(iimg, iimg_stride, x, y, d);
@@ -158,13 +144,20 @@ unsafe fn sgrproj_box_ab_wasm<const BD: usize>(
         SGRPROJ_MTABLE_BITS as u32,
       );
 
-      let mut a_vals = [0u32; 4];
-      let z_vals: [u32; 4] = mem::transmute(z);
-      for i in 0..4 {
-        let idx = z_vals[i].min(255) as usize;
-        a_vals[i] = *X_BY_XPLUS1.get_unchecked(idx);
-      }
-      let a = v128_load(a_vals.as_ptr() as *const v128);
+      let z_clamped = u32x4_min(z, max_val);
+
+      let z_f = f32x4_convert_i32x4(z_clamped);
+
+      let den = f32x4_add(z_f, one_f);
+      let term = f32x4_div(k256, den);
+      let res_f = f32x4_sub(k256_5, term);
+
+      let res_i = i32x4_trunc_sat_f32x4(res_f);
+
+      let val_fixed_0 = u32x4_max(res_i, min_fix);
+
+      let is_255 = u32x4_eq(z_clamped, max_val);
+      let a = v128_bitselect(map_255_to_256, val_fixed_0, is_255);
 
       let b_term1 = i32x4_sub(sgr_bits_vec, a);
       let b = i32x4_mul(i32x4_mul(b_term1, sum), one_over_n_vec);
@@ -329,7 +322,7 @@ unsafe fn sgrproj_box_f_r2_wasm<T: Pixel>(
   let b1_ptr = bf[1].as_ptr();
 
   let row_ptr = cdeffed.subslice(0, y).as_ptr();
-  let next_row_ptr = cdeffed.subslice(0, y).as_ptr();
+  let next_row_ptr = cdeffed.subslice(0, y + 1).as_ptr();
 
   for x in (0..w).step_by(4) {
     if x + 4 <= w {
