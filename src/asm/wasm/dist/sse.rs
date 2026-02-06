@@ -5,14 +5,6 @@ use crate::tiling::PlaneRegion;
 use crate::util::{self, Pixel, PixelType};
 use std::arch::wasm32::*;
 
-unsafe fn sum128_i32(v: v128) -> i32 {
-  let hi = i32x4_shuffle::<2, 3, 0, 0>(v, v);
-  let sum = i32x4_add(v, hi);
-  let hi2 = i32x4_shuffle::<1, 0, 0, 0>(sum, sum);
-  let final_sum = i32x4_add(sum, hi2);
-  i32x4_extract_lane::<0>(final_sum)
-}
-
 #[inline(always)]
 #[allow(clippy::let_and_return)]
 pub fn get_weighted_sse<T: Pixel>(
@@ -40,8 +32,8 @@ where
 
   let den = DistortionScale::new(1, 1 << 8).0 as u64;
 
-  let dist = unsafe {
-    let mut acc = 0u64;
+  unsafe {
+    let mut acc_lo = i64x2_splat(0);
     let src_ptr = src.data_ptr();
     let dst_ptr = dst.data_ptr();
     let src_stride = src.plane_cfg.stride as usize;
@@ -51,7 +43,7 @@ where
       for c in (0..w).step_by(4) {
         let s_val = *scale.as_ptr().add((r >> 2) * scale_stride + (c >> 2));
 
-        let mut block_sse = 0u64;
+        let scale_vec = i32x4_splat(s_val as i32);
 
         for i in 0..4 {
           let s_row_ptr = src_ptr.add((r + i) * src_stride + c);
@@ -69,16 +61,19 @@ where
 
           let diff = i16x8_sub(s, d);
           let sq = i32x4_dot_i16x8(diff, diff);
-          let sum_sq = sum128_i32(sq) as u64;
-          block_sse += sum_sq;
-        }
 
-        acc += block_sse * (s_val as u64);
+          let weighted_sq = i64x2_extmul_low_i32x4(sq, scale_vec);
+
+          acc_lo = i64x2_add(acc_lo, weighted_sq);
+        }
       }
     }
 
-    (acc + (den >> 1)) / den
-  };
+    let res_lo = i64x2_extract_lane::<0>(acc_lo) as u64;
+    let res_hi = i64x2_extract_lane::<1>(acc_lo) as u64;
 
-  dist
+    let total = res_lo + res_hi;
+
+    (total + (den >> 1)) / den
+  }
 }
