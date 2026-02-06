@@ -5,6 +5,7 @@ pub use self::cdef_dist::*;
 pub use self::sse::*;
 
 use crate::cpu_features::CpuFeatureLevel;
+use crate::partition::BlockSize;
 use crate::tiling::PlaneRegion;
 use crate::util::{self, Pixel, PixelType};
 use std::arch::wasm32::*;
@@ -402,16 +403,55 @@ unsafe fn satd_wxh<T: Pixel, const W: usize, const H: usize>(
   (total + 2) >> 2
 }
 
-macro_rules! dist_dispatch {
-    ($w:ident, $h:ident, $bit_depth:ident, $cpu:ident, $src:ident, $dst:ident, $simd_func:ident, $fallback_func:ident, $T:ty, $(($W:literal, $H:literal)),*) => {
-        match ($w, $h) {
-            $(
-                ($W, $H) => $simd_func::<$T, $W, $H>($src, $dst),
-            )*
-            _ => crate::dist::rust::$fallback_func($dst, $src, $w, $h, $bit_depth, $cpu),
-        }
-    };
+type DistFn<T> = unsafe fn(&PlaneRegion<'_, T>, &PlaneRegion<'_, T>) -> u32;
+
+const DIST_FNS_LENGTH: usize = 32;
+
+#[inline(always)]
+const fn to_index(bsize: BlockSize) -> usize {
+  bsize as usize & (DIST_FNS_LENGTH - 1)
 }
+
+macro_rules! generate_dist_table {
+  ($T:ty, $method:ident) => {{
+    let mut out: [Option<DistFn<$T>>; DIST_FNS_LENGTH] =
+      [None; DIST_FNS_LENGTH];
+    use BlockSize::*;
+    out[BLOCK_4X4 as usize] = Some($method::<$T, 4, 4>);
+    out[BLOCK_4X8 as usize] = Some($method::<$T, 4, 8>);
+    out[BLOCK_4X16 as usize] = Some($method::<$T, 4, 16>);
+    out[BLOCK_8X4 as usize] = Some($method::<$T, 8, 4>);
+    out[BLOCK_8X8 as usize] = Some($method::<$T, 8, 8>);
+    out[BLOCK_8X16 as usize] = Some($method::<$T, 8, 16>);
+    out[BLOCK_8X32 as usize] = Some($method::<$T, 8, 32>);
+    out[BLOCK_16X4 as usize] = Some($method::<$T, 16, 4>);
+    out[BLOCK_16X8 as usize] = Some($method::<$T, 16, 8>);
+    out[BLOCK_16X16 as usize] = Some($method::<$T, 16, 16>);
+    out[BLOCK_16X32 as usize] = Some($method::<$T, 16, 32>);
+    out[BLOCK_16X64 as usize] = Some($method::<$T, 16, 64>);
+    out[BLOCK_32X8 as usize] = Some($method::<$T, 32, 8>);
+    out[BLOCK_32X16 as usize] = Some($method::<$T, 32, 16>);
+    out[BLOCK_32X32 as usize] = Some($method::<$T, 32, 32>);
+    out[BLOCK_32X64 as usize] = Some($method::<$T, 32, 64>);
+    out[BLOCK_64X16 as usize] = Some($method::<$T, 64, 16>);
+    out[BLOCK_64X32 as usize] = Some($method::<$T, 64, 32>);
+    out[BLOCK_64X64 as usize] = Some($method::<$T, 64, 64>);
+    out[BLOCK_64X128 as usize] = Some($method::<$T, 64, 128>);
+    out[BLOCK_128X64 as usize] = Some($method::<$T, 128, 64>);
+    out[BLOCK_128X128 as usize] = Some($method::<$T, 128, 128>);
+    out
+  }};
+}
+
+static SAD_FNS_U8: [Option<DistFn<u8>>; DIST_FNS_LENGTH] =
+  generate_dist_table!(u8, sad_wxh);
+static SAD_FNS_U16: [Option<DistFn<u16>>; DIST_FNS_LENGTH] =
+  generate_dist_table!(u16, sad_wxh);
+
+static SATD_FNS_U8: [Option<DistFn<u8>>; DIST_FNS_LENGTH] =
+  generate_dist_table!(u8, satd_wxh);
+static SATD_FNS_U16: [Option<DistFn<u16>>; DIST_FNS_LENGTH] =
+  generate_dist_table!(u16, satd_wxh);
 
 #[inline(always)]
 #[allow(clippy::let_and_return)]
@@ -422,42 +462,27 @@ pub fn get_sad<T: Pixel>(
 where
   i32: util::math::CastFromPrimitive<T>,
 {
-  let call_dist = unsafe {
-    dist_dispatch!(
-      w,
-      h,
-      bit_depth,
-      _cpu,
-      src,
-      dst,
-      sad_wxh,
-      get_sad,
-      T,
-      (4, 4),
-      (4, 8),
-      (4, 16),
-      (8, 4),
-      (8, 8),
-      (8, 16),
-      (8, 32),
-      (16, 4),
-      (16, 8),
-      (16, 16),
-      (16, 32),
-      (16, 64),
-      (32, 8),
-      (32, 16),
-      (32, 32),
-      (32, 64),
-      (64, 16),
-      (64, 32),
-      (64, 64),
-      (64, 128),
-      (128, 64),
-      (128, 128)
-    )
-  };
-  call_dist
+  let bsize_opt = BlockSize::from_width_and_height_opt(w, h);
+
+  if let Ok(bsize) = bsize_opt {
+    unsafe {
+      if T::type_enum() == PixelType::U8 {
+        if let Some(func) = SAD_FNS_U8[to_index(bsize)] {
+          let src_u8 = std::mem::transmute(src);
+          let dst_u8 = std::mem::transmute(dst);
+          return func(src_u8, dst_u8);
+        }
+      } else {
+        if let Some(func) = SAD_FNS_U16[to_index(bsize)] {
+          let src_u16 = std::mem::transmute(src);
+          let dst_u16 = std::mem::transmute(dst);
+          return func(src_u16, dst_u16);
+        }
+      }
+    }
+  }
+
+  crate::dist::rust::get_sad(dst, src, w, h, bit_depth, _cpu)
 }
 
 #[inline(always)]
@@ -469,40 +494,25 @@ pub fn get_satd<T: Pixel>(
 where
   i32: util::math::CastFromPrimitive<T>,
 {
-  let call_dist = unsafe {
-    dist_dispatch!(
-      w,
-      h,
-      bit_depth,
-      _cpu,
-      src,
-      dst,
-      satd_wxh,
-      get_satd,
-      T,
-      (4, 4),
-      (4, 8),
-      (4, 16),
-      (8, 4),
-      (8, 8),
-      (8, 16),
-      (8, 32),
-      (16, 4),
-      (16, 8),
-      (16, 16),
-      (16, 32),
-      (16, 64),
-      (32, 8),
-      (32, 16),
-      (32, 32),
-      (32, 64),
-      (64, 16),
-      (64, 32),
-      (64, 64),
-      (64, 128),
-      (128, 64),
-      (128, 128)
-    )
-  };
-  call_dist
+  let bsize_opt = BlockSize::from_width_and_height_opt(w, h);
+
+  if let Ok(bsize) = bsize_opt {
+    unsafe {
+      if T::type_enum() == PixelType::U8 {
+        if let Some(func) = SATD_FNS_U8[to_index(bsize)] {
+          let src_u8 = std::mem::transmute(src);
+          let dst_u8 = std::mem::transmute(dst);
+          return func(src_u8, dst_u8);
+        }
+      } else {
+        if let Some(func) = SATD_FNS_U16[to_index(bsize)] {
+          let src_u16 = std::mem::transmute(src);
+          let dst_u16 = std::mem::transmute(dst);
+          return func(src_u16, dst_u16);
+        }
+      }
+    }
+  }
+
+  crate::dist::rust::get_satd(dst, src, w, h, bit_depth, _cpu)
 }
