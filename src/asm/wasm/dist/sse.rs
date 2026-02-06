@@ -38,7 +38,7 @@ where
     )
   };
 
-  let den = DistortionScale::new(1, 1 << 12).0 as u64;
+  let den = DistortionScale::new(1, 1 << 8).0 as u64;
 
   let dist = unsafe {
     let mut acc = 0u64;
@@ -49,7 +49,7 @@ where
 
     for r in (0..h).step_by(4) {
       for c in (0..w).step_by(4) {
-        let s_val = *scale.as_ptr().add((r >> 3) * scale_stride + (c >> 3));
+        let s_val = *scale.as_ptr().add((r >> 2) * scale_stride + (c >> 2));
 
         let mut block_sse = 0u64;
 
