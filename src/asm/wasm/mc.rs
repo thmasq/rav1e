@@ -42,13 +42,10 @@ unsafe fn filter_8tap_h_u8_8wide(
   let mut sum_hi = i32x4_splat(0);
 
   for k in 0..8 {
-    let p_u8 = v128_load64_zero(src.offset(k as isize) as *const u64);
-    let p_i16 = u16x8_extend_low_u8x16(p_u8);
+    let p_i16 = u16x8_load_extend_u8x8(src.offset(k as isize));
 
-    let term_i16 = i16x8_mul(p_i16, coeffs[k]);
-
-    sum_lo = i32x4_add(sum_lo, i32x4_extend_low_i16x8(term_i16));
-    sum_hi = i32x4_add(sum_hi, i32x4_extend_high_i16x8(term_i16));
+    sum_lo = i32x4_add(sum_lo, i32x4_extmul_low_i16x8(p_i16, coeffs[k]));
+    sum_hi = i32x4_add(sum_hi, i32x4_extmul_high_i16x8(p_i16, coeffs[k]));
   }
   (sum_lo, sum_hi)
 }
@@ -279,10 +276,23 @@ unsafe fn prep_8tap_u8(
 
   match (col_frac, row_frac) {
     (0, 0) => {
+      let src_ptr = src.as_ptr();
+      let src_stride = src.plane.geometry().stride.get();
+
       for r in 0..height {
-        let src_row = src.row(r);
-        for c in 0..width {
-          tmp[r * width + c] = (src_row[c] as i16) << 4;
+        let src_row = src_ptr.offset((r as isize) * (src_stride as isize));
+        let tmp_row = tmp.as_mut_ptr().add(r * width);
+        let mut c = 0;
+
+        while c + 8 <= width {
+          let val = u16x8_load_extend_u8x8(src_row.add(c));
+          let shifted = i16x8_shl(val, 4);
+          v128_store(tmp_row.add(c) as *mut v128, shifted);
+          c += 8;
+        }
+
+        for i in c..width {
+          *tmp_row.add(i) = (*src_row.add(i) as i16) << 4;
         }
       }
     }
@@ -303,11 +313,13 @@ unsafe fn prep_8tap_u8(
           for k in 0..8 {
             let p_ptr = src_row_ptr
               .offset((k as isize) * (src_stride as isize) + c as isize);
-            let p_u8 = v128_load64_zero(p_ptr as *const u64);
-            let p_i16 = u16x8_extend_low_u8x16(p_u8);
-            let term = i16x8_mul(p_i16, y_coeffs[k]);
-            sum_lo = i32x4_add(sum_lo, i32x4_extend_low_i16x8(term));
-            sum_hi = i32x4_add(sum_hi, i32x4_extend_high_i16x8(term));
+
+            let p_i16 = u16x8_load_extend_u8x8(p_ptr);
+
+            sum_lo =
+              i32x4_add(sum_lo, i32x4_extmul_low_i16x8(p_i16, y_coeffs[k]));
+            sum_hi =
+              i32x4_add(sum_hi, i32x4_extmul_high_i16x8(p_i16, y_coeffs[k]));
           }
 
           let round = i32x4_splat(1 << 2);
