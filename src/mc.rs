@@ -12,6 +12,8 @@ cfg_if::cfg_if! {
     pub use crate::asm::x86::mc::*;
   } else if #[cfg(asm_neon)] {
     pub use crate::asm::aarch64::mc::*;
+  } else if #[cfg(all(target_arch = "wasm32", target_feature = "simd128"))] {
+    pub use crate::asm::wasm::mc::*;
   } else {
     pub use self::rust::*;
   }
@@ -107,7 +109,7 @@ pub enum FilterMode {
 
 pub const SUBPEL_FILTER_SIZE: usize = 8;
 
-const SUBPEL_FILTERS: [[[i32; SUBPEL_FILTER_SIZE]; 16]; 6] = [
+pub(crate) const SUBPEL_FILTERS: [[[i32; SUBPEL_FILTER_SIZE]; 16]; 6] = [
   [
     [0, 0, 0, 128, 0, 0, 0, 0],
     [0, 2, -6, 126, 8, -2, 0, 0],
