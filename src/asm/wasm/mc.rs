@@ -235,10 +235,8 @@ unsafe fn put_8tap_u8(
               let int_ptr = intermediate.as_ptr().add((r + k) * 8);
               let val = v128_load(int_ptr as *const v128);
 
-              let term_lo =
-                i32x4_extend_low_i16x8(i16x8_mul(val, y_coeffs[k]));
-              let term_hi =
-                i32x4_extend_high_i16x8(i16x8_mul(val, y_coeffs[k]));
+              let term_lo = i32x4_extmul_low_i16x8(val, y_coeffs[k]);
+              let term_hi = i32x4_extmul_high_i16x8(val, y_coeffs[k]);
 
               sum_lo = i32x4_add(sum_lo, term_lo);
               sum_hi = i32x4_add(sum_hi, term_hi);
