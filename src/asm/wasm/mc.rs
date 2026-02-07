@@ -440,6 +440,11 @@ pub fn put_8tap<T: Pixel>(
 ) {
   if T::type_enum() == PixelType::U8 {
     unsafe {
+      debug_assert_eq!(height & 1, 0);
+      debug_assert!(width.is_power_of_two() && (2..=128).contains(&width));
+      debug_assert!(dst.rect().width >= width && dst.rect().height >= height);
+      debug_assert!(src.accessible(width + 4, height + 4));
+
       let dst_u8 = &mut *(dst as *mut PlaneRegionMut<'_, T>
         as *mut PlaneRegionMut<'_, u8>);
       // SAFETY: Checked T == u8, PlaneSlice internal layout is compatible for reinterpretation.
@@ -464,6 +469,9 @@ pub fn prep_8tap<T: Pixel>(
 ) {
   if T::type_enum() == PixelType::U8 {
     unsafe {
+      assert_eq!(height & 1, 0);
+      assert!(width.is_power_of_two() && (2..=128).contains(&width));
+
       // SAFETY: Checked T == u8.
       let src_u8 = transmute::<PlaneSlice<'_, T>, PlaneSlice<'_, u8>>(src);
       prep_8tap_u8(
