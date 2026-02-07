@@ -12,8 +12,6 @@ cfg_if::cfg_if! {
     pub use crate::asm::x86::dist::*;
   } else if #[cfg(asm_neon)] {
     pub use crate::asm::aarch64::dist::*;
-  } else if #[cfg(all(target_arch = "wasm32", target_feature = "simd128"))] {
-    pub(crate) use crate::asm::wasm::dist::*;
   } else {
     pub use self::rust::*;
   }
