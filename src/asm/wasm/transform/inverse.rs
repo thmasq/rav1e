@@ -6,6 +6,8 @@ use crate::util::Pixel;
 use std::arch::wasm32::*;
 
 const SQRT2: i32 = 5793;
+const INV_SQRT2: i32 = 5793;
+const SQRT2_BITS: i32 = 13;
 const INV_COS_BIT: i32 = 12;
 
 static COSPI_INV: [i32; 64] = [
@@ -544,6 +546,13 @@ unsafe fn inv_txfm_add_4x4(
   for (i, row) in input.chunks(4).take(4).enumerate() {
     work[i] = i32x4_load_extend_i16x4(row.as_ptr());
   }
+
+  if tx_type == TxType::WHT_WHT {
+    for i in 0..4 {
+      work[i] = i32x4_shr(work[i], 2);
+    }
+  }
+
   transpose_4x4(&mut work);
 
   match tx_type_row {
@@ -605,7 +614,13 @@ unsafe fn inv_txfm_add_generic(
       let mut blk = [i32x4_splat(0); 4];
       for i in 0..4 {
         if r + i < h {
-          blk[i] = i32x4_load_extend_i16x4(input[(r + i) * w + c..].as_ptr());
+          let val = i32x4_load_extend_i16x4(input[(r + i) * w + c..].as_ptr());
+          if (w == 2 * h) || (h == 2 * w) {
+            let multiplier = i32x4_splat(INV_SQRT2);
+            blk[i] = round_shift(i32x4_mul(val, multiplier), SQRT2_BITS);
+          } else {
+            blk[i] = val;
+          }
         }
       }
       transpose_4x4(&mut blk);
