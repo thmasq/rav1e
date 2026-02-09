@@ -576,7 +576,11 @@ unsafe fn inv_txfm_add_4x4(
     let dest_ptr = output[i].as_mut_ptr();
     let d_u8 = v128_load32_zero(dest_ptr as *const u32);
     let d_i32 = u32x4_extend_low_u16x8(u16x8_extend_low_u8x16(d_u8));
-    let res = i32x4_add(d_i32, *v);
+    let res = if tx_type == TxType::WHT_WHT {
+      i32x4_add(d_i32, *v)
+    } else {
+      i32x4_add(d_i32, round_shift(*v, 4))
+    };
     let res_clamped =
       i32x4_min(i32x4_splat(255), i32x4_max(i32x4_splat(0), res));
     let res_u16 = i16x8_narrow_i32x4(res_clamped, res_clamped);
@@ -587,7 +591,7 @@ unsafe fn inv_txfm_add_4x4(
 
 unsafe fn inv_txfm_add_generic(
   input: &[i16], output: &mut PlaneRegionMut<'_, u8>, tx_type: TxType,
-  bd: usize, w: usize, h: usize,
+  bd: usize, w: usize, h: usize, shift: i32,
 ) {
   let (tx_type_col, tx_type_row) = get_1d_tx_types(tx_type);
   let range = bd + 8;
@@ -660,7 +664,16 @@ unsafe fn inv_txfm_add_generic(
         buffer[(c + 2) * (h / 4) + r_chunk],
         buffer[(c + 3) * (h / 4) + r_chunk],
       ];
+
       transpose_4x4(&mut blk);
+
+      if shift != 0 {
+        blk[0] = round_shift(blk[0], shift);
+        blk[1] = round_shift(blk[1], shift);
+        blk[2] = round_shift(blk[2], shift);
+        blk[3] = round_shift(blk[3], shift);
+      }
+
       col_input[r_chunk * 4 + 0] = blk[0];
       col_input[r_chunk * 4 + 1] = blk[1];
       col_input[r_chunk * 4 + 2] = blk[2];
@@ -706,7 +719,8 @@ unsafe fn inv_txfm_add_generic(
       let dest_ptr = output[i].as_mut_ptr().add(c);
       let d_u8 = v128_load32_zero(dest_ptr as *const u32);
       let d_i32 = u32x4_extend_low_u16x8(u16x8_extend_low_u8x16(d_u8));
-      let r_val = i32x4_add(d_i32, res[i]);
+      let r_shifted = round_shift(res[i], 4);
+      let r_val = i32x4_add(d_i32, r_shifted);
       let r_clamped =
         i32x4_min(i32x4_splat(255), i32x4_max(i32x4_splat(0), r_val));
       let r_u16 = i16x8_narrow_i32x4(r_clamped, r_clamped);
@@ -745,25 +759,28 @@ pub fn inverse_transform_add<T: Pixel>(
       inv_txfm_add_4x4(input_i16, output_u8, tx_type, bd)
     },
     TxSize::TX_8X8 => unsafe {
-      inv_txfm_add_generic(input_i16, output_u8, tx_type, bd, 8, 8)
+      inv_txfm_add_generic(input_i16, output_u8, tx_type, bd, 8, 8, 1)
     },
     TxSize::TX_4X8 => unsafe {
-      inv_txfm_add_generic(input_i16, output_u8, tx_type, bd, 4, 8)
+      inv_txfm_add_generic(input_i16, output_u8, tx_type, bd, 4, 8, 0)
     },
     TxSize::TX_8X4 => unsafe {
-      inv_txfm_add_generic(input_i16, output_u8, tx_type, bd, 8, 4)
+      inv_txfm_add_generic(input_i16, output_u8, tx_type, bd, 8, 4, 0)
+    },
+    TxSize::TX_16X16 => unsafe {
+      inv_txfm_add_generic(input_i16, output_u8, tx_type, bd, 16, 16, 2)
     },
     TxSize::TX_16X8 => unsafe {
-      inv_txfm_add_generic(input_i16, output_u8, tx_type, bd, 16, 8)
+      inv_txfm_add_generic(input_i16, output_u8, tx_type, bd, 16, 8, 1)
     },
     TxSize::TX_8X16 => unsafe {
-      inv_txfm_add_generic(input_i16, output_u8, tx_type, bd, 8, 16)
+      inv_txfm_add_generic(input_i16, output_u8, tx_type, bd, 8, 16, 1)
     },
     TxSize::TX_16X4 => unsafe {
-      inv_txfm_add_generic(input_i16, output_u8, tx_type, bd, 16, 4)
+      inv_txfm_add_generic(input_i16, output_u8, tx_type, bd, 16, 4, 1)
     },
     TxSize::TX_4X16 => unsafe {
-      inv_txfm_add_generic(input_i16, output_u8, tx_type, bd, 4, 16)
+      inv_txfm_add_generic(input_i16, output_u8, tx_type, bd, 4, 16, 1)
     },
     _ => {
       crate::transform::inverse::rust::inverse_transform_add(
